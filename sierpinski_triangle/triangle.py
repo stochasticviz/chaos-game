@@ -21,8 +21,9 @@ pygame.display.set_caption('Quick Start')
 surface = pygame.display.set_mode((800, 600))
 background = pygame.Surface((800, 600))
 background.fill(pygame.Color('#000000'))
-is_running = True
+ITERATIONS_BETWEEN_DISPLAY_UPDATES=100  # try 10 or 100
 
+is_running = True
 x=10
 y=100
 color = (220,220,254)
@@ -37,5 +38,7 @@ while is_running:
      target = random.choice(targets)
      point = (int((point[0]+target[0])/2) , int((point[1]+target[1])/2))
      i = i + 1
-     if (i % 100) == 0:
+     if (i % ITERATIONS_BETWEEN_DISPLAY_UPDATES) == 0:  # this is an opt to update the display less frequently
         pygame.display.update()
+        if (i % 10000) == 0:
+            print("i=",i)
