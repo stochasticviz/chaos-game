@@ -58,7 +58,7 @@ Z = np.array(Z).astype(float)
 fig = plt.figure(figsize=(12,10))
 ax = fig.add_subplot(111, projection='3d')
 
-ax.scatter3D(X, Y, Z, s=1, c='black', alpha=.2)
+ax.scatter3D(X, Y, Z, s=1, c='black', alpha=.1)
 plt.show()
 import time
 time.sleep(5)
