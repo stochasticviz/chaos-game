@@ -41,4 +41,4 @@ while is_running:
      if (i % ITERATIONS_BETWEEN_DISPLAY_UPDATES) == 0:  # this is an opt to update the display less frequently
         pygame.display.update()
         if (i % 10000) == 0:
-            print("i=",i)
+            print("points count=",i)

@@ -41,7 +41,7 @@ while i < POINTS_COUNT_TARGET:
     Y.append(point[1])
     Z.append(point[2])
     if (i % ITERATIONS_BETWEEN_DISPLAY_UPDATES) == 0:  # this is an opt to update the display less frequently
-        print("i=",i," making numpy arrays. point=",point)
+        print("points count:",i," making numpy arrays. point=",point)
         ax.scatter3D(np.array(X), np.array(Y), np.array(Z), s=.1, c='black', alpha=.1)  # "s" is the size (diameter) of point
         plt.draw()
         plt.pause(.2)
