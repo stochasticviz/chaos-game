@@ -2,20 +2,12 @@
 '''
 Makes a 3D sierpinski triangle.
 
-
-This worked for me 2022-10-07:
-conda create -c conda-forge -n pygame_1 python=3.10  #
-conda activate pygame_1
-python -m pip install pygame
-
-# INSTALL PYGAME  (the first 3 steps worked to run the other script, triangle.py)
-conda create -c conda-forge -n pygame_1 python=3.10
-conda activate pygame_1
-python -m pip install pygame
-python -m pip install --upgrade matplotlib
+First make a conda env, as in triangle.py
+Then
+    python -m pip install --upgrade matplotlib
 
 # RUN IT:
-python3.9 triangle.make.array.3d.py
+    python3.9 triangle.make.array.3d.py
 
 '''
 
