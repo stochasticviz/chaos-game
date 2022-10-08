@@ -1,3 +1,17 @@
+'''
+Makes a (2D) sierpinski triangle.
+
+This worked for me 2022-10-07:
+# INSTALL PYGAME
+conda create -c conda-forge -n pygame_1 python=3.10
+conda activate pygame_1
+python -m pip install pygame
+
+# RUN IT:
+python ./triangle.py
+
+'''
+
 import pygame
 from pygame import gfxdraw
 import random
