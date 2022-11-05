@@ -22,8 +22,6 @@ pygame.display.set_caption('Quick Start')
 surface = pygame.display.set_mode((800, 600))
 background = pygame.Surface((800, 800))
 background.fill(pygame.Color('#000000'))
-POINTS_COUNT_TARGET = 200000
-ITERATIONS_BETWEEN_DISPLAY_UPDATES=1000  # try 10 or 100
 
 is_running = True
 color = (220,220,254)
@@ -36,6 +34,7 @@ color = (220,220,254)
 #(500,637),
 #(600,637),
 #(650,550))
+
 
 # use https://www.mathopenref.com/coordpolycalc.html  to find coordinates of polygon vertices
 targets_6=((500,227),
@@ -72,7 +71,15 @@ targets_9=((400,100),
 (695,348),
 (593,170))
 
-targets = targets_6
+targets_3=((10,10),
+(200,570),
+(600,44))
+
+
+POINTS_COUNT_TARGET = 200000
+ITERATIONS_BETWEEN_DISPLAY_UPDATES=1000  # try 10 or 100
+
+targets = targets_3
 point = (100,100)
 i = 0
 while is_running:
