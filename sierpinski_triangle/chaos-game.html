@@ -15,6 +15,16 @@
       display: block;
       margin-top: 1em;
     }
+    /* Spinner styles */
+    #spinner {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2em;
+      color: #555;
+    }
   </style>
 </head>
 <body>
@@ -32,6 +42,7 @@
   <button id="generateBtn">Generate</button>
 </div>
 
+<div id="spinner">Loading...</div>
 <canvas id="myCanvas" width="800" height="800"></canvas>
 
 <script>
@@ -120,23 +131,31 @@ function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) 
  * Reads the input values from the DOM, generates the fractal points,
  * and then draws them on the canvas with partial transparency.
  */
+// Show or hide the spinner
+function toggleSpinner(show) {
+  const spinner = document.getElementById('spinner');
+  spinner.style.display = show ? 'block' : 'none';
+}
+
 function generateAndDraw() {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
-  // Generate points
-  const points = generatePolygonPoints2d(vertices, steps);
+  toggleSpinner(true); // Show spinner
 
-  // Get the canvas context
-  const canvas = document.getElementById('myCanvas');
-  const ctx = canvas.getContext('2d');
+  // Use setTimeout to allow the spinner to show before computation starts
+  setTimeout(() => {
+    const points = generatePolygonPoints2d(vertices, steps);
 
-  // Draw the points
-  drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
+
+    toggleSpinner(false); // Hide spinner
+  }, 0);
 }
-
-// ------------------ Event wiring ------------------
 
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
 
