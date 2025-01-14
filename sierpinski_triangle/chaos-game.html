@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Chaos Game in JavaScript with Transparency</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    #controls {
+      margin-bottom: 1em;
+    }
+    #myCanvas {
+      border: 1px solid #555;
+      display: block;
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+
+<div id="controls">
+  <label for="vertices">Polygon Vertices:</label>
+  <input type="number" id="vertices" value="3" min="2" max="100" />
+
+  <label for="steps">Steps:</label>
+  <input type="number" id="steps" value="16384" min="1" />
+
+  <label for="alpha">Alpha (transparency, 0.0 - 1.0):</label>
+  <input type="number" id="alpha" value="0.1" step="0.01" min="0" max="1" />
+
+  <button id="generateBtn">Generate</button>
+</div>
+
+<canvas id="myCanvas" width="800" height="800"></canvas>
+
+<script>
+// ------------------ Utility functions ------------------
+
+/**
+ * Returns an (x, y) coordinate for a circle at angle theta,
+ * centered at (x_center, y_center) with the given radius.
+ */
+function getCircleCoord(theta, x_center, y_center, radius) {
+  const x = radius * Math.cos(theta) + x_center;
+  const y = radius * Math.sin(theta) + x_center;
+  return { x, y };
+}
+
+/**
+ * Returns an array of (x, y) coordinates for polygonOrder points
+ * evenly spaced on a circle (center=(0,0), radius=750).
+ */
+function getAllCircleCoords(x_center, y_center, radius, n_points) {
+  const circleCoords = [];
+  for (let i = 0; i < n_points; i++) {
+    // Like Python: theta = (i / n_points * 2*pi) + 0.5
+    const theta = (i / n_points) * 2 * Math.PI + 0.5;
+    circleCoords.push(getCircleCoord(theta, x_center, y_center, radius));
+  }
+  return circleCoords;
+}
+
+/**
+ * Generates "Chaos Game" points by repeatedly picking a random
+ * circle vertex and moving halfway toward it from the current point.
+ */
+function generatePolygonPoints2d(polygonOrder, steps) {
+  const targets = getAllCircleCoords(0, 0, 750, polygonOrder);
+
+  let x = 100.0;
+  let y = 100.0;
+
+  const points = [];
+  for (let i = 0; i < steps; i++) {
+    // Pick a random target
+    const randIndex = Math.floor(Math.random() * targets.length);
+    const tx = targets[randIndex].x;
+    const ty = targets[randIndex].y;
+
+    // Move halfway
+    x = (x + tx) / 2.0;
+    y = (y + ty) / 2.0;
+
+    points.push({ x, y });
+  }
+  return points;
+}
+
+// ------------------ Rendering logic ------------------
+
+/**
+ * Given an array of {x, y} points, draw them onto the canvas.
+ * We map the mathematical coordinates to canvas coordinates.
+ */
+function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) {
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  // Optionally scale/translate so everything fits nicely.
+  // The code uses a circle radius = 750, so let's scale down to ~800x800.
+  const scale = 0.4;
+  const offsetX = canvasWidth / 2;
+  const offsetY = canvasHeight / 2;
+
+  // Apply the specified transparency to all draw calls
+  ctx.globalAlpha = alphaValue;
+
+  // Draw each point
+  ctx.fillStyle = "black";
+  for (let i = 0; i < points.length; i++) {
+    const sx = points[i].x * scale + offsetX;
+    const sy = points[i].y * scale + offsetY;
+    // You can draw a 1x1 pixel rectangle for speed
+    ctx.fillRect(sx, sy, 1, 1);
+  }
+}
+
+/**
+ * Reads the input values from the DOM, generates the fractal points,
+ * and then draws them on the canvas with partial transparency.
+ */
+function generateAndDraw() {
+  const vertices = parseInt(document.getElementById('vertices').value, 10);
+  const steps = parseInt(document.getElementById('steps').value, 10);
+  const alphaValue = parseFloat(document.getElementById('alpha').value);
+
+  // Generate points
+  const points = generatePolygonPoints2d(vertices, steps);
+
+  // Get the canvas context
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Draw the points
+  drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
+}
+
+// ------------------ Event wiring ------------------
+
+document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
+
+// Optionally, generate on initial page load
+generateAndDraw();
+</script>
+</body>
+</html>
