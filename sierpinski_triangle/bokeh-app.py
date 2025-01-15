@@ -110,12 +110,5 @@ def create_interactive_plot():
 
     )
 
-# Main function
-def main():
-    interactive_plot = create_interactive_plot()
-    print("Starting Bokeh server with sliders... Open the link in your browser.")
-    pn.serve(interactive_plot, port=5006, show=True, title='Fooling around with the Chaos game')
-
-# Run script
-if __name__ == "__main__":
-    main()
+print("Starting chaos game Bokeh app server... Open the link in your browser.")
+create_interactive_plot().servable()
