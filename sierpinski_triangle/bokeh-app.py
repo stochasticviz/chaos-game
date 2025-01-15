@@ -17,13 +17,17 @@ def get_all_circle_coords(x_center, y_center, radius, n_points):
     circle_coords = [get_circle_coord(theta, x_center, y_center, radius) for theta in thetas]
     return circle_coords
 
-def generate_polygon_points_2d(polygon_order, steps):
+def generate_polygon_points_2d(polygon_order, steps, scalar):
+    # print(f"Generating polygon points for polygon_order={polygon_order}, steps={steps}, scalar={scalar}")
     targets = get_all_circle_coords(x_center=0, y_center=0, radius=750, n_points=polygon_order)
     points = []
-    point = (100, 100)
+    point = (100, 100)  # it doesn't matter where you start
     for _ in range(steps):
         target = random.choice(targets)
-        point = ((point[0] + target[0]) / 2.0, (point[1] + target[1]) / 2.0)
+        #point = ((point[0] + target[0]) / 2, (point[1] + target[1]) / 2)    # old way
+        delta_v = (target[0] - point[0], target[1] - point[1])
+        delta_v_scaled = (delta_v[0] * scalar, delta_v[1] * scalar)
+        point = (point[0] + delta_v_scaled[0], point[1] + delta_v_scaled[1])
         points.append(point)
     return points
 
@@ -52,12 +56,12 @@ def generate_polygon_points_2d_optimized(polygon_order, steps):
 
 # Cached Holoviews Points object
 cache = {}
-def make_holoviz_polygon_points_obj(vertices, steps):
-    if (vertices, steps) not in cache:
-        points_obj = hv.Points(generate_polygon_points_2d(vertices, steps))
+def make_holoviz_polygon_points_obj(vertices, steps, scalar):
+    if (vertices, steps, scalar) not in cache:
+        points_obj = hv.Points(generate_polygon_points_2d(vertices, steps, scalar))
         points_obj.opts(color='k', size=.1)
-        cache[(vertices, steps)] = rasterize(points_obj, dynamic=False, width=800, height=800)
-    return cache[(vertices, steps)]
+        cache[(vertices, steps, scalar)] = rasterize(points_obj, dynamic=False, width=800, height=800)
+    return cache[(vertices, steps, scalar)]
 
 
 # Create panel layout
@@ -81,11 +85,13 @@ def create_interactive_plot():
         make_holoviz_polygon_points_obj,
         kdims=[
             hv.Dimension("steps", default=16384, label="Steps"),
-            hv.Dimension("vertices", default=3, label="Polygon Vertices")
+            hv.Dimension("vertices", default=3, label="Polygon Vertices"),
+            hv.Dimension("scalar", label="scalar of vector")
         ]
     ).redim.values(
         vertices=np.arange(2, 50, 1),
-        steps=np.power(2, np.arange(8, 25))
+        steps=np.power(2, np.arange(8, 25)),
+        scalar=np.arange(.2, 3, .1)
     ).opts(width=800, height=800)
     # Bind sliders to the DynamicMap via parameters
     #sierpinksi_gasket_polygon_live_view = hv.DynamicMap(
