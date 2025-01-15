@@ -67,20 +67,6 @@ def make_holoviz_polygon_points_obj(vertices, steps, scalar):
 # Create panel layout
 def create_interactive_plot():
     # Create sliders
-
-    '''
-    sierpinksi_gasket_polygon_live_view = hv.DynamicMap(
-        make_holoviz_polygon_points_obj,
-        kdims=["vertices", "steps"]
-    ).redim.values(
-        vertices=np.arange(3, 50, 1),  # Discrete values for vertices
-        steps=np.power(2, np.arange(3, 25))  # Discrete values for steps
-    ).redim(
-        vertices=hv.Dimension("vertices", default=6),
-        steps=hv.Dimension("steps", default=8)
-    ).opts(width=800, height=800)
-    '''
-
     sierpinksi_gasket_polygon_live_view = hv.DynamicMap(
         make_holoviz_polygon_points_obj,
         kdims=[
