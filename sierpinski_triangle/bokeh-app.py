@@ -55,14 +55,18 @@ def generate_polygon_points_2d_optimized(polygon_order, steps):
     return points
 
 # Cached Holoviews Points object
-cache = {}
-def make_holoviz_polygon_points_obj(vertices, steps, scalar):
+#cache = {}
+def make_holoviz_polygon_points_obj__with_cache(vertices, steps, scalar):
     if (vertices, steps, scalar) not in cache:
         points_obj = hv.Points(generate_polygon_points_2d(vertices, steps, scalar))
         points_obj.opts(color='k', size=.1)
         cache[(vertices, steps, scalar)] = rasterize(points_obj, dynamic=False, width=800, height=800)
     return cache[(vertices, steps, scalar)]
 
+def make_holoviz_polygon_points_obj(vertices, steps, scalar):
+    points_obj = hv.Points(generate_polygon_points_2d(vertices, steps, scalar))
+    points_obj.opts(color='k')
+    return points_obj
 
 # Create panel layout
 def create_interactive_plot():
@@ -72,13 +76,17 @@ def create_interactive_plot():
         kdims=[
             hv.Dimension("steps", default=16384, label="Steps"),
             hv.Dimension("vertices", default=3, label="Polygon Vertices"),
-            hv.Dimension("scalar", label="scalar of vector")
+            hv.Dimension("scalar", label="scalar of vector"),
         ]
     ).redim.values(
         vertices=np.arange(2, 50, 1),
         steps=np.power(2, np.arange(8, 25)),
         scalar=np.arange(.2, 3, .1)
-    ).opts(width=800, height=800)
+    )
+
+    rasterized_dynamic_map = rasterize(sierpinksi_gasket_polygon_live_view, dynamic=True).opts(height=1000, width=1000, responsive=True)
+
+
     # Bind sliders to the DynamicMap via parameters
     #sierpinksi_gasket_polygon_live_view = hv.DynamicMap(
     #    make_holoviz_polygon_points_obj,
