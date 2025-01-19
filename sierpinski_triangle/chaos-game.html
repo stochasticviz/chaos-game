@@ -15,7 +15,7 @@
       display: block;
       margin-top: 1em;
     }
-    #spinner {
+    #progressIndicator {
       display: none;
       position: fixed;
       top: 50%;
@@ -31,7 +31,7 @@
   </style>
 </head>
 <body>
-<div id="spinner">Generating pixels...</div>
+<div id="progressIndicator">Generating pixels...</div>
 <div id="controls">
   <label for="vertices">Polygon Vertices:</label>
   <input type="number" id="vertices" value="3" min="2" max="100" />
@@ -126,9 +126,9 @@ function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) 
   }
 }
 
-function toggleSpinner(show) {
-  const spinner = document.getElementById('spinner');
-  spinner.style.display = show ? 'block' : 'none';
+function toggleProgressIndicator(show) {
+  const progressIndicator = document.getElementById('progressIndicator');
+  progressIndicator.style.display = show ? 'block' : 'none';
 }
 
 async function generateAndDraw() {
@@ -140,7 +140,7 @@ async function generateAndDraw() {
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
-  toggleSpinner(true);
+  toggleProgressIndicator(true);
 
   try {
     const cacheKey = getCacheKey(vertices, steps, alphaValue);
@@ -153,11 +153,11 @@ async function generateAndDraw() {
     } else {
       console.log(`Generating new image for key: ${cacheKey}`);
 
-      // Add a small delay to ensure the spinner is visible
+      // Add a small delay to ensure the progressIndicator is visible
       await new Promise(resolve => setTimeout(resolve, 50));
 
       const points = await generatePolygonPoints2d(vertices, steps, (progress) => {
-        document.getElementById('spinner').textContent =
+        document.getElementById('progressIndicator').textContent =
           `Generating pixels... ${Math.round(progress * 100)}%`;
       });
 
@@ -167,7 +167,7 @@ async function generateAndDraw() {
   } catch (error) {
     console.error('Error generating fractal:', error);
   } finally {
-    toggleSpinner(false);
+    toggleProgressIndicator(false);
     generateBtn.disabled = false;
   }
 }
