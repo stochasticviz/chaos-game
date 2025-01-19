@@ -1,7 +1,11 @@
 import numpy as np
 import holoviews as hv
 import panel as pn  # Panel for widgets
+from holoviews.streams import Stream
+
 hv.extension('bokeh')  # Enable the Bokeh backend
+#hv.renderer('bokeh').theme = {'attrs': {'Figure': {'sizing_mode': 'stretch_both'}}}
+
 import random
 import math
 from holoviews.operation.datashader import rasterize
@@ -63,28 +67,50 @@ def make_holoviz_polygon_points_obj__with_cache(vertices, steps, scalar):
         cache[(vertices, steps, scalar)] = rasterize(points_obj, dynamic=False, width=800, height=800)
     return cache[(vertices, steps, scalar)]
 
-def make_holoviz_polygon_points_obj(vertices, steps, scalar):
-    points_obj = hv.Points(generate_polygon_points_2d(vertices, steps, scalar))
+def make_holoviz_polygon_points_obj(vertices, steps, numerator, denominator):
+    points_obj = hv.Points(generate_polygon_points_2d(vertices, steps, 1.0 * numerator / denominator))
     points_obj.opts(color='k')
     return points_obj
 
 # Create panel layout
 def create_interactive_plot():
+    #scalar_stream = Stream.define('has the scalar fraction', numerator=1, denominator=2)()
+
+    numerator_widget = pn.widgets.IntInput(name='numerator', start=-32, end=32, step=1, value=1)
+    #numerator_widget.link(scalar_stream, value='numerator')    # Link the slider's value to the stream (this updates the stream automatically)
+
+    denominator_widget = pn.widgets.IntInput(name='denominator', start=1, end=32, step=1, value=2)
+    #denominator_widget.link(scalar_stream, value='denominator')    # Link the slider's value to the stream (this updates the stream automatically)
+
+
+    #print(scalar_stream.param['numerator'].constant)  # Should print False
+    #print(scalar_stream.param['denominator'].constant)  # Should print False
+
+    #scalar_stream.param['numerator'].constant = False
+    #scalar_stream.param['denominator'].constant = False
+
     # Create sliders
     sierpinksi_gasket_polygon_live_view = hv.DynamicMap(
-        make_holoviz_polygon_points_obj,
+        pn.bind(make_holoviz_polygon_points_obj, numerator=numerator_widget, denominator=denominator_widget),
         kdims=[
             hv.Dimension("steps", default=16384, label="Steps"),
             hv.Dimension("vertices", default=3, label="Polygon Vertices"),
-            hv.Dimension("scalar", label="scalar of vector"),
+            #hv.Dimension("scalar", label="scalar of vector"),
         ]
+        #streams=[scalar_stream]
     ).redim.values(
         vertices=np.arange(2, 50, 1),
-        steps=np.power(2, np.arange(8, 25)),
-        scalar=np.arange(.2, 3, .1)
+        steps=np.power(2, np.arange(8, 25))
+        #, scalar=np.arange(.2, 3, .1)
     )
 
+
     rasterized_dynamic_map = rasterize(sierpinksi_gasket_polygon_live_view, dynamic=True).opts(height=1000, width=1000, responsive=True)
+
+    #numerator_input = pn.widgets.TextInput(name="Numerator", placeholder="Enter numerator")
+    #denominator_input = pn.widgets.TextInput(name="Denominator", placeholder="Enter denominator")
+            #hv.Dimension('numerator', default=1),
+            #hv.Dimension('denominator', default=2)
 
 
     # Bind sliders to the DynamicMap via parameters
@@ -99,10 +125,14 @@ def create_interactive_plot():
 
     return pn.Column(
         pn.pane.Markdown("Fool around with variations on the [Chaos game](https://www.youtube.com/watch?v=k3V72Qvcn94). Try bumping up the number of steps ->"),
-        sierpinksi_gasket_polygon_live_view,
+        rasterized_dynamic_map,
+        numerator_widget, denominator_widget,
         pn.pane.Markdown("(More vertices requires more steps)"),
 
     )
 
 print("Starting chaos game Bokeh app server... Open the link in your browser.")
 create_interactive_plot().servable()
+
+
+# WIWL: this doesn't work. I checked it into git to save where I was with this while I do something with the Javascript version  status:  https://chatgpt.com/c/6789a629-086c-8011-9b59-9306331dcf3a
