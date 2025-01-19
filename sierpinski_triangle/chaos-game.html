@@ -137,21 +137,26 @@ function generatePolygonPoints2d(steps, progressCallback) {
   });
 }
 
-function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) {
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  // Draw fractal points
-  ctx.globalAlpha = alphaValue;
-  ctx.fillStyle = "black";
-
-  for (let i = 0; i < points.length; i++) {
-    const {x, y} = toCanvasCoords(points[i].x, points[i].y);
-    ctx.fillRect(x, y, 1, 1);
-  }
-
-  // Draw vertices with handles
+function drawVerticesOnCanvas(ctx) {
+  // Draw lines between vertices
   ctx.globalAlpha = 1.0;
-
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)';
+  ctx.lineWidth = 1;
+  targets.forEach((target, i) => {
+    const {x, y} = toCanvasCoords(target.x, target.y);
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  // Close the polygon
+  if (targets.length > 0) {
+    const first = toCanvasCoords(targets[0].x, targets[0].y);
+    ctx.lineTo(first.x, first.y);
+  }
+  ctx.stroke();
 
   // Draw vertex handles
   targets.forEach((target, i) => {
@@ -176,6 +181,22 @@ function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) 
     ctx.font = '12px sans-serif';
     ctx.fillText(i + 1, x, y);
   });
+}
+
+function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) {
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  // Draw fractal points
+  ctx.globalAlpha = alphaValue;
+  ctx.fillStyle = "black";
+
+  for (let i = 0; i < points.length; i++) {
+    const {x, y} = toCanvasCoords(points[i].x, points[i].y);
+    ctx.fillRect(x, y, 1, 1);
+  }
+
+  // Draw vertices on top
+  drawVerticesOnCanvas(ctx);
 }
 
 function toggleSpinner(show) {
@@ -295,8 +316,14 @@ canvas.addEventListener('mouseleave', handleMouseUp);
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
 document.getElementById('resetBtn').addEventListener('click', () => {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
   initializeVertices(vertices);
-  //generateAndDraw();
+
+  // Clear canvas and only draw vertices
+  //ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawVerticesOnCanvas(ctx);
 });
 
 // Initial generation
