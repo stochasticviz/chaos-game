@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Chaos Game with Image Caching</title>
+  <title>Interactive Chaos Game</title>
   <style>
     body {
       font-family: sans-serif;
@@ -14,8 +14,12 @@
       border: 1px solid #555;
       display: block;
       margin-top: 1em;
+      cursor: default;
     }
-    #progressIndicator {
+    #myCanvas.dragging {
+      cursor: move;
+    }
+    #spinner {
       display: none;
       position: fixed;
       top: 50%;
@@ -31,7 +35,7 @@
   </style>
 </head>
 <body>
-<div id="progressIndicator">Generating pixels...</div>
+<div id="spinner">Generating pixels...</div>
 <div id="controls">
   <label for="vertices">Polygon Vertices:</label>
   <input type="number" id="vertices" value="3" min="2" max="100" />
@@ -43,39 +47,62 @@
   <input type="number" id="alpha" value="0.1" step="0.01" min="0" max="1" />
 
   <button id="generateBtn">Generate</button>
+  <button id="resetBtn">Reset Vertices</button>
 </div>
 
 <canvas id="myCanvas" width="800" height="800"></canvas>
 
 <script>
 const cache = {};
+let targets = [];  // Store vertex positions
+let isDragging = false;
+let draggedVertexIndex = -1;
+const VERTEX_RADIUS = 8;
+const HANDLE_RADIUS = 15; // Larger hit area for interaction
+
+// Transform between canvas and math coordinates
+const SCALE = 0.4;
+const CIRCLE_RADIUS = 750;
+
+function toCanvasCoords(x, y) {
+  const canvas = document.getElementById('myCanvas');
+  return {
+    x: x * SCALE + canvas.width / 2,
+    y: y * SCALE + canvas.height / 2
+  };
+}
+
+function toMathCoords(canvasX, canvasY) {
+  const canvas = document.getElementById('myCanvas');
+  return {
+    x: (canvasX - canvas.width / 2) / SCALE,
+    y: (canvasY - canvas.height / 2) / SCALE
+  };
+}
 
 function getCacheKey(vertices, steps, alpha) {
-  return `${vertices}_${steps}_${alpha}`;
+  return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}`;
 }
 
 function getCircleCoord(theta, x_center, y_center, radius) {
   const x = radius * Math.cos(theta) + x_center;
-  const y = radius * Math.sin(theta) + x_center;
+  const y = radius * Math.sin(theta) + y_center;
   return { x, y };
 }
 
-function getAllCircleCoords(x_center, y_center, radius, n_points) {
-  const circleCoords = [];
+function initializeVertices(n_points) {
+  targets = [];
   for (let i = 0; i < n_points; i++) {
     const theta = (i / n_points) * 2 * Math.PI + 0.5;
-    circleCoords.push(getCircleCoord(theta, x_center, y_center, radius));
+    targets.push(getCircleCoord(theta, 0, 0, CIRCLE_RADIUS));
   }
-  return circleCoords;
 }
 
-function generatePolygonPoints2d(polygonOrder, steps, progressCallback) {
-  const targets = getAllCircleCoords(0, 0, 750, polygonOrder);
+function generatePolygonPoints2d(steps, progressCallback) {
   let x = 100.0;
   let y = 100.0;
   const points = [];
 
-  // Break the generation into chunks
   const chunkSize = 1000;
   let currentStep = 0;
 
@@ -112,23 +139,48 @@ function generatePolygonPoints2d(polygonOrder, steps, progressCallback) {
 
 function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) {
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-  const scale = 0.4;
-  const offsetX = canvasWidth / 2;
-  const offsetY = canvasHeight / 2;
 
+  // Draw fractal points
   ctx.globalAlpha = alphaValue;
   ctx.fillStyle = "black";
 
   for (let i = 0; i < points.length; i++) {
-    const sx = points[i].x * scale + offsetX;
-    const sy = points[i].y * scale + offsetY;
-    ctx.fillRect(sx, sy, 1, 1);
+    const {x, y} = toCanvasCoords(points[i].x, points[i].y);
+    ctx.fillRect(x, y, 1, 1);
   }
+
+  // Draw vertices with handles
+  ctx.globalAlpha = 1.0;
+
+
+  // Draw vertex handles
+  targets.forEach((target, i) => {
+    const {x, y} = toCanvasCoords(target.x, target.y);
+
+    // Draw outer handle circle
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+    ctx.arc(x, y, HANDLE_RADIUS, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Draw inner vertex circle
+    ctx.beginPath();
+    ctx.fillStyle = i === draggedVertexIndex ? '#ff4444' : '#4444ff';
+    ctx.arc(x, y, VERTEX_RADIUS, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Add vertex number
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(i + 1, x, y);
+  });
 }
 
-function toggleProgressIndicator(show) {
-  const progressIndicator = document.getElementById('progressIndicator');
-  progressIndicator.style.display = show ? 'block' : 'none';
+function toggleSpinner(show) {
+  const spinner = document.getElementById('spinner');
+  spinner.style.display = show ? 'block' : 'none';
 }
 
 async function generateAndDraw() {
@@ -136,13 +188,17 @@ async function generateAndDraw() {
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
-  // Disable the generate button
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
-  toggleProgressIndicator(true);
+  toggleSpinner(true);
 
   try {
+    // Initialize vertices if needed
+    if (targets.length !== vertices) {
+      initializeVertices(vertices);
+    }
+
     const cacheKey = getCacheKey(vertices, steps, alphaValue);
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
@@ -153,11 +209,10 @@ async function generateAndDraw() {
     } else {
       console.log(`Generating new image for key: ${cacheKey}`);
 
-      // Add a small delay to ensure the progressIndicator is visible
       await new Promise(resolve => setTimeout(resolve, 50));
 
-      const points = await generatePolygonPoints2d(vertices, steps, (progress) => {
-        document.getElementById('progressIndicator').textContent =
+      const points = await generatePolygonPoints2d(steps, (progress) => {
+        document.getElementById('spinner').textContent =
           `Generating pixels... ${Math.round(progress * 100)}%`;
       });
 
@@ -167,12 +222,84 @@ async function generateAndDraw() {
   } catch (error) {
     console.error('Error generating fractal:', error);
   } finally {
-    toggleProgressIndicator(false);
+    toggleSpinner(false);
     generateBtn.disabled = false;
   }
 }
 
+// Mouse interaction handlers
+function getVertexAtPosition(canvasX, canvasY) {
+  for (let i = 0; i < targets.length; i++) {
+    const {x, y} = toCanvasCoords(targets[i].x, targets[i].y);
+    const dx = x - canvasX;
+    const dy = y - canvasY;
+    if (dx * dx + dy * dy < HANDLE_RADIUS * HANDLE_RADIUS) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function handleMouseMove(e) {
+  const canvas = document.getElementById('myCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  if (isDragging && draggedVertexIndex !== -1) {
+    const mathCoords = toMathCoords(x, y);
+    targets[draggedVertexIndex] = mathCoords;
+
+    // Redraw immediately with current points
+    const ctx = canvas.getContext('2d');
+    const alphaValue = parseFloat(document.getElementById('alpha').value);
+    drawPointsOnCanvas(ctx, [], canvas.width, canvas.height, alphaValue);
+
+    // Debounced regeneration
+    clearTimeout(canvas.regenerateTimeout);
+    canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
+  } else {
+    // Update cursor based on hover
+    const hoveredIndex = getVertexAtPosition(x, y);
+    canvas.style.cursor = hoveredIndex !== -1 ? 'move' : 'default';
+  }
+}
+
+function handleMouseDown(e) {
+  const canvas = document.getElementById('myCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  draggedVertexIndex = getVertexAtPosition(x, y);
+  if (draggedVertexIndex !== -1) {
+    isDragging = true;
+    canvas.classList.add('dragging');
+  }
+}
+
+function handleMouseUp() {
+  const canvas = document.getElementById('myCanvas');
+  isDragging = false;
+  draggedVertexIndex = -1;
+  canvas.classList.remove('dragging');
+}
+
+// Setup event listeners
+const canvas = document.getElementById('myCanvas');
+canvas.addEventListener('mousemove', handleMouseMove);
+canvas.addEventListener('mousedown', handleMouseDown);
+canvas.addEventListener('mouseup', handleMouseUp);
+canvas.addEventListener('mouseleave', handleMouseUp);
+
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  const vertices = parseInt(document.getElementById('vertices').value, 10);
+  initializeVertices(vertices);
+  //generateAndDraw();
+});
+
+// Initial generation
 generateAndDraw();
 </script>
 </body>
