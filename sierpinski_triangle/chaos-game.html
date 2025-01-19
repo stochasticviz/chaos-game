@@ -15,15 +15,18 @@
       display: block;
       margin-top: 1em;
     }
-    /* Spinner styles */
     #spinner {
-      display: none; /* Hidden by default */
+      display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 2em;
       color: #555;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 8px;
+      z-index: 1000;
     }
   </style>
 </head>
@@ -45,89 +48,77 @@
 <canvas id="myCanvas" width="800" height="800"></canvas>
 
 <script>
-// ------------------ Cache Setup ------------------
 const cache = {};
 
-/**
- * Generate a unique key for the cache based on parameters.
- */
 function getCacheKey(vertices, steps, alpha) {
   return `${vertices}_${steps}_${alpha}`;
 }
 
-// ------------------ Utility functions ------------------
-
-/**
- * Returns an (x, y) coordinate for a circle at angle theta,
- * centered at (x_center, y_center) with the given radius.
- */
 function getCircleCoord(theta, x_center, y_center, radius) {
   const x = radius * Math.cos(theta) + x_center;
   const y = radius * Math.sin(theta) + x_center;
   return { x, y };
 }
 
-/**
- * Returns an array of (x, y) coordinates for polygonOrder points
- * evenly spaced on a circle (center=(0,0), radius=750).
- */
 function getAllCircleCoords(x_center, y_center, radius, n_points) {
   const circleCoords = [];
   for (let i = 0; i < n_points; i++) {
-    // Like Python: theta = (i / n_points * 2*pi) + 0.5
     const theta = (i / n_points) * 2 * Math.PI + 0.5;
     circleCoords.push(getCircleCoord(theta, x_center, y_center, radius));
   }
   return circleCoords;
 }
 
-/**
- * Generates "Chaos Game" points by repeatedly picking a random
- * circle vertex and moving halfway toward it from the current point.
- */
-function generatePolygonPoints2d(polygonOrder, steps) {
+function generatePolygonPoints2d(polygonOrder, steps, progressCallback) {
   const targets = getAllCircleCoords(0, 0, 750, polygonOrder);
-
   let x = 100.0;
   let y = 100.0;
-
   const points = [];
-  for (let i = 0; i < steps; i++) {
-    // Pick a random target
-    const randIndex = Math.floor(Math.random() * targets.length);
-    const tx = targets[randIndex].x;
-    const ty = targets[randIndex].y;
 
-    // Move halfway
-    x = (x + tx) / 2.0;
-    y = (y + ty) / 2.0;
+  // Break the generation into chunks
+  const chunkSize = 1000;
+  let currentStep = 0;
 
-    points.push({ x, y });
-  }
-  return points;
+  return new Promise((resolve) => {
+    function generateChunk() {
+      const endStep = Math.min(currentStep + chunkSize, steps);
+
+      for (let i = currentStep; i < endStep; i++) {
+        const randIndex = Math.floor(Math.random() * targets.length);
+        const tx = targets[randIndex].x;
+        const ty = targets[randIndex].y;
+
+        x = (x + tx) / 2.0;
+        y = (y + ty) / 2.0;
+        points.push({ x, y });
+      }
+
+      currentStep = endStep;
+
+      if (progressCallback) {
+        progressCallback(currentStep / steps);
+      }
+
+      if (currentStep < steps) {
+        setTimeout(generateChunk, 0);
+      } else {
+        resolve(points);
+      }
+    }
+
+    generateChunk();
+  });
 }
 
-// ------------------ Rendering logic ------------------
-
-/**
- * Given an array of {x, y} points, draw them onto the canvas.
- * We map the mathematical coordinates to canvas coordinates.
- */
 function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) {
-  // Clear the canvas
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  // Optionally scale/translate so everything fits nicely.
-  // The code uses a circle radius = 750, so let's scale down to ~800x800.
   const scale = 0.4;
   const offsetX = canvasWidth / 2;
   const offsetY = canvasHeight / 2;
 
-  // Apply the specified transparency to all draw calls
   ctx.globalAlpha = alphaValue;
-
-  // Draw each point
   ctx.fillStyle = "black";
+
   for (let i = 0; i < points.length; i++) {
     const sx = points[i].x * scale + offsetX;
     const sy = points[i].y * scale + offsetY;
@@ -135,53 +126,53 @@ function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) 
   }
 }
 
-// Show or hide the spinner
 function toggleSpinner(show) {
   const spinner = document.getElementById('spinner');
   spinner.style.display = show ? 'block' : 'none';
 }
 
-/**
- * Reads the input values from the DOM, checks the cache, generates the fractal
- * if necessary, and then draws it on the canvas.
- */
-function generateAndDraw() {
-  toggleSpinner(true); // Show spinner
+async function generateAndDraw() {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
-  // Get cache key
-  const cacheKey = getCacheKey(vertices, steps, alphaValue);
+  // Disable the generate button
+  const generateBtn = document.getElementById('generateBtn');
+  generateBtn.disabled = true;
 
-  // Get the canvas context
-  const canvas = document.getElementById('myCanvas');
-  const ctx = canvas.getContext('2d');
+  toggleSpinner(true);
 
-  // Check the cache
-  if (cache[cacheKey]) {
-    console.log(`Using cached image for key: ${cacheKey}`);
-    // Draw cached image
-    ctx.putImageData(cache[cacheKey], 0, 0);
-  } else {
-    console.log(`Generating new image for key: ${cacheKey}`);
-    // Generate points
-    const points = generatePolygonPoints2d(vertices, steps);
+  try {
+    const cacheKey = getCacheKey(vertices, steps, alphaValue);
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
 
-    // Draw points
-    drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
+    if (cache[cacheKey]) {
+      console.log(`Using cached image for key: ${cacheKey}`);
+      ctx.putImageData(cache[cacheKey], 0, 0);
+    } else {
+      console.log(`Generating new image for key: ${cacheKey}`);
 
-    // Cache the rendered image
-    cache[cacheKey] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      // Add a small delay to ensure the spinner is visible
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      const points = await generatePolygonPoints2d(vertices, steps, (progress) => {
+        document.getElementById('spinner').textContent =
+          `Generating pixels... ${Math.round(progress * 100)}%`;
+      });
+
+      drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
+      cache[cacheKey] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+  } catch (error) {
+    console.error('Error generating fractal:', error);
+  } finally {
+    toggleSpinner(false);
+    generateBtn.disabled = false;
   }
-  toggleSpinner(false); // Hide spinner
 }
 
-// ------------------ Event wiring ------------------
-
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
-
-// Optionally, generate on initial page load
 generateAndDraw();
 </script>
 </body>
