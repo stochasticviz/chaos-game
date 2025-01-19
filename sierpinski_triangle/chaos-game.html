@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Chaos Game in JavaScript with Transparency</title>
+  <title>Chaos Game with Image Caching</title>
   <style>
     body {
       font-family: sans-serif;
@@ -28,7 +28,7 @@
   </style>
 </head>
 <body>
-
+<div id="spinner">Generating pixels...</div>
 <div id="controls">
   <label for="vertices">Polygon Vertices:</label>
   <input type="number" id="vertices" value="3" min="2" max="100" />
@@ -42,10 +42,19 @@
   <button id="generateBtn">Generate</button>
 </div>
 
-<div id="spinner">Generating pixels...</div>
 <canvas id="myCanvas" width="800" height="800"></canvas>
 
 <script>
+// ------------------ Cache Setup ------------------
+const cache = {};
+
+/**
+ * Generate a unique key for the cache based on parameters.
+ */
+function getCacheKey(vertices, steps, alpha) {
+  return `${vertices}_${steps}_${alpha}`;
+}
+
 // ------------------ Utility functions ------------------
 
 /**
@@ -122,40 +131,53 @@ function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) 
   for (let i = 0; i < points.length; i++) {
     const sx = points[i].x * scale + offsetX;
     const sy = points[i].y * scale + offsetY;
-    // You can draw a 1x1 pixel rectangle for speed
     ctx.fillRect(sx, sy, 1, 1);
   }
 }
 
-/**
- * Reads the input values from the DOM, generates the fractal points,
- * and then draws them on the canvas with partial transparency.
- */
 // Show or hide the spinner
 function toggleSpinner(show) {
   const spinner = document.getElementById('spinner');
   spinner.style.display = show ? 'block' : 'none';
 }
 
+/**
+ * Reads the input values from the DOM, checks the cache, generates the fractal
+ * if necessary, and then draws it on the canvas.
+ */
 function generateAndDraw() {
+  toggleSpinner(true); // Show spinner
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
-  toggleSpinner(true); // Show spinner
+  // Get cache key
+  const cacheKey = getCacheKey(vertices, steps, alphaValue);
 
-  // Use setTimeout to allow the spinner to show before computation starts
-  setTimeout(() => {
+  // Get the canvas context
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Check the cache
+  if (cache[cacheKey]) {
+    console.log(`Using cached image for key: ${cacheKey}`);
+    // Draw cached image
+    ctx.putImageData(cache[cacheKey], 0, 0);
+  } else {
+    console.log(`Generating new image for key: ${cacheKey}`);
+    // Generate points
     const points = generatePolygonPoints2d(vertices, steps);
 
-    const canvas = document.getElementById('myCanvas');
-    const ctx = canvas.getContext('2d');
-
+    // Draw points
     drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
 
-    toggleSpinner(false); // Hide spinner
-  }, 0);
+    // Cache the rendered image
+    cache[cacheKey] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  }
+  toggleSpinner(false); // Hide spinner
 }
+
+// ------------------ Event wiring ------------------
 
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
 
