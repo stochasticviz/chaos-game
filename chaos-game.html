@@ -13,9 +13,6 @@
       margin-top: 1em;
       cursor: default;
     }
-    #myCanvas.dragging {
-      cursor: move;
-    }
     #spinner {
       display: none;
       position: fixed;
@@ -32,7 +29,7 @@
   </style>
 </head>
 <body>
-<div>Fool around with variations on the <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">Chaos game</a>.</div
+<div>Fool around with variations on the <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">Chaos game</a>.</div>
 <br/>
 <br/>
 <div id="spinner">Generating pixels...</div>
@@ -49,7 +46,7 @@
   <button id="generateBtn">Generate</button>
   <button id="resetBtn">Reset Vertices</button>
 </div>
-<div>(hint: More vertices or less opacity require more pixels. Less opacity exposes subtler structure.</div
+<div>(hint: More vertices or less opacity require more pixels. Less opacity exposes subtler structure.)</div>
 <br/>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
 
@@ -76,7 +73,7 @@ function getCircleCoord(theta, x_center, y_center, radius) {
 function initializeVertices(n_points) {
   targets = [];
   for (let i = 0; i < n_points; i++) {
-    shift = n_points == 2 ? Math.PI/6 : 0;  // Rotate by 30 degrees to make the 2 vertices version better
+    const shift = n_points == 2 ? Math.PI/6 : 0;  // Rotate by 30 degrees to make the 2 vertices version better
     const theta = (i / n_points) * 2 * Math.PI + shift
     targets.push(getCircleCoord(theta, 500, 500, CIRCLE_RADIUS));
   }
