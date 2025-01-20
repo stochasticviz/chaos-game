@@ -28,4 +28,4 @@ bokeh serve --show bokeh-app.py
 
 This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-You are free to use, modify, and distribute this project under the terms of the Apache 2.0 License. For more details, see the [LICENSE](LICENSE) file.
+You are free to use, modify, and distribute this project under the terms of the Apache 2.0 License.
