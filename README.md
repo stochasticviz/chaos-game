@@ -2,8 +2,11 @@
 
 Fun web tools for exploring the [Chaos Game](https://www.youtube.com/watch?v=k3V72Qvcn94).
 
+## chaos-game.html
+Browser-based version ported from bokeh-app.py by ChatGPT. Open directly in any web browser.
+
 ## bokeh-app.py
-Original implementation using Bokeh/Panel. 
+Original implementation using Bokeh/Panel.
 
 Requires: numpy, holoviews, panel, bokeh
 
@@ -19,10 +22,3 @@ conda activate chaos-game
 ```
 bokeh serve --show bokeh-app.py
 ```
-
-## chaos-game.html
-Browser-based version ported from bokeh-app.py by ChatGPT. Open directly in any web browser.
-
-## Usage
-Set vertices count, points to plot (2⁸-2²⁵), and movement scalar. Watch patterns emerge.
-
