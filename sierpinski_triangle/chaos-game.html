@@ -152,16 +152,10 @@ function drawVerticesOnCanvas(ctx) {
 
     // Draw inner vertex circle
     ctx.beginPath();
-    ctx.fillStyle = i === draggedVertexIndex ? '#ff4444' : '#4444ff';
+    ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
     ctx.arc(x, y, VERTEX_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Add vertex number
-    ctx.fillStyle = 'white';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '12px sans-serif';
-    ctx.fillText(i + 1, x, y);
   });
 }
 
