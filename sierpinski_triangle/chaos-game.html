@@ -61,25 +61,6 @@ let draggedVertexIndex = -1;
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15; // Larger hit area for interaction
 
-// Transform between canvas and math coordinates
-const SCALE = 0.4;
-const CIRCLE_RADIUS = 750;
-
-function toCanvasCoords(x, y) {
-  const canvas = document.getElementById('myCanvas');
-  return {
-    x: x * SCALE + canvas.width / 2,
-    y: y * SCALE + canvas.height / 2
-  };
-}
-
-function toMathCoords(canvasX, canvasY) {
-  const canvas = document.getElementById('myCanvas');
-  return {
-    x: (canvasX - canvas.width / 2) / SCALE,
-    y: (canvasY - canvas.height / 2) / SCALE
-  };
-}
 
 function getCacheKey(vertices, steps, alpha) {
   return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}`;
@@ -142,18 +123,16 @@ function generatePolygonPoints2d(steps, progressCallback) {
 function drawVerticesOnCanvas(ctx) {
   // Draw vertex handles
   targets.forEach((target, i) => {
-    const {x, y} = toCanvasCoords(target.x, target.y);
-
     // Draw outer handle circle
     ctx.beginPath();
     ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-    ctx.arc(x, y, HANDLE_RADIUS, 0, 2 * Math.PI);
+    ctx.arc(target.x, target.y, HANDLE_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
 
     // Draw inner vertex circle
     ctx.beginPath();
     ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
-    ctx.arc(x, y, VERTEX_RADIUS, 0, 2 * Math.PI);
+    ctx.arc(target.x, target.y, VERTEX_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
 
   });
@@ -167,8 +146,7 @@ function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) 
   ctx.fillStyle = "black";
 
   for (let i = 0; i < points.length; i++) {
-    const {x, y} = toCanvasCoords(points[i].x, points[i].y);
-    ctx.fillRect(x, y, 1, 1);
+    ctx.fillRect(points[i].x, points[i].y, 1, 1);
   }
 
   // Draw vertices on top
@@ -227,9 +205,8 @@ async function generateAndDraw() {
 // Mouse interaction handlers
 function getVertexAtPosition(canvasX, canvasY) {
   for (let i = 0; i < targets.length; i++) {
-    const {x, y} = toCanvasCoords(targets[i].x, targets[i].y);
-    const dx = x - canvasX;
-    const dy = y - canvasY;
+    const dx = targets[i].x - canvasX;
+    const dy = targets[i].y - canvasY;
     if (dx * dx + dy * dy < HANDLE_RADIUS * HANDLE_RADIUS) {
       return i;
     }
@@ -244,8 +221,7 @@ function handleMouseMove(e) {
   const y = e.clientY - rect.top;
 
   if (isDragging && draggedVertexIndex !== -1) {
-    const mathCoords = toMathCoords(x, y);
-    targets[draggedVertexIndex] = mathCoords;
+    targets[draggedVertexIndex] = {x, y};
 
     // Redraw immediately with current points
     const ctx = canvas.getContext('2d');
