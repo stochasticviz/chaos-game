@@ -1,18 +1,20 @@
 import numpy as np
 import holoviews as hv
-import panel as pn  # Panel for widgets
 hv.extension('bokeh')  # Enable the Bokeh backend
+import panel as pn  # Panel for widgets
 import random
 import math
 from holoviews.operation.datashader import rasterize
 
-# Functions for generating polygon points
+
 def get_circle_coord(theta, x_center, y_center, radius):
     x = radius * math.cos(theta) + x_center
     y = radius * math.sin(theta) + y_center
     return (x, y)
 
+
 def get_all_circle_coords(x_center, y_center, radius, n_points):
+    ''' Get the coordinates of n_points equidistant points on a circle. '''
     thetas = [ (i / n_points * math.tau) + .5 for i in range(n_points)]
     circle_coords = [get_circle_coord(theta, x_center, y_center, radius) for theta in thetas]
     return circle_coords
