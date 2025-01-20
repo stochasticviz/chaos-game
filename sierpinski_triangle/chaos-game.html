@@ -93,7 +93,8 @@ function getCircleCoord(theta, x_center, y_center, radius) {
 function initializeVertices(n_points) {
   targets = [];
   for (let i = 0; i < n_points; i++) {
-    const theta = (i / n_points) * 2 * Math.PI + 0.5;
+    shift = n_points == 2 ? Math.PI/6 : 0;  // Rotate by 30 degrees to make the 2 vertices version better
+    const theta = (i / n_points) * 2 * Math.PI + shift
     targets.push(getCircleCoord(theta, 0, 0, CIRCLE_RADIUS));
   }
 }
