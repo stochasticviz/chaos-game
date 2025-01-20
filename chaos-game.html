@@ -47,11 +47,11 @@
   <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
 
   <button id="generateBtn">Generate</button>
-  <button id="resetBtn">Reset Vertices Locations</button>
+  <button id="resetBtn">Reset Vertices</button>
 </div>
-<div>(hint: More vertices or less opacity requires more pixels. Less opacity exposes subtler structure.</div
+<div>(hint: More vertices or less opacity require more pixels. Less opacity exposes subtler structure.</div
 <br/>
-<canvas id="myCanvas" width="800" height="800"></canvas>
+<canvas id="myCanvas" width="1000" height="1000"></canvas>
 
 <script>
 const cache = {};
@@ -60,26 +60,8 @@ let isDragging = false;
 let draggedVertexIndex = -1;
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15; // Larger hit area for interaction
+const CIRCLE_RADIUS = 475;
 
-// Transform between canvas and math coordinates
-const SCALE = 0.4;
-const CIRCLE_RADIUS = 750;
-
-function toCanvasCoords(x, y) {
-  const canvas = document.getElementById('myCanvas');
-  return {
-    x: x * SCALE + canvas.width / 2,
-    y: y * SCALE + canvas.height / 2
-  };
-}
-
-function toMathCoords(canvasX, canvasY) {
-  const canvas = document.getElementById('myCanvas');
-  return {
-    x: (canvasX - canvas.width / 2) / SCALE,
-    y: (canvasY - canvas.height / 2) / SCALE
-  };
-}
 
 function getCacheKey(vertices, steps, alpha) {
   return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}`;
@@ -96,7 +78,7 @@ function initializeVertices(n_points) {
   for (let i = 0; i < n_points; i++) {
     shift = n_points == 2 ? Math.PI/6 : 0;  // Rotate by 30 degrees to make the 2 vertices version better
     const theta = (i / n_points) * 2 * Math.PI + shift
-    targets.push(getCircleCoord(theta, 0, 0, CIRCLE_RADIUS));
+    targets.push(getCircleCoord(theta, 500, 500, CIRCLE_RADIUS));
   }
 }
 
@@ -105,7 +87,7 @@ function generatePolygonPoints2d(steps, progressCallback) {
   let y = 100.0;
   const points = [];
 
-  const chunkSize = 1000;
+  const chunkSize = 10000;
   let currentStep = 0;
 
   return new Promise((resolve) => {
@@ -140,48 +122,20 @@ function generatePolygonPoints2d(steps, progressCallback) {
 }
 
 function drawVerticesOnCanvas(ctx) {
-  // Draw lines between vertices
-  ctx.globalAlpha = 1.0;
-  ctx.beginPath();
-  ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)';
-  ctx.lineWidth = 1;
-  targets.forEach((target, i) => {
-    const {x, y} = toCanvasCoords(target.x, target.y);
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
-  });
-  // Close the polygon
-  if (targets.length > 0) {
-    const first = toCanvasCoords(targets[0].x, targets[0].y);
-    ctx.lineTo(first.x, first.y);
-  }
-  ctx.stroke();
-
   // Draw vertex handles
   targets.forEach((target, i) => {
-    const {x, y} = toCanvasCoords(target.x, target.y);
-
     // Draw outer handle circle
     ctx.beginPath();
     ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-    ctx.arc(x, y, HANDLE_RADIUS, 0, 2 * Math.PI);
+    ctx.arc(target.x, target.y, HANDLE_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
 
     // Draw inner vertex circle
     ctx.beginPath();
-    ctx.fillStyle = i === draggedVertexIndex ? '#ff4444' : '#4444ff';
-    ctx.arc(x, y, VERTEX_RADIUS, 0, 2 * Math.PI);
+    ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
+    ctx.arc(target.x, target.y, VERTEX_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Add vertex number
-    ctx.fillStyle = 'white';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '12px sans-serif';
-    ctx.fillText(i + 1, x, y);
   });
 }
 
@@ -193,8 +147,7 @@ function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) 
   ctx.fillStyle = "black";
 
   for (let i = 0; i < points.length; i++) {
-    const {x, y} = toCanvasCoords(points[i].x, points[i].y);
-    ctx.fillRect(x, y, 1, 1);
+    ctx.fillRect(points[i].x, points[i].y, 1, 1);
   }
 
   // Draw vertices on top
@@ -253,9 +206,8 @@ async function generateAndDraw() {
 // Mouse interaction handlers
 function getVertexAtPosition(canvasX, canvasY) {
   for (let i = 0; i < targets.length; i++) {
-    const {x, y} = toCanvasCoords(targets[i].x, targets[i].y);
-    const dx = x - canvasX;
-    const dy = y - canvasY;
+    const dx = targets[i].x - canvasX;
+    const dy = targets[i].y - canvasY;
     if (dx * dx + dy * dy < HANDLE_RADIUS * HANDLE_RADIUS) {
       return i;
     }
@@ -270,8 +222,7 @@ function handleMouseMove(e) {
   const y = e.clientY - rect.top;
 
   if (isDragging && draggedVertexIndex !== -1) {
-    const mathCoords = toMathCoords(x, y);
-    targets[draggedVertexIndex] = mathCoords;
+    targets[draggedVertexIndex] = {x, y};
 
     // Redraw immediately with current points
     const ctx = canvas.getContext('2d');
