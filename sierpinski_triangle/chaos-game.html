@@ -140,26 +140,6 @@ function generatePolygonPoints2d(steps, progressCallback) {
 }
 
 function drawVerticesOnCanvas(ctx) {
-  // Draw lines between vertices
-  ctx.globalAlpha = 1.0;
-  ctx.beginPath();
-  ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)';
-  ctx.lineWidth = 1;
-  targets.forEach((target, i) => {
-    const {x, y} = toCanvasCoords(target.x, target.y);
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
-  });
-  // Close the polygon
-  if (targets.length > 0) {
-    const first = toCanvasCoords(targets[0].x, targets[0].y);
-    ctx.lineTo(first.x, first.y);
-  }
-  ctx.stroke();
-
   // Draw vertex handles
   targets.forEach((target, i) => {
     const {x, y} = toCanvasCoords(target.x, target.y);
