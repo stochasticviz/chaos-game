@@ -51,7 +51,7 @@
 </div>
 <div>(hint: More vertices or less opacity require more pixels. Less opacity exposes subtler structure.</div
 <br/>
-<canvas id="myCanvas" width="800" height="800"></canvas>
+<canvas id="myCanvas" width="1000" height="1000"></canvas>
 
 <script>
 const cache = {};
@@ -60,6 +60,7 @@ let isDragging = false;
 let draggedVertexIndex = -1;
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15; // Larger hit area for interaction
+const CIRCLE_RADIUS = 475;
 
 
 function getCacheKey(vertices, steps, alpha) {
@@ -77,7 +78,7 @@ function initializeVertices(n_points) {
   for (let i = 0; i < n_points; i++) {
     shift = n_points == 2 ? Math.PI/6 : 0;  // Rotate by 30 degrees to make the 2 vertices version better
     const theta = (i / n_points) * 2 * Math.PI + shift
-    targets.push(getCircleCoord(theta, 0, 0, CIRCLE_RADIUS));
+    targets.push(getCircleCoord(theta, 500, 500, CIRCLE_RADIUS));
   }
 }
 
