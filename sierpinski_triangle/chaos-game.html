@@ -87,7 +87,7 @@ function generatePolygonPoints2d(steps, progressCallback) {
   let y = 100.0;
   const points = [];
 
-  const chunkSize = 1000;
+  const chunkSize = 10000;
   let currentStep = 0;
 
   return new Promise((resolve) => {
