@@ -1,7 +1,7 @@
 import numpy as np
 import holoviews as hv
-hv.extension('bokeh')  # Enable the Bokeh backend
 import panel as pn  # Panel for widgets
+hv.extension('bokeh')  # Enable the Bokeh backend
 import random
 import math
 from holoviews.operation.datashader import rasterize
@@ -101,7 +101,7 @@ def create_interactive_plot():
 
     return pn.Column(
         pn.pane.Markdown("Fool around with variations on the [Chaos game](https://www.youtube.com/watch?v=k3V72Qvcn94). Try bumping up the number of steps ->"),
-        sierpinksi_gasket_polygon_live_view,
+        rasterized_dynamic_map,
         pn.pane.Markdown("(More vertices requires more steps)"),
 
     )
