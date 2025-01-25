@@ -1,8 +1,6 @@
-
 '''
-Makes a 3D sierpinski triangle.
+Makes a 3D lattice with arbitrary number of vertices.
 
-First make a conda env. See docs in triangle.py
 Then:
     python -m pip install --upgrade matplotlib  # this should install mpl_toolkits
 
