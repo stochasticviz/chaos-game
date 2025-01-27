@@ -121,8 +121,8 @@ def get_equidistant_points_on_sphere(center_x, center_y, center_z, radius, n_poi
         points = icosahedron()
     if n_points == 20:
         points = dodecahedron()
-    if points is None:
-        # there is no exact equal distribution of points on a sphere so get an approximation
+    if points == []:
+        print('there is no exact equal distribution of points on a sphere so we will find an approximation')
         points = get_equidistant_points_on_unit_sphere_approximation(n_points)
     return [(x * radius + center_x, y * radius + center_y, z * radius + center_z) for (x, y, z) in points]
 
