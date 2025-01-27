@@ -139,10 +139,6 @@ radius = SPACE_DIAMETER/3
 targets = get_equidistant_points_on_sphere(center_x, center_y, center_z, radius, VERTICES)
 print('targets', targets)
 
-from itertools import combinations
-print("list(combinations(targets, 2))=", list(combinations(targets, 2)))
-print('all pairwise distances: ', list(map(lambda combo: np.linalg.norm(np.array(combo[0]) - np.array(combo[1])), combinations(targets, 2))))
-
 fig = plt.figure(figsize=(12,12))
 ax = fig.add_subplot(111, projection='3d')
 plt.ion()
