@@ -1,5 +1,5 @@
 '''
-Makes a 3D lattice with arbitrary number of vertices.
+Makes a 3D Sierpinski sponge (which is the 3D analouge of the 2D Sierpinski triangle), aka tetrix in the case of 4 vertices (see https://mathworld.wolfram.com/Tetrix.html), but with arbitrary number of vertices.
 
 Then:
     python -m pip install --upgrade matplotlib  # this should install mpl_toolkits
@@ -170,10 +170,9 @@ for i in range(POINTS_COUNT_TARGET):
         # apparently ax.scatter3D() works as an appending operation, not a new scatter. So just add the new points.
         ax.scatter3D(X, Y, Z, s=1, c='black', alpha=.2, depthshade=True)  # "s" is the size (diameter) of point   #(random.random(), random.random(), random.random()),
         plt.draw()
-        plt.pause(.05)
+        plt.pause(.05)  # give the display a chance to update
         X = []
         Y = []
         Z = []
 
-#plt.pause(10)
 plt.show(block=True)  # on my current backend this pauses until you close the window, and allowing panning and zooming.
