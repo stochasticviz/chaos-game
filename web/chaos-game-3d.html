@@ -57,6 +57,105 @@ let vertices = [];
 let points;
 const SPHERE_RADIUS = 5;
 
+function normalize(point) {
+    const norm = Math.sqrt(point[0] * point[0] + point[1] * point[1] + point[2] * point[2]);
+    return new THREE.Vector3(point[0] / norm, point[1] / norm, point[2] / norm);
+
+}
+
+function tetrahedron() {
+    const points = [
+        [1, 1, 1],
+        [1, -1, -1],
+        [-1, 1, -1],
+        [-1, -1, 1]
+    ];
+    return points.map(normalize);
+}
+
+function octahedron() {
+    const points = [
+        [1, 0, 0], [-1, 0, 0],
+        [0, 1, 0], [0, -1, 0],
+        [0, 0, 1], [0, 0, -1]
+    ];
+    return points.map(normalize);
+}
+
+function cube() {
+    const points = [
+        [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
+        [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1]
+    ];
+    return points.map(normalize);
+}
+
+function icosahedron() {
+    const phi = (1 + Math.sqrt(5)) / 2;  // Golden ratio
+    const points = [
+        [0, 1, phi], [0, 1, -phi], [0, -1, phi], [0, -1, -phi],
+        [1, phi, 0], [1, -phi, 0], [-1, phi, 0], [-1, -phi, 0],
+        [phi, 0, 1], [phi, 0, -1], [-phi, 0, 1], [-phi, 0, -1]
+    ];
+    return points.map(normalize);
+}
+
+function dodecahedron() {
+    const phi = (1 + Math.sqrt(5)) / 2;  // Golden ratio
+    const points = [
+        [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
+        [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1],
+        [0, 1/phi, phi], [0, 1/phi, -phi], [0, -1/phi, phi], [0, -1/phi, -phi],
+        [1/phi, phi, 0], [1/phi, -phi, 0], [-1/phi, phi, 0], [-1/phi, -phi, 0],
+        [phi, 0, 1/phi], [phi, 0, -1/phi], [-phi, 0, 1/phi], [-phi, 0, -1/phi]
+    ];
+    return points.map(normalize);
+}
+
+
+function getEquidistantPointsOnUnitSphereApproximation(n) {
+    // Fibonacci lattice method
+    const points = [];
+    const offset = 2 / n;
+    const increment = Math.PI * (3 - Math.sqrt(5)); // Golden angle in radians
+
+    for (let i = 0; i < n; i++) {
+        const y = ((i * offset) - 1) + (offset / 2);
+        const r = Math.sqrt(1 - y * y);
+        const phi = i * increment;
+
+        const x = Math.cos(phi) * r;
+        const z = Math.sin(phi) * r;
+
+        points.push([x, y, z]);
+    }
+
+    return points.map(normalize);
+}
+
+function getEquidistantPointsOnSphere(radius, nPoints) {
+    let points = [];
+
+    // Check for platonic solids
+    if (nPoints === 4) points = tetrahedron();
+    else if (nPoints === 6) points = octahedron();
+    else if (nPoints === 8) points = cube();
+    else if (nPoints === 12) points = icosahedron();
+    else if (nPoints === 20) points = dodecahedron();
+    else {
+        console.log('There is no exact equal distribution of points on a sphere so we will find an approximation');
+        points = getEquidistantPointsOnUnitSphereApproximation(nPoints);
+    }
+
+    // Scale by radius
+    return points.map(p => new THREE.Vector3(
+        p.x * radius,
+        p.y * radius,
+        p.z * radius
+    ));
+}
+
+
 function init() {
   // Scene setup
   scene = new THREE.Scene();
@@ -96,31 +195,20 @@ function animate() {
 }
 
 function createVertices(numVertices) {
-  vertices = [];
   // Remove old vertex spheres
   scene.children = scene.children.filter(child => !(child instanceof THREE.Mesh && child.userData.isVertex));
 
-  // Create vertices on a sphere using fibonacci sphere distribution
-  const goldenRatio = (1 + Math.sqrt(5)) / 2;
-
-  for(let i = 0; i < numVertices; i++) {
-    const phi = Math.acos(1 - 2 * (i + 0.5) / numVertices);
-    const theta = 2 * Math.PI * i / goldenRatio;
-
-    const x = SPHERE_RADIUS * Math.sin(phi) * Math.cos(theta);
-    const y = SPHERE_RADIUS * Math.sin(phi) * Math.sin(theta);
-    const z = SPHERE_RADIUS * Math.cos(phi);
-
-    vertices.push(new THREE.Vector3(x, y, z));
-
+  vertices = getEquidistantPointsOnSphere(SPHERE_RADIUS, numVertices);
+  // for(let i = 0; i < numVertices; i++) {
+  vertices.forEach(vertex => {
     // Add visible vertex as small sphere
     const geometry = new THREE.SphereGeometry(0.2);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
-    vertexMesh.position.set(x, y, z);
+    vertexMesh.position.set(vertex.x, vertex.y, vertex.z);
     vertexMesh.userData.isVertex = true;
     scene.add(vertexMesh);
-  }
+  })
 }
 
 async function generatePoints(numPoints, pointSize) {
