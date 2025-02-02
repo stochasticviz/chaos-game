@@ -39,12 +39,12 @@
 <div>Play around with variations on the <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">Chaos game</a>!&nbsp;&nbsp;<a href="https://github.com/herdrick/chaos-game/blob/main/chaos-game.html" target="_blank">source</a>&nbsp;&nbsp;<a href="chaos-game-3d.html">3D version</a></div>
 <br/>
 <br/>
-<div id="spinner">Generating pixels...</div>
+<div id="spinner">Generating points...</div>
 <div id="controls">
   <label for="vertices">Vertices:</label>
   <input type="number" id="vertices" value="3" min="2" max="100" />
 
-  <label for="steps">Pixels:</label>
+  <label for="steps">Points:</label>
   <input type="number" id="steps" value="32000" step="50000" min="1" max="10000000"/>
 
   <label for="alpha">Opacity (0.0 - 1.0):</label>
@@ -53,7 +53,7 @@
   <button id="generateBtn">Generate</button>
   <button id="resetBtn">Reset Vertices</button>
 </div>
-<div>(hint: More vertices or less opacity require more pixels. Less opacity exposes subtler structure.)</div>
+<div>(hint: More vertices or less opacity requires more points. Less opacity exposes subtler structure.)</div>
 <br/>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
 <script>
@@ -190,7 +190,7 @@ async function generateAndDraw() {
 
       const points = await generatePoints(steps, (progress) => {
         document.getElementById('spinner').textContent =
-          `Generating pixels... ${Math.round(progress * 100)}%`;
+          `Generating points... ${Math.round(progress * 100)}%`;
       });
 
       drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
