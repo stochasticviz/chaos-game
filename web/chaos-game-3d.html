@@ -189,6 +189,9 @@ function init() {
   controls.zoomSpeed = 0.8; // Slower zoom for touch/pinch
   controls.panSpeed = 0.2; // Slow panning
 
+  controls.minDistance = 0;
+  controls.maxDistance = 4000;
+
 
   // Add coordinate axes helper
   const axesHelper = new THREE.AxesHelper(SPHERE_RADIUS + 15);
