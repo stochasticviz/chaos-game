@@ -51,7 +51,7 @@ Play around with the <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">Chaos
   <input type="number" id="points" value="30000" step="10000"/>
 
   <label for="size">Point Size:</label>
-  <input type="number" id="size" value="0.01" step="0.001"/>
+  <input type="number" id="size" value="1"/>
 
   <button id="generateBtn">Generate</button>
 </div>
@@ -247,10 +247,23 @@ async function generatePoints(numPoints, pointSize) {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
-  const material = new THREE.PointsMaterial({
-    size: pointSize,
-    color: 0x000000,
-    sizeAttenuation: true,
+  const material = new THREE.ShaderMaterial({
+    vertexShader: `
+      uniform float pointSize;
+      void main() {
+        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
+        gl_PointSize = pointSize;
+      }
+    `,
+    fragmentShader: `
+      void main() {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+      }
+    `,
+    uniforms: {
+      pointSize: { value: pointSize }
+    }
   });
 
   points = new THREE.Points(geometry, material);
