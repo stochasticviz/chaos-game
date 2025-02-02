@@ -189,12 +189,6 @@ function init() {
   controls.zoomSpeed = 0.8; // Slower zoom for touch/pinch
   controls.panSpeed = 0.2; // Slow panning
 
-  // Add lights
-  const ambientLight = new THREE.AmbientLight(0x404040);
-  scene.add(ambientLight);
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(10, 10, 10);
-  scene.add(light);
 
   // Add coordinate axes helper
   const axesHelper = new THREE.AxesHelper(SPHERE_RADIUS + 15);
