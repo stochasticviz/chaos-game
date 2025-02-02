@@ -185,6 +185,9 @@ function init() {
   // Controls setup
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
+  controls.rotateSpeed = 0.7; // Slower rotation for touch
+  controls.zoomSpeed = 0.8; // Slower zoom for touch/pinch
+  controls.panSpeed = 0.2; // Slow panning
 
   // Add lights
   const ambientLight = new THREE.AmbientLight(0x404040);
