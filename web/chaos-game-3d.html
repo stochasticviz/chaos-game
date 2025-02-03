@@ -69,6 +69,7 @@ let vertices = [];
 let points;
 const SPHERE_RADIUS = 500;
 const pointSize = 1;
+const chunkSize = 10000;
 
 function normalize(point) {
     const norm = Math.sqrt(point[0] * point[0] + point[1] * point[1] + point[2] * point[2]);
@@ -240,7 +241,7 @@ async function generatePoints(numPoints, pointSize) {
     currentPoint.lerp(targetVertex, 0.5);
     positions.push(currentPoint.x, currentPoint.y, currentPoint.z);
 
-    if (i % 1000 === 0) {
+    if (i % chunkSize === 0) {
       await new Promise(resolve => setTimeout(resolve, 0));
       document.getElementById('spinner').textContent =
         `Generating points... ${Math.round((i / numPoints) * 100)}%`;
