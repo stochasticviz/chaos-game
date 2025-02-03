@@ -85,10 +85,10 @@ function initializeVertices(n_points) {
   }
 }
 
-function generatePoints(steps, progressCallback) {
+function generatePoints(steps, consumePoints) {
   let x = 100.0;
   let y = 100.0;
-  const points = [];
+  let points = [];
 
   const chunkSize = 50000;
   let currentStep = 0;
@@ -109,9 +109,8 @@ function generatePoints(steps, progressCallback) {
 
       currentStep = endStep;
 
-      if (progressCallback) {
-        progressCallback(currentStep / steps);
-      }
+      consumePoints(currentStep / steps, points);
+      points = []
 
       if (currentStep < steps) {
         setTimeout(generateChunk, 0);
@@ -142,8 +141,7 @@ function drawVerticesOnCanvas(ctx) {
   });
 }
 
-function drawPointsOnCanvas(ctx, points, canvasWidth, canvasHeight, alphaValue) {
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+function drawPointsOnCanvas(ctx, points, alphaValue) {
 
   // Draw points
   ctx.fillStyle = `rgba(0, 0, 0, ${alphaValue})`;  // black
@@ -179,21 +177,20 @@ async function generateAndDraw() {
     const cacheKey = getCacheKey(vertices, steps, alphaValue);
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
-
     if (cache[cacheKey]) {
       console.log(`Using cached image for key: ${cacheKey}`);
       ctx.putImageData(cache[cacheKey], 0, 0);
     } else {
       console.log(`Generating new image for key: ${cacheKey}`);
-
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      const points = await generatePoints(steps, (progress) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      await new Promise(resolve => setTimeout(resolve, 5));
+      const _ = await generatePoints(steps, (progress, points) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
+        drawPointsOnCanvas(ctx, points, alphaValue);
       });
 
-      drawPointsOnCanvas(ctx, points, canvas.width, canvas.height, alphaValue);
+
       cache[cacheKey] = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
   } catch (error) {
