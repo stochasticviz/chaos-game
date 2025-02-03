@@ -55,9 +55,6 @@ Play around with the <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">Chaos
   <label for="points">Points:</label>
   <input type="number" id="points" value="30000" step="10000"/>
 
-  <label for="size">Point Size:</label>
-  <input type="number" id="size" value="1"/>
-
   <button id="generateBtn">Generate</button>
 </div>
 <div id="spinner">Generating points...</div>
@@ -71,6 +68,7 @@ let scene, camera, renderer, controls;
 let vertices = [];
 let points;
 const SPHERE_RADIUS = 500;
+const pointSize = 1;
 
 function normalize(point) {
     const norm = Math.sqrt(point[0] * point[0] + point[1] * point[1] + point[2] * point[2]);
@@ -265,7 +263,6 @@ async function generatePoints(numPoints, pointSize) {
 async function handleGenerate() {
   const numVertices = parseInt(document.getElementById('vertices').value);
   const numPoints = parseInt(document.getElementById('points').value);
-  const pointSize = parseFloat(document.getElementById('size').value);
 
   document.getElementById('spinner').style.display = 'block';
   document.getElementById('generateBtn').disabled = true;
