@@ -202,8 +202,6 @@ async function generateAndDraw() {
 
       cache[cacheKey] = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
-  //} catch (error) {
-  //  console.error('Error:', error);
   } finally {
     toggleSpinner(false);
     generateBtn.disabled = false;
