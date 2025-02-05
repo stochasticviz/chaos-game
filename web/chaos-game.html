@@ -50,13 +50,18 @@
   <label for="alpha">Opacity (0.0 - 1.0):</label>
   <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
 
+  <input type="text" id="nextPointFunction" value="f(currentX, currentY, targetX, targetY) = [ (currentX+targetX) / 2, (currentY+targetY) / 2]">
+
   <button id="generateBtn">Generate</button>
   <button id="resetBtn">Reset Vertices</button>
 </div>
 <div>(hint: More vertices or less opacity requires more points. Less opacity exposes subtler structure.)</div>
 <br/>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
-<script>
+<script type="module">
+import { create, all } from './lib/mathjs/14.2.0/math.mjs';
+const math = create(all); // Initialize Math.js with everything
+
 const cache = {};
 let targets = [];  // Store vertex positions
 let isDragging = false;
@@ -66,8 +71,8 @@ const HANDLE_RADIUS = 15; // Larger hit area for interaction
 const CIRCLE_RADIUS = 475;
 
 
-function getCacheKey(vertices, steps, alpha) {
-  return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}`;
+function getCacheKey(vertices, steps, alpha, nextPointFunctionString) {
+  return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}_${nextPointFunctionString}`;
 }
 
 function getCircleCoord(theta, x_center, y_center, radius) {
@@ -85,7 +90,7 @@ function initializeVertices(n_points) {
   }
 }
 
-function generatePoints(steps, consumePoints) {
+function generatePoints(steps, nextStepFunction, consumePoints) {
   let x = 100.0;
   let y = 100.0;
   let points = [];
@@ -101,9 +106,13 @@ function generatePoints(steps, consumePoints) {
         const nextTargetIdx = Math.floor(Math.random() * targets.length);
         const targetX = targets[nextTargetIdx].x;
         const targetY = targets[nextTargetIdx].y;
-
-        x = (x + targetX) / 2.0;
-        y = (y + targetY) / 2.0;
+        if (nextStepFunction){
+            [x, y] = nextStepFunction(x, y, targetX, targetY).toArray();
+        }
+        else {
+            x = (x + targetX) / 2.0;
+            y = (y + targetY) / 2.0;
+        }
         points.push({ x, y });
       }
 
@@ -162,7 +171,9 @@ async function generateAndDraw() {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
-
+  // todo put the random target selection in the function too https://mathjs.org/docs/reference/functions/pickRandom.html
+  const nextPointFunctionString = document.getElementById("nextPointFunction").value;
+  const nextPointFunction = math.evaluate(nextPointFunctionString);
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
@@ -174,7 +185,7 @@ async function generateAndDraw() {
       initializeVertices(vertices);
     }
 
-    const cacheKey = getCacheKey(vertices, steps, alphaValue);
+    const cacheKey = getCacheKey(vertices, steps, alphaValue, nextPointFunctionString);
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
     if (cache[cacheKey]) {
@@ -184,7 +195,7 @@ async function generateAndDraw() {
       console.log(`Generating new image for key: ${cacheKey}`);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       await new Promise(resolve => setTimeout(resolve, 5));
-      const _ = await generatePoints(steps, (progress, points) => {
+      const _ = await generatePoints(steps, nextPointFunction, (progress, points) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         drawPointsOnCanvas(ctx, points, alphaValue);
