@@ -189,10 +189,8 @@ async function generateAndDraw() {
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
     if (cache[cacheKey]) {
-      console.log(`Using cached image for key: ${cacheKey}`);
       ctx.putImageData(cache[cacheKey], 0, 0);
     } else {
-      console.log(`Generating new image for key: ${cacheKey}`);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       await new Promise(resolve => setTimeout(resolve, 5));
       const _ = await generatePoints(steps, nextPointFunction, (progress, points) => {
