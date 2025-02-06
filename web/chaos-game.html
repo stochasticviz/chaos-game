@@ -26,20 +26,23 @@
       border-radius: 8px;
       z-index: 1000;
     }
+    #nextPointFunction {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 10px;
+    }
   </style>
 <script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
     posthog.init('phc_VgjFl2kzM4ipDWGy1kIZMOgSNrZqecVZR8QvYbvIX7K', {
         api_host:'https://us.i.posthog.com',
-        person_profiles: 'identified_only' // or 'always' to create profiles for anonymous users as well
+        person_profiles: 'identified_only'
     })
 </script>
 </head>
 <body>
 <div>Play around with variations on the <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">Chaos game</a>!&nbsp;&nbsp;<a href="https://github.com/herdrick/chaos-game/blob/main/chaos-game.html" target="_blank">source</a>&nbsp;&nbsp;<a href="chaos-game-3d.html">3D version</a></div>
-<div id="spinner">Generating points...</div>
-<br/>
-<br/>
 <div id="controls">
   <label for="vertices">Vertices:</label>
   <input type="number" id="vertices" value="3" min="2" max="100" />
@@ -50,26 +53,55 @@
   <label for="alpha">Opacity (0.0 - 1.0):</label>
   <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
 
-  <input type="text" id="nextPointFunction" value="f(currentX, currentY, targetX, targetY) = [ (currentX+targetX) / 2, (currentY+targetY) / 2]">
-
   <button id="generateBtn">Generate</button>
   <button id="resetBtn">Reset Vertices</button>
 </div>
 <div>(hint: More vertices or less opacity requires more points. Less opacity exposes subtler structure.)</div>
-<br/>
+
+<div>
+  <input type="checkbox" id="customizeFunction" />
+  <label for="customizeFunction">Customize jump function</label>
+</div>
+
+<div id="functionExplanation" style="display: none; margin: 10px 0;">
+  <p>Define how the next point is calculated using a function of these variables:</p>
+  <ul>
+    <li><code>currentX, currentY</code>: Current point coordinates</li>
+    <li><code>targetX, targetY</code>: Coordinates of randomly chosen vertex</li>
+  </ul>
+  <p>The default function simply moves to halfway to the target. But you can use any of the arithmetic, trigonometry, or matrix functions in the <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">docs</a> of Math.JS, which is what evaluates the function.</p>
+<br/>Spirals!
+<code>
+f(currentX, currentY, targetX, targetY) = [
+  dot([cos(pi/4), -sin(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2]),
+  dot([sin(pi/4), cos(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2])
+]
+</code>
+  <p>Or just change 1/2 to something else.</p>
+</div>
+
+<input type="text" id="nextPointFunction" value="f(currentX, currentY, targetX, targetY) = [ (currentX+targetX) * 1/2, (currentY+targetY) * 1/2]">
+<div id="spinner">Generating points...</div>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
 <script type="module">
 import { create, all } from './lib/mathjs/14.2.0/math.mjs';
-const math = create(all); // Initialize Math.js with everything
+const math = create(all);
 
 const cache = {};
-let targets = [];  // Store vertex positions
+let targets = [];
 let isDragging = false;
 let draggedVertexIndex = -1;
 const VERTEX_RADIUS = 8;
-const HANDLE_RADIUS = 15; // Larger hit area for interaction
+const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 
+// Add event listener for the checkbox
+document.getElementById('customizeFunction').addEventListener('change', function(e) {
+    const functionInput = document.getElementById('nextPointFunction');
+    const explanation = document.getElementById('functionExplanation');
+    functionInput.style.display = e.target.checked ? 'block' : 'none';
+    explanation.style.display = e.target.checked ? 'block' : 'none';
+});
 
 function getCacheKey(vertices, steps, alpha, nextPointFunctionString) {
   return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}_${nextPointFunctionString}`;
@@ -84,7 +116,7 @@ function getCircleCoord(theta, x_center, y_center, radius) {
 function initializeVertices(n_points) {
   targets = [];
   for (let i = 0; i < n_points; i++) {
-    const shift = n_points == 2 ? Math.PI/6 : 0;  // Rotate by 30 degrees to make the 2 vertices version better
+    const shift = n_points == 2 ? Math.PI/6 : 0;
     const theta = (i / n_points) * 2 * Math.PI + shift
     targets.push(getCircleCoord(theta, 500, 500, CIRCLE_RADIUS));
   }
@@ -133,32 +165,25 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
 }
 
 function drawVerticesOnCanvas(ctx) {
-  // Draw vertex handles
   targets.forEach((target, i) => {
-    // Draw outer handle circle
     ctx.beginPath();
     ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
     ctx.arc(target.x, target.y, HANDLE_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Draw inner vertex circle
     ctx.beginPath();
     ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
     ctx.arc(target.x, target.y, VERTEX_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
-
   });
 }
 
 function drawPointsOnCanvas(ctx, points, alphaValue) {
-
-  // Draw points
-  ctx.fillStyle = `rgba(0, 0, 0, ${alphaValue})`;  // black
+  ctx.fillStyle = `rgba(0, 0, 0, ${alphaValue})`;
   for (let i = 0; i < points.length; i++) {
     ctx.fillRect(points[i].x, points[i].y, 1, 1);
   }
 
-  // Draw vertices on top
   drawVerticesOnCanvas(ctx);
 }
 
@@ -171,7 +196,6 @@ async function generateAndDraw() {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
-  // todo put the random target selection in the function too https://mathjs.org/docs/reference/functions/pickRandom.html
   const nextPointFunctionString = document.getElementById("nextPointFunction").value;
   const nextPointFunction = math.evaluate(nextPointFunctionString);
   const generateBtn = document.getElementById('generateBtn');
@@ -180,7 +204,6 @@ async function generateAndDraw() {
   toggleSpinner(true);
 
   try {
-    // Initialize vertices if needed
     if (targets.length !== vertices) {
       initializeVertices(vertices);
     }
@@ -199,7 +222,6 @@ async function generateAndDraw() {
         drawPointsOnCanvas(ctx, points, alphaValue);
       });
 
-
       cache[cacheKey] = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
   } finally {
@@ -208,7 +230,6 @@ async function generateAndDraw() {
   }
 }
 
-// Mouse interaction handlers
 function getVertexAtPosition(canvasX, canvasY) {
   for (let i = 0; i < targets.length; i++) {
     const dx = targets[i].x - canvasX;
@@ -229,16 +250,13 @@ function handleMouseMove(e) {
   if (isDragging && draggedVertexIndex !== -1) {
     targets[draggedVertexIndex] = {x, y};
 
-    // Redraw immediately with current points
     const ctx = canvas.getContext('2d');
     const alphaValue = parseFloat(document.getElementById('alpha').value);
     drawPointsOnCanvas(ctx, [], canvas.width, canvas.height, alphaValue);
 
-    // Debounced regeneration
     clearTimeout(canvas.regenerateTimeout);
     canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
   } else {
-    // Update cursor based on hover
     const hoveredIndex = getVertexAtPosition(x, y);
     canvas.style.cursor = hoveredIndex !== -1 ? 'move' : 'default';
   }
@@ -264,7 +282,6 @@ function handleMouseUp() {
   canvas.classList.remove('dragging');
 }
 
-// Setup event listeners
 const canvas = document.getElementById('myCanvas');
 canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mousedown', handleMouseDown);
@@ -278,13 +295,9 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   const ctx = canvas.getContext('2d');
 
   initializeVertices(vertices);
-
-  // Clear canvas and only draw vertices
-  //ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawVerticesOnCanvas(ctx);
 });
 
-// Initial generation
 generateAndDraw();
 </script>
 </body>
