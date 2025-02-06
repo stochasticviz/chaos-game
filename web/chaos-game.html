@@ -60,17 +60,21 @@
 
 <div>
   <input type="checkbox" id="customizeFunction" />
-  <label for="customizeFunction">Customize "next point" function</label>
+  <label for="customizeFunction">Customize the "next point" function</label>
 </div>
 
 <div id="functionExplanation" style="display: none; margin: 10px 0;">
   <p>Define how the next point is calculated using a function of these variables:</p>
   <ul>
-    <li><code>currentX, currentY</code>: Current point coordinates</li>
-    <li><code>targetX, targetY</code>: Coordinates of randomly chosen vertex</li>
+    <li><code>currentX, currentY</code>:&nbsp;&nbsp;&nbsp;&nbsp;the current point's coordinates</li>
+    <li><code>targetX, targetY</code>&nbsp;&nbsp;&nbsp;&nbsp;a randomly chosen vertex's coordinates</li>
   </ul>
-  <p>The default function simply moves to halfway to the target. But you can use any of the arithmetic, trigonometry, or matrix functions in the <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">docs</a> of Math.JS, which is what evaluates the function. The only requirement is that the right side of the equation return and array of two numbers.</p>
-<br/>Example:
+  <p>... which returns an array of two numbers:</p>
+  <ul>
+    <li><code>nextX, nextY</code>:&nbsp;&nbsp;&nbsp;&nbsp;the next point's coordinates</li>
+  </ul>
+  <p>The default function simply moves to halfway to the target. But you can use any of the arithmetic, trigonometry, or matrix functions in the <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">docs</a> of Math.JS, which is what evaluates the function.</p>
+Example:
 <code>
 f(currentX, currentY, targetX, targetY) = [ currentX + 1,  currentY + 1]
 </code>
