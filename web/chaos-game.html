@@ -198,6 +198,9 @@ async function generateAndDraw() {
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextPointFunctionString = document.getElementById("nextPointFunction").value;
   const nextPointFunction = math.evaluate(nextPointFunctionString);
+
+  const scope = {};
+  math.evaluate(nextPointFunctionString, scope); // put this function into scope (function will have access to scope, including all the math.* functions)
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
@@ -216,7 +219,7 @@ async function generateAndDraw() {
     } else {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       await new Promise(resolve => setTimeout(resolve, 5));
-      await generatePoints(steps, nextPointFunction, (progress, points) => {
+        await generatePoints(steps, scope.f, (progress, points) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         drawPointsOnCanvas(ctx, points, alphaValue);
