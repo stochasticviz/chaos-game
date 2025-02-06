@@ -60,7 +60,7 @@
 
 <div>
   <input type="checkbox" id="customizeFunction" />
-  <label for="customizeFunction">Customize jump function</label>
+  <label for="customizeFunction">Customize "next point" function</label>
 </div>
 
 <div id="functionExplanation" style="display: none; margin: 10px 0;">
@@ -69,15 +69,22 @@
     <li><code>currentX, currentY</code>: Current point coordinates</li>
     <li><code>targetX, targetY</code>: Coordinates of randomly chosen vertex</li>
   </ul>
-  <p>The default function simply moves to halfway to the target. But you can use any of the arithmetic, trigonometry, or matrix functions in the <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">docs</a> of Math.JS, which is what evaluates the function.</p>
-<br/>Spirals!
+  <p>The default function simply moves to halfway to the target. But you can use any of the arithmetic, trigonometry, or matrix functions in the <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">docs</a> of Math.JS, which is what evaluates the function. The only requirement is that the right side of the equation return and array of two numbers.</p>
+<br/>Example:
+<code>
+f(currentX, currentY, targetX, targetY) = [ currentX + 1,  currentY + 1]
+</code>
+<br/><br/>Example:
+<code>
+f(currentX, currentY, targetX, targetY) = [   (currentX + targetX)/2 + (currentY - targetY)/4,   (currentY + targetY)/2 - (currentX - targetX)/4 ]
+</code>
+<br/><br/>Example:
 <code>
 f(currentX, currentY, targetX, targetY) = [
-  dot([cos(pi/4), -sin(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2]),
-  dot([sin(pi/4), cos(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2])
+  dot([cos(pi/4), -sin(pi/4)], [(currentX + targetX)/2 - 500, (currentY + targetY)/2 - 500]) + 500,
+  dot([sin(pi/4), cos(pi/4)], [(currentX + targetX)/2 - 500, (currentY + targetY)/2 - 500]) + 500
 ]
 </code>
-  <p>Or just change 1/2 to something else.</p>
 </div>
 
 <input type="text" id="nextPointFunction" value="f(currentX, currentY, targetX, targetY) = [ (currentX+targetX) * 1/2, (currentY+targetY) * 1/2]">
