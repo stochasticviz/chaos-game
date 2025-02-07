@@ -105,6 +105,8 @@ const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 
 // Add event listener for the checkbox
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextPointFunction');
     const explanation = document.getElementById('functionExplanation');
@@ -221,8 +223,7 @@ async function generateAndDraw() {
     }
 
     const cacheKey = getCacheKey(vertices, steps, alphaValue, nextPointFunctionString);
-    const canvas = document.getElementById('myCanvas');
-    const ctx = canvas.getContext('2d');
+
     if (cache[cacheKey]) {
       ctx.putImageData(cache[cacheKey], 0, 0);
     } else {
@@ -254,7 +255,6 @@ function getVertexAtPosition(canvasX, canvasY) {
 }
 
 function handleMouseMove(e) {
-  const canvas = document.getElementById('myCanvas');
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
@@ -262,7 +262,6 @@ function handleMouseMove(e) {
   if (isDragging && draggedVertexIndex !== -1) {
     targets[draggedVertexIndex] = {x, y};
 
-    const ctx = canvas.getContext('2d');
     const alphaValue = parseFloat(document.getElementById('alpha').value);
     drawPointsOnCanvas(ctx, [], canvas.width, canvas.height, alphaValue);
 
@@ -275,7 +274,6 @@ function handleMouseMove(e) {
 }
 
 function handleMouseDown(e) {
-  const canvas = document.getElementById('myCanvas');
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
@@ -288,13 +286,11 @@ function handleMouseDown(e) {
 }
 
 function handleMouseUp() {
-  const canvas = document.getElementById('myCanvas');
   isDragging = false;
   draggedVertexIndex = -1;
   canvas.classList.remove('dragging');
 }
 
-const canvas = document.getElementById('myCanvas');
 canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mouseup', handleMouseUp);
@@ -303,9 +299,6 @@ canvas.addEventListener('mouseleave', handleMouseUp);
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
 document.getElementById('resetBtn').addEventListener('click', () => {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
-  const canvas = document.getElementById('myCanvas');
-  const ctx = canvas.getContext('2d');
-
   initializeVertices(vertices);
   drawVerticesOnCanvas(ctx);
 });
