@@ -1,3 +1,4 @@
+<!-- todo: move call drawVerticesOnCanvas(ctx); to the outermost scope of generatePoints().  also it looks like Claude called  drawPointsOnCanvas() within the mouse*() functions just to get vertices drawn call drawVerticesOnCanvas() within those instead  -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,10 +43,10 @@
 </script>
 </head>
 <body>
-<div>Play around with variations on the <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">Chaos game</a>!&nbsp;&nbsp;<a href="https://github.com/herdrick/chaos-game/blob/main/chaos-game.html" target="_blank">source</a>&nbsp;&nbsp;<a href="chaos-game-3d.html">3D version</a></div>
+<div>Play around with variations on the <a href="https://en.wikipedia.org/wiki/Chaos_game">Chaos</a> <a href="https://www.youtube.com/watch?v=k3V72Qvcn94">game</a>!</div>
 <div id="controls">
   <label for="vertices">Vertices:</label>
-  <input type="number" id="vertices" value="3" min="2" max="100" />
+  <input type="number" id="vertices" value="3" min="1"/>
 
   <label for="steps">Points:</label>
   <input type="number" id="steps" value="32000" step="50000" min="1" max="10000000"/>
@@ -83,8 +84,8 @@ f(currentX, currentY, targetX, targetY) = [   (currentX + targetX)/2 + (currentY
 <br/><br/>Example:
 <code>
 f(currentX, currentY, targetX, targetY) = [
-  dot([cos(pi/4), -sin(pi/4)], [(currentX + targetX)/2 - 500, (currentY + targetY)/2 - 500]) + 500,
-  dot([sin(pi/4), cos(pi/4)], [(currentX + targetX)/2 - 500, (currentY + targetY)/2 - 500]) + 500
+  dot([cos(pi/4), -sin(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2])
+  dot([sin(pi/4), cos(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2])
 ]
 </code>
 </div>
@@ -105,8 +106,14 @@ const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 
 // Add event listener for the checkbox
+// Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
+// Transform the context to move origin to center
+ctx.translate(canvas.width / 2, canvas.height / 2);
+// Flip Y axis so positive is up
+ctx.scale(1, -1);
+
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextPointFunction');
     const explanation = document.getElementById('functionExplanation');
@@ -118,9 +125,9 @@ function getCacheKey(vertices, steps, alpha, nextPointFunctionString) {
   return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}_${nextPointFunctionString}`;
 }
 
-function getCircleCoord(theta, x_center, y_center, radius) {
-  const x = radius * Math.cos(theta) + x_center;
-  const y = radius * Math.sin(theta) + y_center;
+function getCircleCoord(theta) {
+  const x = CIRCLE_RADIUS * Math.cos(theta);
+  const y = CIRCLE_RADIUS * Math.sin(theta);
   return { x, y };
 }
 
@@ -128,14 +135,15 @@ function initializeVertices(n_points) {
   targets = [];
   for (let i = 0; i < n_points; i++) {
     const shift = n_points == 2 ? Math.PI/6 : 0;
-    const theta = (i / n_points) * 2 * Math.PI + shift
-    targets.push(getCircleCoord(theta, 500, 500, CIRCLE_RADIUS));
+    const theta = (i / n_points) * 2 * Math.PI + shift;
+    targets.push(getCircleCoord(theta));
   }
 }
 
 function generatePoints(steps, nextStepFunction, consumePoints) {
-  let x = 100.0;
-  let y = 100.0;
+  // Start near origin
+  let x = 50.0;
+  let y = 50.0;
   let points = [];
 
   const chunkSize = 10000;
@@ -149,10 +157,9 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
         const nextTargetIdx = Math.floor(Math.random() * targets.length);
         const targetX = targets[nextTargetIdx].x;
         const targetY = targets[nextTargetIdx].y;
-        if (nextStepFunction){
+        if (nextStepFunction) {
             [x, y] = nextStepFunction(x, y, targetX, targetY).toArray();
-        }
-        else {
+        } else {
             x = (x + targetX) / 2.0;
             y = (y + targetY) / 2.0;
         }
@@ -160,9 +167,8 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
       }
 
       currentStep = endStep;
-
       consumePoints(currentStep / steps, points);
-      points = []
+      points = [];
 
       if (currentStep < steps) {
         setTimeout(generateChunk, 0);
@@ -177,11 +183,13 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
 
 function drawVerticesOnCanvas(ctx) {
   targets.forEach((target, i) => {
+    // Draw handle
     ctx.beginPath();
     ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
     ctx.arc(target.x, target.y, HANDLE_RADIUS, 0, 2 * Math.PI);
     ctx.fill();
 
+    // Draw vertex
     ctx.beginPath();
     ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
     ctx.arc(target.x, target.y, VERTEX_RADIUS, 0, 2 * Math.PI);
@@ -225,17 +233,17 @@ async function generateAndDraw() {
     const cacheKey = getCacheKey(vertices, steps, alphaValue, nextPointFunctionString);
 
     if (cache[cacheKey]) {
-      ctx.putImageData(cache[cacheKey], 0, 0);
+      ctx.putImageData(cache[cacheKey], -canvas.width/2, -canvas.height/2);
     } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
       await new Promise(resolve => setTimeout(resolve, 5));
-        await generatePoints(steps, scope.f, (progress, points) => {
+      await generatePoints(steps, scope.f, (progress, points) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         drawPointsOnCanvas(ctx, points, alphaValue);
       });
 
-      cache[cacheKey] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      cache[cacheKey] = ctx.getImageData(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
     }
   } finally {
     toggleSpinner(false);
@@ -243,10 +251,19 @@ async function generateAndDraw() {
   }
 }
 
-function getVertexAtPosition(canvasX, canvasY) {
+function screenToWorld(screenX, screenY) {
+  return {
+    x: screenX - canvas.width/2,
+    y: -(screenY - canvas.height/2)
+  };
+}
+
+function getVertexAtPosition(screenX, screenY) {
+  const worldPos = screenToWorld(screenX, screenY);
+
   for (let i = 0; i < targets.length; i++) {
-    const dx = targets[i].x - canvasX;
-    const dy = targets[i].y - canvasY;
+    const dx = targets[i].x - worldPos.x;
+    const dy = targets[i].y - worldPos.y;
     if (dx * dx + dy * dy < HANDLE_RADIUS * HANDLE_RADIUS) {
       return i;
     }
@@ -256,19 +273,20 @@ function getVertexAtPosition(canvasX, canvasY) {
 
 function handleMouseMove(e) {
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const screenX = e.clientX - rect.left;
+  const screenY = e.clientY - rect.top;
 
   if (isDragging && draggedVertexIndex !== -1) {
-    targets[draggedVertexIndex] = {x, y};
+    targets[draggedVertexIndex] = screenToWorld(screenX, screenY);
 
     const alphaValue = parseFloat(document.getElementById('alpha').value);
-    drawPointsOnCanvas(ctx, [], canvas.width, canvas.height, alphaValue);
+    ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+    drawPointsOnCanvas(ctx, [], alphaValue);
 
     clearTimeout(canvas.regenerateTimeout);
     canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
   } else {
-    const hoveredIndex = getVertexAtPosition(x, y);
+    const hoveredIndex = getVertexAtPosition(screenX, screenY);
     canvas.style.cursor = hoveredIndex !== -1 ? 'move' : 'default';
   }
 }
@@ -300,6 +318,7 @@ document.getElementById('generateBtn').addEventListener('click', generateAndDraw
 document.getElementById('resetBtn').addEventListener('click', () => {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   initializeVertices(vertices);
+  ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
   drawVerticesOnCanvas(ctx);
 });
 
