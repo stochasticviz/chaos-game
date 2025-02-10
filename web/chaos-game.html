@@ -1,4 +1,3 @@
-<!-- todo: move call drawVerticesOnCanvas(ctx); to the outermost scope of generatePoints().  also it looks like Claude called  drawPointsOnCanvas() within the mouse*() functions just to get vertices drawn call drawVerticesOnCanvas() within those instead  -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -202,8 +201,6 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   for (let i = 0; i < points.length; i++) {
     ctx.fillRect(points[i].x, points[i].y, 1, 1);
   }
-
-  drawVerticesOnCanvas(ctx);
 }
 
 function toggleSpinner(show) {
@@ -240,11 +237,11 @@ async function generateAndDraw() {
       await generatePoints(steps, scope.f, (progress, points) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
-        drawPointsOnCanvas(ctx, points, alphaValue);
       });
 
       cache[cacheKey] = ctx.getImageData(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
     }
+    drawVerticesOnCanvas(ctx);
   } finally {
     toggleSpinner(false);
     generateBtn.disabled = false;
@@ -281,7 +278,7 @@ function handleMouseMove(e) {
 
     const alphaValue = parseFloat(document.getElementById('alpha').value);
     ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
-    drawPointsOnCanvas(ctx, [], alphaValue);
+    drawVerticesOnCanvas(ctx);
 
     clearTimeout(canvas.regenerateTimeout);
     canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
