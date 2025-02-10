@@ -96,7 +96,6 @@ f(currentX, currentY, targetX, targetY) = [
 import { create, all } from './lib/mathjs/14.2.0/math.mjs';
 const math = create(all);
 
-const cache = {};
 let targets = [];
 let isDragging = false;
 let draggedVertexIndex = -1;
@@ -119,10 +118,6 @@ document.getElementById('customizeFunction').addEventListener('change', function
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
 });
-
-function getCacheKey(vertices, steps, alpha, nextPointFunctionString) {
-  return `${vertices}_${steps}_${alpha}_${JSON.stringify(targets)}_${nextPointFunctionString}`;
-}
 
 function getCircleCoord(theta) {
   const x = CIRCLE_RADIUS * Math.cos(theta);
@@ -226,22 +221,14 @@ async function generateAndDraw() {
     if (targets.length !== vertices) {
       initializeVertices(vertices);
     }
-
-    const cacheKey = getCacheKey(vertices, steps, alphaValue, nextPointFunctionString);
-
-    if (cache[cacheKey]) {
-      ctx.putImageData(cache[cacheKey], -canvas.width/2, -canvas.height/2);
-    } else {
-      ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
-      await new Promise(resolve => setTimeout(resolve, 5));
-      await generatePoints(steps, scope.f, (progress, points) => {
-        document.getElementById('spinner').textContent =
-          `Generating points... ${Math.round(progress * 100)}%`;
-      });
-
-      cache[cacheKey] = ctx.getImageData(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
-    }
+    ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
     drawVerticesOnCanvas(ctx);
+    await new Promise(resolve => setTimeout(resolve, 5));
+    await generatePoints(steps, scope.f, (progress, points) => {
+      document.getElementById('spinner').textContent =
+        `Generating points... ${Math.round(progress * 100)}%`;
+      drawPointsOnCanvas(ctx, points, alphaValue);
+    });
   } finally {
     toggleSpinner(false);
     generateBtn.disabled = false;
