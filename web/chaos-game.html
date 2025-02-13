@@ -32,6 +32,10 @@
       max-width: 600px;
       margin-top: 10px;
     }
+    #viewSettings {
+      display: none;
+      margin-top: 10px;
+    }
   </style>
 <script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
@@ -48,7 +52,7 @@
   <input type="number" id="vertices" value="3" min="1"/>
 
   <label for="steps">Points:</label>
-  <input type="number" id="steps" value="32000" step="50000" min="1" max="10000000"/>
+  <input type="number" id="steps" value="32000" step="50000"/>
 
   <label for="alpha">Opacity (0.0 - 1.0):</label>
   <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
@@ -90,6 +94,25 @@ f(currentX, currentY, targetX, targetY) = [
 </div>
 
 <input type="text" id="nextPointFunction" value="f(currentX, currentY, targetX, targetY) = [ (currentX+targetX) * 1/2, (currentY+targetY) * 1/2]">
+
+<div>
+    <input type="checkbox" id="customizeView" />
+    <label for="customizeView">Zoom and pan</label>
+</div>
+
+<div id="viewSettings">
+    <label for="centerX">Center X:</label>
+    <input type="number" id="centerX" value="0" />
+
+    <label for="centerY">Center Y:</label>
+    <input type="number" id="centerY" value="0" />
+
+    <label for="zoom">Zoom:</label>
+    <input type="number" id="zoom" value="1" step="0.1"/>
+    <span id="pointsInView"></span>
+</div>
+
+
 <div id="spinner">Generating points...</div>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
 <script type="module">
@@ -103,7 +126,6 @@ const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 
-// Add event listener for the checkbox
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
@@ -112,11 +134,17 @@ ctx.translate(canvas.width / 2, canvas.height / 2);
 // Flip Y axis so positive is up
 ctx.scale(1, -1);
 
+
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextPointFunction');
     const explanation = document.getElementById('functionExplanation');
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
+});
+
+document.getElementById('customizeView').addEventListener('change', function(e) {
+    const viewSettings = document.getElementById('viewSettings');
+    viewSettings.style.display = e.target.checked ? 'block' : 'none';
 });
 
 function getCircleCoord(theta) {
@@ -139,6 +167,15 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
   let x = 50.0;
   let y = 50.0;
   let points = [];
+  let pointsInViewCount = 0;
+
+  const centerX = parseFloat(document.getElementById('centerX').value);
+  const centerY = parseFloat(document.getElementById('centerY').value);
+  const zoom = parseFloat(document.getElementById('zoom').value);
+  const viewWidth = canvas.width / zoom;
+  const viewHeight = canvas.height / zoom;
+  const viewLeft = centerX - viewWidth / 2;
+  const viewTop = centerY - viewHeight / 2;
 
   const chunkSize = 10000;
   let currentStep = 0;
@@ -158,11 +195,17 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
             y = (y + targetY) / 2.0;
         }
         points.push({ x, y });
+
+        if (x >= viewLeft && x <= viewLeft + viewWidth &&
+            y >= viewTop && y <= viewTop + viewHeight) {
+          pointsInViewCount++;
+        }
       }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, points);
+      consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);
       points = [];
+      //pointsInViewCount = 0;
 
       if (currentStep < steps) {
         setTimeout(generateChunk, 0);
@@ -176,26 +219,45 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
 }
 
 function drawVerticesOnCanvas(ctx) {
-  targets.forEach((target, i) => {
-    // Draw handle
-    ctx.beginPath();
-    ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-    ctx.arc(target.x, target.y, HANDLE_RADIUS, 0, 2 * Math.PI);
-    ctx.fill();
+    const centerX = parseFloat(document.getElementById('centerX').value);
+    const centerY = parseFloat(document.getElementById('centerY').value);
+    const zoom = parseFloat(document.getElementById('zoom').value);
 
-    // Draw vertex
-    ctx.beginPath();
-    ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
-    ctx.arc(target.x, target.y, VERTEX_RADIUS, 0, 2 * Math.PI);
-    ctx.fill();
-  });
+    ctx.save();
+    ctx.scale(zoom, zoom);
+    ctx.translate(-centerX, -centerY);
+
+    targets.forEach((target, i) => {
+        // Draw handle
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+        ctx.arc(target.x, target.y, HANDLE_RADIUS / zoom, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Draw vertex
+        ctx.beginPath();
+        ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
+        ctx.arc(target.x, target.y, VERTEX_RADIUS / zoom, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+    ctx.restore();
 }
 
+
 function drawPointsOnCanvas(ctx, points, alphaValue) {
+  const centerX = parseFloat(document.getElementById('centerX').value);
+  const centerY = parseFloat(document.getElementById('centerY').value);
+  const zoom = parseFloat(document.getElementById('zoom').value);
+
+  ctx.save();
+  ctx.scale(zoom, zoom);
+  ctx.translate(-centerX, -centerY);
+
   ctx.fillStyle = `rgba(0, 0, 0, ${alphaValue})`;
   for (let i = 0; i < points.length; i++) {
-    ctx.fillRect(points[i].x, points[i].y, 1, 1);
+    ctx.fillRect(points[i].x, points[i].y, 1/zoom, 1/zoom);
   }
+  ctx.restore();
 }
 
 function toggleSpinner(show) {
@@ -221,12 +283,21 @@ async function generateAndDraw() {
     if (targets.length !== vertices) {
       initializeVertices(vertices);
     }
-    ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+
+    // save the current transformation matrix
+    ctx.save();
+    // use the identity matrix while clearing the canvas
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // restore the transform
+    ctx.restore();
+
     drawVerticesOnCanvas(ctx);
     await new Promise(resolve => setTimeout(resolve, 5));
-    await generatePoints(steps, scope.f, (progress, points) => {
+    await generatePoints(steps, scope.f, (progress, points, proportionInView) => {
       document.getElementById('spinner').textContent =
         `Generating points... ${Math.round(progress * 100)}%`;
+      document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
       drawPointsOnCanvas(ctx, points, alphaValue);
     });
   } finally {
@@ -236,9 +307,13 @@ async function generateAndDraw() {
 }
 
 function screenToWorld(screenX, screenY) {
+  const centerX = parseFloat(document.getElementById('centerX').value);
+  const centerY = parseFloat(document.getElementById('centerY').value);
+  const zoom = parseFloat(document.getElementById('zoom').value);
+
   return {
-    x: screenX - canvas.width/2,
-    y: -(screenY - canvas.height/2)
+    x: (screenX - canvas.width/2) / zoom + centerX,
+    y: -(screenY - canvas.height/2) / zoom + centerY
   };
 }
 
@@ -262,9 +337,16 @@ function handleMouseMove(e) {
 
   if (isDragging && draggedVertexIndex !== -1) {
     targets[draggedVertexIndex] = screenToWorld(screenX, screenY);
-
     const alphaValue = parseFloat(document.getElementById('alpha').value);
-    ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+
+    // save the current transformation matrix
+    ctx.save();
+    // use the identity matrix while clearing the canvas
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // restore the transform
+    ctx.restore();
+
     drawVerticesOnCanvas(ctx);
 
     clearTimeout(canvas.regenerateTimeout);
@@ -302,7 +384,15 @@ document.getElementById('generateBtn').addEventListener('click', generateAndDraw
 document.getElementById('resetBtn').addEventListener('click', () => {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   initializeVertices(vertices);
-  ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+
+  // save the current transformation matrix
+  ctx.save();
+  // use the identity matrix while clearing the canvas
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // restore the transform
+  ctx.restore();
+
   drawVerticesOnCanvas(ctx);
 });
 
