@@ -17,7 +17,7 @@ Requires: numpy, holoviews, panel, bokeh
 Using conda:
 
 ```
-conda env create -f environment.yml
+conda env create -f sierpinski_triangle/environment.yml
 
 conda activate chaos-game
 ```
