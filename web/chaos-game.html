@@ -93,7 +93,11 @@ f(currentX, currentY, targetX, targetY) = [
 </code>
 </div>
 
-<input type="text" id="nextPointFunction" value="f(currentX, currentY, targetX, targetY) = [ (currentX+targetX) * 1/2, (currentY+targetY) * 1/2]">
+<input type="text" id="nextVertexAndPointMathJSCode" value="    nextTargetIndex = math.randomInt(1, targetPointsLength+1);
+    _nextTarget = targetPoints[nextTargetIndex];
+    nextX = (currentX + _nextTarget.x) / 2;
+    nextY = (currentY + _nextTarget.y) / 2;
+">
 
 <div>
     <input type="checkbox" id="customizeView" />
@@ -162,10 +166,8 @@ function initializeVertices(n_points) {
   }
 }
 
-function generatePoints(steps, nextStepFunction, consumePoints) {
+function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints) {
   // Start near origin
-  let x = 50.0;
-  let y = 50.0;
   let points = [];
   let pointsInViewCount = 0;
 
@@ -180,22 +182,38 @@ function generatePoints(steps, nextStepFunction, consumePoints) {
   const chunkSize = 10000;
   let currentStep = 0;
 
+  const scope = {
+      math: math,
+      targetPoints: targets,
+      targetPointsLength: targets.length,
+      // arbitrary index. mathJS uses 1-index.
+      currentTargetIndex: 1,
+      // arbitary point to start is 100, 100
+      currentX: 100,
+      currentY: 100,
+  };
+
   return new Promise((resolve) => {
     function generateChunk() {
       const endStep = Math.min(currentStep + chunkSize, steps);
-
+      let x = null;
+      let y = null;
       for (let i = currentStep; i < endStep; i++) {
-        const nextTargetIdx = Math.floor(Math.random() * targets.length);
-        const targetX = targets[nextTargetIdx].x;
-        const targetY = targets[nextTargetIdx].y;
-        if (nextStepFunction) {
-            [x, y] = nextStepFunction(x, y, targetX, targetY).toArray();
+        if (nextVertexAndPointMathJSCodeString) {
+            // evaluate (parse, etc.) this string of code in every iteration. needs opt.
+            math.evaluate(nextVertexAndPointMathJSCodeString, scope); // execute this code within scope defined by scope object, leaving behind values in scope: scope.nextX, scope.nextY, scope.nextTargetIndex (at minimum)
+            x = scope.nextX;
+            y = scope.nextY;
+            // update the scope for the next iteration
+            scope.currentX = x;
+            scope.currentY = y;
+            scope.currentTargetIndex = scope.nextTargetIndex;
         } else {
+            // a performance opt
             x = (x + targetX) / 2.0;
             y = (y + targetY) / 2.0;
         }
         points.push({ x, y });
-
         if (x >= viewLeft && x <= viewLeft + viewWidth &&
             y >= viewTop && y <= viewTop + viewHeight) {
           pointsInViewCount++;
@@ -269,10 +287,8 @@ async function generateAndDraw() {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
-  const nextPointFunctionString = document.getElementById("nextPointFunction").value;
+  const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
 
-  const scope = {};
-  math.evaluate(nextPointFunctionString, scope); // put this function into scope (function will have access to scope, including all the math.* functions)
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
@@ -293,7 +309,7 @@ async function generateAndDraw() {
 
     drawVerticesOnCanvas(ctx);
     await new Promise(resolve => setTimeout(resolve, 5));
-    await generatePoints(steps, scope.f, (progress, points, proportionInView) => {
+    await generatePoints(steps, nextVertexAndPointMathJSCodeString, (progress, points, proportionInView) => {
       document.getElementById('spinner').textContent =
         `Generating points... ${Math.round(progress * 100)}%`;
       document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
