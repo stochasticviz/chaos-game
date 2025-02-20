@@ -126,17 +126,6 @@ const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 
-console.log("eval:");
-console.log(math.evaluate([  'x = 3', 'y = 4', 'x + y']));
-console.log(math.evaluate([  'q=7', 'x = pickRandom([q,1,2,3,10,100])', 'y = 4', 'x + y']));
-console.log("now commas with surrounding []");
-console.log(math.evaluate( [ 'q=7', 'x = pickRandom([q,1,2,3,10,100])', 'y = 4', 'x + y' ] ));
-console.log(math.evaluate('q=70 ; x = pickRandom([q,10,20,30,100,1000]) ; y = 40 ; x + y'));
-console.log("now semicolins without surrounding []");
-console.log(math.evaluate('x = 3; y = 4; x + y'));
-console.log("now semicolins WITH surrounding []");
-console.log(math.evaluate(['x = 3; y = 4; x + y']));
-
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
