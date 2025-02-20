@@ -270,7 +270,6 @@ async function generateAndDraw() {
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextPointFunctionString = document.getElementById("nextPointFunction").value;
-  const nextPointFunction = math.evaluate(nextPointFunctionString);
 
   const scope = {};
   math.evaluate(nextPointFunctionString, scope); // put this function into scope (function will have access to scope, including all the math.* functions)
