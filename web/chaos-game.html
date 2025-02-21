@@ -193,15 +193,18 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       currentY: 100,
   };
 
+  const compiled_expressions = math.compile(nextVertexAndPointMathJSCodeString);
+  let x = null;
+  let y = null;
+
   return new Promise((resolve) => {
     function generateChunk() {
       const endStep = Math.min(currentStep + chunkSize, steps);
-      let x = null;
-      let y = null;
       for (let i = currentStep; i < endStep; i++) {
         if (nextVertexAndPointMathJSCodeString) {
             // evaluate (parse, etc.) this string of code in every iteration. needs opt.
-            math.evaluate(nextVertexAndPointMathJSCodeString, scope); // execute this code within scope defined by scope object, leaving behind values in scope: scope.nextX, scope.nextY, scope.nextTargetIndex (at minimum)
+            //math.evaluate(nextVertexAndPointMathJSCodeString, scope); // execute this code within scope defined by scope object, leaving behind values in scope: scope.nextX and scope.nextY, at minimum
+            compiled_expressions.evaluate(scope);
             x = scope.nextX;
             y = scope.nextY;
             // update the scope for the next iteration
@@ -210,6 +213,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             scope.currentTargetIndex = scope.nextTargetIndex;
         } else {
             // a performance opt
+            const nextTargetIdx = Math.floor(Math.random() * targets.length);
+            const targetX = targets[nextTargetIdx].x;
+            const targetY = targets[nextTargetIdx].y;
             x = (x + targetX) / 2.0;
             y = (y + targetY) / 2.0;
         }
