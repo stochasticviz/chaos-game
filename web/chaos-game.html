@@ -26,10 +26,13 @@
       border-radius: 8px;
       z-index: 1000;
     }
+    #codeExplanation code.codeExample {
+      display: block;
+      padding: 1em;
+    }
     #nextVertexAndPointMathJSCode {
       display: none;
       width: 100%;
-      max-width: 600px;
       margin-top: 10px;
     }
     #viewSettings {
@@ -62,37 +65,31 @@
 </div>
 <div>
   <input type="checkbox" id="customizeFunction" />
-  <label for="customizeFunction">Customize the "next point" function</label>
+  <label for="customizeFunction">Customize the "next point" code</label>
 </div>
 
-<div id="functionExplanation" style="display: none; margin: 10px 0;">
-  <p>Define how the next point is calculated using a function of these variables:</p>
-  <ul>
-    <li><code>currentX, currentY</code>:&nbsp;&nbsp;&nbsp;&nbsp;the current point's coordinates</li>
-    <li><code>targetX, targetY</code>&nbsp;&nbsp;&nbsp;&nbsp;a randomly chosen vertex's coordinates</li>
-  </ul>
-  <p>... which returns an array of two numbers:</p>
-  <ul>
-    <li><code>nextX, nextY</code>:&nbsp;&nbsp;&nbsp;&nbsp;the next point's coordinates</li>
-  </ul>
-  <p>The default function simply moves to halfway to the target. But you can use any of the arithmetic, trigonometry, or matrix functions in the <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">docs</a> of Math.JS, which is what evaluates the function.</p>
-Example:
-<code>
-f(currentX, currentY, targetX, targetY) = [ currentX + 1,  currentY + 1]
+<div id="codeExplanation" style="display: none; margin: 10px 0;">
+Write code determining where the next point should be, based on current point's coordinates, <code>currentX</code> and <code>currentY</code>. The default code simply picks a target at random and moves the current point halfway there. But you can change that, using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a> and <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a> of Math.JS. You just have to make sure you set the <code>nextX</code> and <code>nextY</code> variables.
+<br/><br/>Example:<br/>
+<code class="codeExample">
+nextX = currentX + 1;<br/>
+nextY = currentY + 1;<br/>
 </code>
-<br/><br/>Example:
-<code>
-f(currentX, currentY, targetX, targetY) = [   (currentX + targetX)/2 + (currentY - targetY)/4,   (currentY + targetY)/2 - (currentX - targetX)/4 ]
+<br/>Example:<br/>
+<code class="codeExample">
+nextTargetIndex = math.randomInt(1, targetPointsLength+1);<br/>
+_nextTarget = targetPoints[nextTargetIndex];<br/>
+nextX = (currentX + _nextTarget.x) / 2 + (currentY - _nextTarget.y) / 4;<br/>
+nextY = (currentY + _nextTarget.y) / 2 - (currentX - _nextTarget.x) / 4;<br/>
 </code>
-<br/><br/>Example:
-<code>
-f(currentX, currentY, targetX, targetY) = [
-  dot([cos(pi/4), -sin(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2]),
-  dot([sin(pi/4), cos(pi/4)], [(currentX + targetX)/2, (currentY + targetY)/2])
-]
+<br/>Example:<br/>
+<code class="codeExample">
+nextTargetIndex = math.randomInt(1, targetPointsLength+1);<br/>
+_nextTarget = targetPoints[nextTargetIndex];<br/>
+nextX = dot([cos(pi/4), -sin(pi/4)], [(currentX + _nextTarget.x)/2, (currentY + _nextTarget.y)/2]);<br/>
+nextY = dot([sin(pi/4), cos(pi/4)], [(currentX + _nextTarget.x)/2, (currentY + _nextTarget.y)/2]);<br/>
 </code>
 </div>
-
 <textarea id="nextVertexAndPointMathJSCode" rows="5">
  nextTargetIndex = math.randomInt(1, targetPointsLength+1);
  _nextTarget = targetPoints[nextTargetIndex];
@@ -141,7 +138,7 @@ ctx.scale(1, -1);
 
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
-    const explanation = document.getElementById('functionExplanation');
+    const explanation = document.getElementById('codeExplanation');
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
 });
