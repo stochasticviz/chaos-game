@@ -203,6 +203,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
         if (nextVertexAndPointMathJSCodeString) {
             // evaluate (parse, etc.) this string of code in every iteration. needs opt.
             //math.evaluate(nextVertexAndPointMathJSCodeString, scope); // execute this code within scope defined by scope object, leaving behind values in scope: scope.nextX and scope.nextY, at minimum
+            if (firstTime | (i % 100000 == 0)){
+                showStuff = true;
+            }
+            else {
+                showStuff = false;
+            }
             resultSet = compiled_expressions.evaluate(scope);
             if (showStuff) {
                 console.log("currentPoint straight from scope:", scope.currentPoint);
