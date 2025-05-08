@@ -221,7 +221,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             scope.currentTargetIndex = scope.nextTargetIndex;
             firstTime = false;
         } else {
-            // a performance opt
+            // a performance opt   todo: make this opt include the entire loop    todo: bring this into the new way
+            // this block currently never runs
             const nextTargetIdx = Math.floor(Math.random() * targets.length);
             const targetX = targets[nextTargetIdx].x;
             const targetY = targets[nextTargetIdx].y;
