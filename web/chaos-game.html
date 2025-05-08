@@ -70,7 +70,7 @@
 </div>
 
 <div id="codeExplanation" style="display: none; margin: 10px 0;">
-Write code determining where the next point should be, based on current point's coordinates, <code>currentX</code> and <code>currentY</code>. The default code simply picks a target at random and moves the current point halfway there. But you can change that, using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a> and <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a> of Math.JS. You just have to make sure you set the <code>nextX</code> and <code>nextY</code> variables.
+Write your own code to calculate where the next point should be. You can use the coordinates of the current point, <code>currentPoint</code>, and an matrix, <code>targetPoints</code>, which contains the coordinates of each target vertex. The default code simply picks one of those targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. <em>All you must do is set the <code>nextPoint</code> variable to a array of two numbers.</em>
 <br/><br/>Example:<br/>
 <code class="codeExample">
 nextX = currentX + 1;<br/>
