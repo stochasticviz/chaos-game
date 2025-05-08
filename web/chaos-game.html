@@ -121,7 +121,7 @@ nextY = dot([sin(pi/4), cos(pi/4)], [(currentX + _nextTarget.x)/2, (currentY + _
 import { create, all } from './lib/mathjs/14.2.0/math.mjs';
 const math = create(all);
 
-let targets = [];
+let targets = [];  // TODO: these should probably be MathJS matrices
 let isDragging = false;
 let draggedVertexIndex = -1;
 const VERTEX_RADIUS = 8;
@@ -135,7 +135,6 @@ const ctx = canvas.getContext('2d');
 ctx.translate(canvas.width / 2, canvas.height / 2);
 // Flip Y axis so positive is up
 ctx.scale(1, -1);
-
 
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
@@ -166,9 +165,6 @@ function initializeVertices(n_points) {
 
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints) {
   // Start near origin
-  let points = [];
-  let pointsInViewCount = 0;
-
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
   const zoom = parseFloat(document.getElementById('zoom').value);
@@ -182,19 +178,23 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
 
   const scope = {
       math: math,
-      targetPoints: targets,
+      targetPoints: math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] })),
       targetPointsLength: targets.length,
       // arbitrary index. mathJS uses 1-index.
       currentTargetIndex: 1,
       // arbitary point to start is 100, 100
-      currentX: 100,
-      currentY: 100,
+      currentPoint: math.matrix([[100, 100]]),
       userData: {},
   };
 
   const compiled_expressions = math.compile(nextVertexAndPointMathJSCodeString);
-  let x = null;
-  let y = null;
+  let points = [];
+  let pointsInViewCount = 0;
+  let nextPoint = null;
+  let nextPointArray = null;
+  let showStuff = false;
+  let firstTime = true;
+  let resultSet = null;
 
   return new Promise((resolve) => {
     function generateChunk() {
@@ -203,13 +203,17 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
         if (nextVertexAndPointMathJSCodeString) {
             // evaluate (parse, etc.) this string of code in every iteration. needs opt.
             //math.evaluate(nextVertexAndPointMathJSCodeString, scope); // execute this code within scope defined by scope object, leaving behind values in scope: scope.nextX and scope.nextY, at minimum
-            compiled_expressions.evaluate(scope);
-            x = scope.nextX;
-            y = scope.nextY;
+            resultSet = compiled_expressions.evaluate(scope);
+            if (showStuff) {
+                console.log("currentPoint straight from scope:", scope.currentPoint);
+                console.log("nextPoint straight from scope:", scope.nextPoint);
+                console.log("the ResultSet returned from those expressions:", resultSet)
+            }
+            nextPoint = scope.nextPoint;
             // update the scope for the next iteration
-            scope.currentX = x;
-            scope.currentY = y;
+            scope.currentPoint = nextPoint;
             scope.currentTargetIndex = scope.nextTargetIndex;
+            firstTime = false;
         } else {
             // a performance opt
             const nextTargetIdx = Math.floor(Math.random() * targets.length);
@@ -218,9 +222,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             x = (x + targetX) / 2.0;
             y = (y + targetY) / 2.0;
         }
-        points.push({ x, y });
-        if (x >= viewLeft && x <= viewLeft + viewWidth &&
-            y >= viewTop && y <= viewTop + viewHeight) {
+        nextPointArray = nextPoint.toArray()[0]; // nextPoint was a MathJS matrix with one row. Get that row.  TODO: try using MathJS Matrix objects throughout the code.
+        points.push({ x: nextPointArray[0], y: nextPointArray[1] });
+        if (nextPointArray[0] >= viewLeft && nextPointArray[0] <= viewLeft + viewWidth &&
+            nextPointArray[1] >= viewTop && nextPointArray[1] <= viewTop + viewHeight) {
           pointsInViewCount++;
         }
       }
@@ -265,7 +270,6 @@ function drawVerticesOnCanvas(ctx) {
     });
     ctx.restore();
 }
-
 
 function drawPointsOnCanvas(ctx, points, alphaValue) {
   const centerX = parseFloat(document.getElementById('centerX').value);
