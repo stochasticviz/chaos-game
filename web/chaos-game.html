@@ -79,47 +79,38 @@ pre.codeExample {
 </div>
 
 <div id="codeExplanation" style="display: none; margin: 10px 0;">
-Write your own code to calculate where the next point should be. You can use the coordinates of the current point, <code>currentPoint</code>, and an matrix, <code>targetPoints</code>, which contains the coordinates of each target vertex. The default code simply picks one of those targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. <em>All you must do is set the <code>nextPoint</code> variable to a array of two numbers.</em>
+Write your own code to calculate where the next point should be. You can use the coordinates of the current point, <code>currentPoint</code>, and an matrix, <code>targetPoints</code>, which contains the coordinates of each target vertex. The default code simply picks one of those targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em>
 <br><br>
 
 <div class="codeBlock">
-  Example:
+  Example (add 1 to both x and y):
   <pre class="codeExample">
-nextPoint = currentPoint + 1;</pre>
+nextPoint = currentPoint + 1</pre>
 </div>
 
 <div class="codeBlock">
-  Example:
+  Example (with rotation):
   <pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1);
-_nextTarget = targetPoints[nextTargetIndex, :];
-nextX = (currentX + _nextTarget.x) / 2 + (currentY - _nextTarget.y) / 4;
-nextY = (currentY + _nextTarget.y) / 2 - (currentX - _nextTarget.x) / 4;</pre>
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+midpoint = (currentPoint + _nextTarget) / 2
+rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), math.cos(math.pi/4)]]
+nextPoint = math.multiply(midpoint, rotation)</pre>
 </div>
 
 <div class="codeBlock">
-  Example:
-<pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1);
-_nextTarget = targetPoints[nextTargetIndex, :];
-midpoint = (currentPoint + _nextTarget) / 2;
-rotation = [[cos(pi/4), -sin(pi/4)], [sin(pi/4), cos(pi/4)]];
-nextPoint = midpoint * rotation ;</pre>
-</div>
-
-<div class="codeBlock">
-  Example:
+  Example (with scaling):
   <pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1);
-_nextTarget = targetPoints[nextTargetIndex];
-midpoint = [(currentX + _nextTarget.x)/2, (currentY + _nextTarget.y)/2];
-rotation = [[cos(pi/4), -sin(pi/4)], [sin(pi/4), cos(pi/4)]];
-nextPoint = dot(rotation, midpoint)[0];</pre>
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+nextPoint = (currentPoint + _nextTarget) * 0.6</pre>
 </div>
 </div> <!-- codeExplanation -->
 <textarea id="nextVertexAndPointMathJSCode" rows="5">
+# Pick a random target vertex
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
+# Move halfway to the chosen target
 nextPoint = (currentPoint + _nextTarget) / 2
 </textarea>
 <div>
