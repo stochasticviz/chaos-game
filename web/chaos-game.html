@@ -117,14 +117,17 @@ nextPoint = (currentPoint + _nextTarget) * 0.6</pre>
   <pre class="codeExample">
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
-# Create a matrix of sine factors
-sineFactors = math.matrix([
-  [math.sin(_nextTarget[1,2] + 500)/2 + 0.5],
-  [math.sin(_nextTarget[1,1] + 500)/2 + 0.5]
+
+sine_shift = math.pi*29/25
+sine_scale = 1/2
+sine_offset = 1/2
+displacement_factors = math.matrix([
+  [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
+   math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset]
 ])
-# Apply the factors to the movement
-movement = _nextTarget - currentPoint
-nextPoint = currentPoint + math.multiply(movement, sineFactors)</pre>
+# Apply the factors to the displacement
+displacement_to_target = _nextTarget - currentPoint
+nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
 </div>
 </div> <!-- codeExplanation -->
 <textarea id="nextVertexAndPointMathJSCode" rows="5">
