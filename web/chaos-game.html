@@ -105,14 +105,6 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
 </div>
 
 <div class="codeBlock">
-  With scaling:
-  <pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
-nextPoint = (currentPoint + _nextTarget) * 0.6</pre>
-</div>
-
-<div class="codeBlock">
   The Corchran art function:
   <pre class="codeExample">
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
@@ -129,7 +121,28 @@ displacement_factors = math.matrix([
 displacement_to_target = _nextTarget - currentPoint
 nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
 </div>
+<div class="codeBlock">
+  Avoid previous target vertex:
+  <pre class="codeExample">
+# Initialize previous vertex if needed
+userData["previous_vertex"] = userData["previous_vertex"] == undefined ? -1 : userData["previous_vertex"]
+
+# Get all possible indices except previous
+_possibleTargetIndices = math.range(1, targetPointsLength+1)
+_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != userData["previous_vertex"]]
+
+# Pick random target and get its coordinates
+_nextTargetIndex = math.pickRandom(_possibleTargetIndices)
+_nextTarget = targetPoints[_nextTargetIndex, :]  # Get the full row to maintain dimensions
+
+# Calculate midpoint
+nextPoint = (currentPoint + _nextTarget) / 2
+
+# Store current vertex for next iteration
+userData["previous_vertex"] = _nextTargetIndex</pre>
+</div>
 </div> <!-- codeExplanation -->
+
 <textarea id="nextVertexAndPointMathJSCode" rows="5">
 # Pick a random target vertex
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
