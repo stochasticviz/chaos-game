@@ -135,7 +135,7 @@ _possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != userDa
 
 # Pick random target and get its coordinates
 _nextTargetIndex = math.pickRandom(_possibleTargetIndices)
-_nextTarget = targetPoints[_nextTargetIndex, :]  # Get the full row to maintain dimensions
+_nextTarget = targetPoints[_nextTargetIndex, :]
 
 # Calculate midpoint
 nextPoint = (currentPoint + _nextTarget) / 2
