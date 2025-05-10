@@ -7,6 +7,11 @@
     body {
       font-family: sans-serif;
     }
+    h1 {
+      font-size: 1.2em;
+      font-weight: normal;
+      margin: 0.5em 0;
+    }
     #myCanvas {
       border: 1px solid #555;
       display: block;
@@ -59,7 +64,7 @@ pre.codeExample {
 </script>
 </head>
 <body>
-<div>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a>!</div>
+<h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a>!</h1>
 <div id="controls">
   <label for="vertices">Vertices:</label>
   <input type="number" id="vertices" value="3" min="1"/>
@@ -82,14 +87,15 @@ pre.codeExample {
 Write your own code to calculate where the next point should be. You can use the coordinates of the current point, <code>currentPoint</code>, and an matrix, <code>targetPoints</code>, which contains the coordinates of each target vertex. The default code simply picks one of those targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em>
 <br><br>
 
+<h4>Examples:</h4>
 <div class="codeBlock">
-  Example (add 1 to both x and y):
+  Add 1 to both x and y:
   <pre class="codeExample">
 nextPoint = currentPoint + 1</pre>
 </div>
 
 <div class="codeBlock">
-  Example (with rotation):
+  With rotation:
   <pre class="codeExample">
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
@@ -99,7 +105,7 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
 </div>
 
 <div class="codeBlock">
-  Example (with scaling):
+  With scaling:
   <pre class="codeExample">
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
