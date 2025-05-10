@@ -1,0 +1,54 @@
+body {
+  font-family: sans-serif;
+}
+
+h1 {
+  font-size: 1.2em;
+  font-weight: normal;
+  margin: 0.5em 0;
+}
+
+#myCanvas {
+  border: 1px solid #555;
+  display: block;
+  margin-top: 1em;
+  cursor: default;
+}
+
+#spinner {
+  display: none;
+  position: fixed;
+  top: 20%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+  font-size: 2em;
+  color: #555;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.codeBlock {
+  margin: 0.5em 0; /* tight vertical spacing between blocks */
+  line-height: 1.2;
+}
+
+pre.codeExample {
+  margin: 0; /* remove top/bottom spacing */
+  padding: 1em;
+  opacity: 0.5;
+  font-family: monospace;
+  white-space: pre;
+}
+
+#nextVertexAndPointMathJSCode {
+  display: none;
+  width: 100%;
+  margin-top: 10px;
+}
+
+#viewSettings {
+  display: none;
+  margin-top: 10px;
+} 
