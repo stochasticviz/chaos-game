@@ -119,7 +119,7 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 sine_shift = math.pi*29/25
-sine_scale = 1/2
+sine_scale = 1/2  # try 1/3 and 12 vertices with low opacity
 sine_offset = 1/2
 displacement_factors = math.matrix([
   [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
