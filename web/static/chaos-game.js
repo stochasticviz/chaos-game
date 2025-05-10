@@ -8,6 +8,9 @@ const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 
+// Store user control values
+const userControlValues = new Map();
+
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
@@ -16,17 +19,85 @@ ctx.translate(canvas.width / 2, canvas.height / 2);
 // Flip Y axis so positive is up
 ctx.scale(1, -1);
 
+// Register userControl function with MathJS
+math.import({
+  userControl: function(label, min, max) {
+    return userControlValues.get(label) || (min + max) / 2;
+  }
+});
+
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
+    const userControls = document.getElementById('userControls');
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
+    userControls.style.display = e.target.checked ? 'block' : 'none';
 });
 
 document.getElementById('customizeView').addEventListener('change', function(e) {
     const viewSettings = document.getElementById('viewSettings');
     viewSettings.style.display = e.target.checked ? 'block' : 'none';
 });
+
+// Function to create a user control
+function createUserControl(label, min, max) {
+    const container = document.createElement('div');
+    container.className = 'userControl';
+    
+    const labelElem = document.createElement('label');
+    labelElem.textContent = label;
+    container.appendChild(labelElem);
+    
+    const slider = document.createElement('div');
+    container.appendChild(slider);
+    
+    noUiSlider.create(slider, {
+        start: (min + max) / 2,
+        connect: true,
+        range: {
+            'min': min,
+            'max': max
+        }
+    });
+    
+    // Store the initial value
+    userControlValues.set(label, (min + max) / 2);
+    
+    // Update value when slider changes
+    slider.noUiSlider.on('update', function(values) {
+        const newValue = parseFloat(values[0]);
+        const oldValue = userControlValues.get(label);
+        if (newValue !== oldValue) {
+            userControlValues.set(label, newValue);
+            // Regenerate points when slider changes
+            clearTimeout(canvas.regenerateTimeout);
+            canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
+        }
+    });
+    
+    return container;
+}
+
+// Function to parse and create UI controls from code
+function parseAndCreateUserControls(code) {
+    const userControls = document.getElementById('userControls');
+    // Don't clear existing controls if they already exist
+    if (userControls.children.length === 0) {
+        userControls.innerHTML = ''; // Clear existing controls
+        userControlValues.clear(); // Clear existing values
+        
+        // Regular expression to find userControl calls
+        const regex = /userControl\s*\(\s*"([^"]+)"\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/g;
+        let match;
+        
+        while ((match = regex.exec(code)) !== null) {
+            const [_, label, min, max] = match;
+            const control = createUserControl(label, parseFloat(min), parseFloat(max));
+            userControls.appendChild(control);
+        }
+    }
+}
 
 function getCircleCoord(theta) {
   const x = CIRCLE_RADIUS * Math.cos(theta);
@@ -179,6 +250,9 @@ async function generateAndDraw() {
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
+
+  // Parse and create UI controls
+  parseAndCreateUserControls(nextVertexAndPointMathJSCodeString);
 
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;

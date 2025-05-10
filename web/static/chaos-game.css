@@ -51,4 +51,36 @@ pre.codeExample {
 #viewSettings {
   display: none;
   margin-top: 10px;
+}
+
+#userControls {
+  display: none;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.userControl {
+  margin: 10px 0;
+}
+
+.userControl label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.noUi-connect {
+  background: #4285F4;
+}
+
+.noUi-handle {
+  border: 1px solid #4285F4;
+  background: #fff;
+  cursor: pointer;
+}
+
+.noUi-handle:before,
+.noUi-handle:after {
+  background: #4285F4;
 } 

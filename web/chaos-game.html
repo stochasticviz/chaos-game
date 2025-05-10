@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>Play around with the 2D chaos game</title>
   <link rel="stylesheet" href="static/chaos-game.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
 <script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
     posthog.init('phc_VgjFl2kzM4ipDWGy1kIZMOgSNrZqecVZR8QvYbvIX7K', {
@@ -34,6 +36,15 @@
 
 <div id="codeExplanation" style="display: none; margin: 10px 0;">
 Write your own code to calculate where the next point should be. You can use the coordinates of the current point, <code>currentPoint</code>, and an matrix, <code>targetPoints</code>, which contains the coordinates of each target vertex. The default code simply picks one of those targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em>
+
+You can also create custom UI controls by using the <code>userControl</code> function with these parameters:
+<ul>
+  <li><code>label</code>: The label to show for the control</li>
+  <li><code>min</code>: The minimum value</li>
+  <li><code>max</code>: The maximum value</li>
+</ul>
+For example: <code>t = userControl("t (scalar)", -4, 4)</code> will create a slider labeled "t (scalar)" that goes from -4 to 4.
+
 <br><br>
 
 <h4>Examples:</h4>
@@ -94,12 +105,18 @@ userData["previous_vertex"] = _nextTargetIndex</pre>
 </div>
 </div> <!-- codeExplanation -->
 
+<div id="userControls"></div>
+
 <textarea id="nextVertexAndPointMathJSCode" rows="5">
 # Pick a random target vertex
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
-# Move halfway to the chosen target
-nextPoint = (currentPoint + _nextTarget) / 2
+
+# Create a user control for the interpolation factor
+t = userControl("Interpolation Factor", 0, 1)
+
+# Move t% of the way to the chosen target
+nextPoint = currentPoint + (_nextTarget - currentPoint) * t
 </textarea>
 <div>
     <input type="checkbox" id="customizeView" />
