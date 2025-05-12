@@ -79,23 +79,12 @@ function createUserControl(label, min, max) {
     return container;
 }
 
-// Function to parse and create UI controls from code
-function parseAndCreateUserControls(code) {
+// Function to ensure UI controls exist
+function ensureUserControls() {
     const userControls = document.getElementById('userControls');
-    // Don't clear existing controls if they already exist
     if (userControls.children.length === 0) {
-        userControls.innerHTML = ''; // Clear existing controls
-        userControlValues.clear(); // Clear existing values
-        
-        // Regular expression to find userControl calls
-        const regex = /userControl\s*\(\s*"([^"]+)"\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/g;
-        let match;
-        
-        while ((match = regex.exec(code)) !== null) {
-            const [_, label, min, max] = match;
-            const control = createUserControl(label, parseFloat(min), parseFloat(max));
-            userControls.appendChild(control);
-        }
+        userControls.innerHTML = '';
+        userControlValues.clear();
     }
 }
 
@@ -136,6 +125,17 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       // arbitary point to start is 100, 100
       currentPoint: math.matrix([[100, 100]]),
       userData: {},
+      userControl: function(label, min, max, defaultValue) {
+          ensureUserControls();
+          const userControls = document.getElementById('userControls');
+          // Only create the control if it doesn't exist
+          if (!userControlValues.has(label)) {
+              console.log(`Creating new control: ${label} (${min} to ${max}, default: ${defaultValue})`);
+              const control = createUserControl(label, min, max, defaultValue);
+              userControls.appendChild(control);
+          }
+          return userControlValues.get(label) || defaultValue;
+      }
   };
 
   const compiled_expressions = math.compile(nextVertexAndPointMathJSCodeString);
