@@ -41,7 +41,7 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 });
 
 // Function to create a user control
-function createUserControl(label, min, max) {
+function createUserControl(label, min, max, defaultValue) {
     const container = document.createElement('div');
     container.className = 'userControl';
     
@@ -53,7 +53,7 @@ function createUserControl(label, min, max) {
     container.appendChild(slider);
     
     noUiSlider.create(slider, {
-        start: (min + max) / 2,
+        start: defaultValue,
         connect: true,
         range: {
             'min': min,
@@ -62,7 +62,7 @@ function createUserControl(label, min, max) {
     });
     
     // Store the initial value
-    userControlValues.set(label, (min + max) / 2);
+    userControlValues.set(label, defaultValue);
     
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {

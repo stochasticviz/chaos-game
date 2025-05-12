@@ -113,7 +113,7 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create a user control for the interpolation factor
-t = userControl("Interpolation Factor", 0, 1)
+t = userControl("Interpolation Factor", 0, 1, 0.5)
 
 # Move t% of the way to the chosen target
 nextPoint = currentPoint + (_nextTarget - currentPoint) * t
