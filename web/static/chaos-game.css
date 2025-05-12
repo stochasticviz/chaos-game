@@ -65,9 +65,19 @@ pre.codeExample {
   margin: 10px 0;
 }
 
-.userControl label {
-  display: block;
+.label-container {
+  display: flex;
+  align-items: baseline;
   margin-bottom: 5px;
+}
+
+.userControl label {
+  margin-right: 8px;
+}
+
+.value-display {
+  font-family: monospace;
+  color: #666;
 }
 
 .noUi-connect {

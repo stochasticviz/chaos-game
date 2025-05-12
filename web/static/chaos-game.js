@@ -45,9 +45,18 @@ function createUserControl(label, min, max, defaultValue) {
     const container = document.createElement('div');
     container.className = 'userControl';
     
+    const labelContainer = document.createElement('div');
+    labelContainer.className = 'label-container';
+    
     const labelElem = document.createElement('label');
-    labelElem.textContent = label;
-    container.appendChild(labelElem);
+    labelElem.textContent = label + ': ';
+    labelContainer.appendChild(labelElem);
+    
+    const valueDisplay = document.createElement('span');
+    valueDisplay.className = 'value-display';
+    labelContainer.appendChild(valueDisplay);
+    
+    container.appendChild(labelContainer);
     
     const slider = document.createElement('div');
     container.appendChild(slider);
@@ -63,6 +72,7 @@ function createUserControl(label, min, max, defaultValue) {
     
     // Store the initial value
     userControlValues.set(label, defaultValue);
+    valueDisplay.textContent = defaultValue.toFixed(3);
     
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
@@ -70,6 +80,7 @@ function createUserControl(label, min, max, defaultValue) {
         const oldValue = userControlValues.get(label);
         if (newValue !== oldValue) {
             userControlValues.set(label, newValue);
+            valueDisplay.textContent = newValue.toFixed(3);
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
             canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
