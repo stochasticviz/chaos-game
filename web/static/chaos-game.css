@@ -45,7 +45,17 @@ pre.codeExample {
 #nextVertexAndPointMathJSCode {
   display: none;
   width: 100%;
+  max-width: 1000px;  /* Match canvas width */
+  height: 200px;  /* Make it taller */
   margin-top: 10px;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
 }
 
 #viewSettings {
@@ -55,10 +65,13 @@ pre.codeExample {
 
 #userControls {
   display: none;
+  width: 100%;
+  max-width: 1000px;  /* Match canvas width */
   margin-top: 10px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .userControl {
