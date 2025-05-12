@@ -251,8 +251,14 @@ async function generateAndDraw() {
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
 
-  // Parse and create UI controls
-  parseAndCreateUserControls(nextVertexAndPointMathJSCodeString);
+  // Only clear controls if this is a fresh generation (not from slider update)
+  // and if the code has changed
+  if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
+    const userControls = document.getElementById('userControls');
+    userControls.innerHTML = '';
+    userControlValues.clear();
+    canvas.lastCode = nextVertexAndPointMathJSCodeString;
+  }
 
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
@@ -283,6 +289,8 @@ async function generateAndDraw() {
   } finally {
     toggleSpinner(false);
     generateBtn.disabled = false;
+    // Clear the regenerate timeout flag
+    canvas.regenerateTimeout = null;
   }
 }
 
