@@ -48,6 +48,26 @@ Write your own code to calculate where the next point should be. The default cod
     <li><code>max</code>: The maximum value</li>
   </ul>
   For example: <code>t = userControl("t (scalar)", -4, 4, 2)</code> will create a slider labeled "t (scalar)". You can then use <code>t</code> anywhere in your code to give your end user 'live' control over some value, with a range for -4 to 4 and a starting value of 2.
+
+  <h4>Advanced Example - The Corchran art function:</h4>
+  <div class="codeBlock">
+    <pre class="codeExample">
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+
+# Create user controls for the parameters
+sine_shift = userControl("Sine Shift", 0, 2*math.pi, math.pi*29/25)  # every value between 0 and 2*pi is interesting
+sine_scale = userControl("Sine Scale", -1, 4, 1/2)  # try 1/3 and 12 vertices with low opacity
+sine_offset = userControl("Sine Offset", -1, 4, 1/2)
+
+displacement_factors = math.matrix([
+  [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
+   math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset]
+])
+# Apply the factors to the displacement
+displacement_to_target = _nextTarget - currentPoint
+nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
+  </div>
 </div>
 
 <h4>Examples:</h4>
@@ -67,23 +87,6 @@ rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), m
 nextPoint = math.multiply(midpoint, rotation)</pre>
 </div>
 
-<div class="codeBlock">
-  The Corchran art function:
-  <pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
-
-sine_shift = math.pi*29/25  # every value between 0 and 2*pi is interesting
-sine_scale = 1/2  # try 1/3 and 12 vertices with low opacity
-sine_offset = 1/2
-displacement_factors = math.matrix([
-  [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
-   math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset]
-])
-# Apply the factors to the displacement
-displacement_to_target = _nextTarget - currentPoint
-nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
-</div>
 <div class="codeBlock">
   Avoid previous target vertex:
   <pre class="codeExample">
