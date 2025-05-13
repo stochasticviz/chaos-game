@@ -29,10 +29,8 @@ math.import({
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
-    const userControls = document.getElementById('userControls');
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
-    userControls.style.display = e.target.checked ? 'block' : 'none';
 });
 
 document.getElementById('customizeView').addEventListener('change', function(e) {

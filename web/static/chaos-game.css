@@ -64,7 +64,6 @@ pre.codeExample {
 }
 
 #userControls {
-  display: none;
   width: 100%;
   max-width: 1000px;  /* Match canvas width */
   margin-top: 10px;
