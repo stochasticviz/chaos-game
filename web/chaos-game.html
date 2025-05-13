@@ -56,9 +56,9 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create user controls for the parameters
-sine_shift = userControl("Sine Shift", 0, 2*math.pi, math.pi*29/25)  # every value between 0 and 2*pi is interesting
-sine_scale = userControl("Sine Scale", -1, 4, 1/2)  # try 1/3 and 12 vertices with low opacity
-sine_offset = userControl("Sine Offset", -1, 4, 1/2)
+sine_shift = userControl("Sine shift", 0, 2*math.pi, math.pi*29/25)  
+sine_scale = userControl("Sine scale", -3/2, 4, 1/2)  # try 1/3 and 12 vertices with low opacity
+sine_offset = userControl("Sine offset", -1, 4, 1/2)
 
 displacement_factors = math.matrix([
   [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
