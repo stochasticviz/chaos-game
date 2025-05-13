@@ -8,6 +8,10 @@ h1 {
   margin: 0.5em 0;
 }
 
+a:hover {
+  color: #004499;
+}
+
 #myCanvas {
   border: 1px solid #555;
   display: block;
@@ -40,6 +44,30 @@ pre.codeExample {
   opacity: 0.5;
   font-family: monospace;
   white-space: pre;
+}
+
+#advanced-docs-toggle {
+  display: none;
+}
+
+.advanced-docs {
+  display: none;
+}
+
+#advanced-docs-toggle:checked ~ .advanced-docs {
+  display: block;
+}
+
+#advanced-docs-label {
+  font-size: smaller;
+}
+
+#advanced-docs-label::after {
+  content: 'Show advanced docs';
+}
+
+#advanced-docs-toggle:checked ~ #advanced-docs-label::after {
+  content: 'Hide advanced docs';
 }
 
 #nextVertexAndPointMathJSCode {
@@ -105,4 +133,5 @@ pre.codeExample {
 .noUi-handle:before,
 .noUi-handle:after {
   background: #4285F4;
-} 
+}
+
