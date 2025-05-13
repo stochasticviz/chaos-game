@@ -9,7 +9,7 @@ const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 
 // Store user control values
-const userControlValues = new Map();
+const userControlsValuesCache = new Map();
 
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
@@ -22,7 +22,7 @@ ctx.scale(1, -1);
 // Register userControl function with MathJS
 math.import({
   userControl: function(label, min, max) {
-    return userControlValues.get(label) || (min + max) / 2;
+    return userControlsValuesCache.get(label) || (min + max) / 2;
   }
 });
 
@@ -69,15 +69,15 @@ function createUserControl(label, min, max, defaultValue) {
     });
     
     // Store the initial value
-    userControlValues.set(label, defaultValue);
+    userControlsValuesCache.set(label, defaultValue);
     valueDisplay.textContent = defaultValue.toFixed(3);
     
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
         const newValue = parseFloat(values[0]);
-        const oldValue = userControlValues.get(label);
+        const oldValue = userControlsValuesCache.get(label);
         if (newValue !== oldValue) {
-            userControlValues.set(label, newValue);
+            userControlsValuesCache.set(label, newValue);
             valueDisplay.textContent = newValue.toFixed(3);
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
@@ -93,7 +93,7 @@ function ensureUserControls() {
     const userControls = document.getElementById('userControls');
     if (userControls.children.length === 0) {
         userControls.innerHTML = '';
-        userControlValues.clear();
+        userControlsValuesCache.clear();
     }
 }
 
@@ -138,12 +138,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
           ensureUserControls();
           const userControls = document.getElementById('userControls');
           // Only create the control if it doesn't exist
-          if (!userControlValues.has(label)) {
+          if (!userControlsValuesCache.has(label)) {
               console.log(`Creating new control: ${label} (${min} to ${max}, default: ${defaultValue})`);
               const control = createUserControl(label, min, max, defaultValue);
               userControls.appendChild(control);
           }
-          return userControlValues.get(label) || defaultValue;
+          return userControlsValuesCache.get(label) || defaultValue;
       }
   };
 
@@ -265,7 +265,7 @@ async function generateAndDraw() {
   if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
     const userControls = document.getElementById('userControls');
     userControls.innerHTML = '';
-    userControlValues.clear();
+    userControlsValuesCache.clear();
     canvas.lastCode = nextVertexAndPointMathJSCodeString;
   }
 
