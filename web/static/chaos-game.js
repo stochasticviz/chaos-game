@@ -42,23 +42,23 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 function createUserControl(label, min, max, defaultValue) {
     const container = document.createElement('div');
     container.className = 'userControl';
-    
+
     const labelContainer = document.createElement('div');
     labelContainer.className = 'label-container';
-    
+
     const labelElem = document.createElement('label');
     labelElem.textContent = label + ': ';
     labelContainer.appendChild(labelElem);
-    
+
     const valueDisplay = document.createElement('span');
     valueDisplay.className = 'value-display';
     labelContainer.appendChild(valueDisplay);
-    
+
     container.appendChild(labelContainer);
-    
+
     const slider = document.createElement('div');
     container.appendChild(slider);
-    
+
     noUiSlider.create(slider, {
         start: defaultValue,
         connect: true,
@@ -67,11 +67,11 @@ function createUserControl(label, min, max, defaultValue) {
             'max': max
         }
     });
-    
+
     // Store the initial value
     userControlsValuesCache.set(label, defaultValue);
     valueDisplay.textContent = defaultValue.toFixed(3);
-    
+
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
         const newValue = parseFloat(values[0]);
@@ -84,7 +84,7 @@ function createUserControl(label, min, max, defaultValue) {
             canvas.regenerateTimeout = setTimeout(generateAndDraw, 200);
         }
     });
-    
+
     return container;
 }
 
@@ -393,4 +393,4 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   drawVerticesOnCanvas(ctx);
 });
 
-generateAndDraw(); 
+generateAndDraw();
