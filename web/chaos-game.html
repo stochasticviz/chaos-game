@@ -35,7 +35,7 @@
 </div>
 
 <div id="codeExplanation" style="display: none; margin: 10px 0;">
-Write your own code to calculate where the next point should be. You can use the coordinates of the current point, <code>currentPoint</code>, and an matrix, <code>targetPoints</code>, which contains the coordinates of each target vertex. The default code simply picks one of those targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em>
+Write your own code to calculate where the next point should be. The default code simply picks one of those targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target vertex,  <code>targetPoints</code>. Both are matrices.
 
 You can also create custom UI controls by using the <code>userControl</code> function with these parameters:
 <ul>
@@ -43,8 +43,8 @@ You can also create custom UI controls by using the <code>userControl</code> fun
   <li><code>min</code>: The minimum value</li>
   <li><code>max</code>: The maximum value</li>
 </ul>
-For example: <code>t = userControl("t (scalar)", -4, 4)</code> will create a slider labeled "t (scalar)" that goes from -4 to 4.
-
+For example: <code>t = userControl("t (scalar)", -4, 4)</code> will create a slider labeled "t (scalar)" that goes from -4 to 4. You can then use <code>t</code> anywhere in your code to give your end user 'live' control.<br/><br/>
+<em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em>
 <br><br>
 
 <h4>Examples:</h4>
