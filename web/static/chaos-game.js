@@ -81,7 +81,7 @@ function createUserControl(label, min, max, defaultValue) {
             valueDisplay.textContent = newValue.toFixed(3);
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
-            canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
+            canvas.regenerateTimeout = setTimeout(generateAndDraw, 200);
         }
     });
     
