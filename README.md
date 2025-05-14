@@ -1,14 +1,14 @@
 # Chaos Game Explorer
 
-Fun web tools for exploring the [Chaos Game](https://www.youtube.com/watch?v=k3V72Qvcn94).
+Fun tools for exploring the [Chaos Game](https://www.youtube.com/watch?v=k3V72Qvcn94).
 
-## chaos-game.html
+## [chaos-game.html](web/chaos-game.html)
 Try it live [here](https://herdrick.github.io/chaos-game/chaos-game.html). Ported from bokeh-app.py mostly by ChatGPT. 
 
-## chaos-game-3d.html
-Try it live [here](https://herdrick.github.io/chaos-game/chaos-game-3d.html). Ported chaos-game.html mostly by Claude.ai. 
+## [chaos-game-3d.html](web/chaos-game-3d.html)
+Try it live [here](https://herdrick.github.io/chaos-game/chaos-game-3d.html). Ported from chaos-game.html mostly by Claude.ai. 
 
-## bokeh-app.py
+## [bokeh-app.py](sierpinski_triangle/bokeh-app.py)
 Original implementation using Bokeh/Panel.
 
 Requires: numpy, holoviews, panel, bokeh
