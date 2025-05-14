@@ -6,7 +6,7 @@ Fun web tools for exploring the [Chaos Game](https://www.youtube.com/watch?v=k3V
 Try it live [here](https://herdrick.github.io/chaos-game/chaos-game.html). Ported from bokeh-app.py mostly by ChatGPT. 
 
 ## chaos-game-3d.html
-Try it live [here](https://herdrick.github.io/chaos-game/chaos-game-3d.html). Ported chaos-game.html mostly by Claude.ai. 
+Try it live [here](https://herdrick.github.io/chaos-game/chaos-game-3d.html). Ported from chaos-game.html mostly by Claude.ai. 
 
 ## bokeh-app.py
 Original implementation using Bokeh/Panel.
