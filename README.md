@@ -3,10 +3,10 @@
 Fun tools for exploring the [Chaos Game](https://www.youtube.com/watch?v=k3V72Qvcn94).
 
 ## [chaos-game.html](web/chaos-game.html)
-Try it live [here](https://stochasticviz.github.io/chaos-game/chaos-game.html). Ported from bokeh-app.py mostly by ChatGPT. 
+Try it live [here](https://stochasticviz.github.io/chaos-game/chaos-game.html). Originally ported from bokeh-app.py mostly by ChatGPT, but has grown since. 
 
 ## [chaos-game-3d.html](web/chaos-game-3d.html)
-Try it live [here](https://stochasticviz.github.io/chaos-game/chaos-game-3d.html). Ported from chaos-game.html mostly by Claude.ai. 
+Try it live [here](https://stochasticviz.github.io/chaos-game/chaos-game-3d.html).
 
 ## [bokeh-app.py](sierpinski_triangle/bokeh-app.py)
 Original implementation using Bokeh/Panel.
