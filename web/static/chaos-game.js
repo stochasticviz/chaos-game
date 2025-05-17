@@ -114,6 +114,7 @@ function initializeVertices(n_points) {
 
 let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints) {
+  const generationId = ++currentGenerationId;
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
