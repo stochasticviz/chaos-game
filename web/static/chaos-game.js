@@ -112,6 +112,7 @@ function initializeVertices(n_points) {
   }
 }
 
+let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints) {
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
@@ -155,8 +156,14 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   let firstTime = true;
   let resultSet = null;
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     function generateChunk() {
+      // Check if this generation is still current
+      if (generationId !== currentGenerationId) {
+        reject(new Error('Generation cancelled'));
+        return;
+      }
+
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
         if (nextVertexAndPointMathJSCodeString) {
@@ -271,7 +278,7 @@ async function generateAndDraw() {
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
-  toggleSpinner(true);
+
 
   try {
     if (targets.length !== vertices) {
@@ -288,14 +295,28 @@ async function generateAndDraw() {
 
     drawVerticesOnCanvas(ctx);
     await new Promise(resolve => setTimeout(resolve, 5));
-    await generatePoints(steps, nextVertexAndPointMathJSCodeString, (progress, points, proportionInView) => {
-      document.getElementById('spinner').textContent =
-        `Generating points... ${Math.round(progress * 100)}%`;
-      document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
-      drawPointsOnCanvas(ctx, points, alphaValue);
-    });
+
+    toggleSpinner(true);
+    try {
+      await generatePoints(steps, nextVertexAndPointMathJSCodeString, (progress, points, proportionInView) => {
+        document.getElementById('spinner').textContent =
+          `Generating points... ${Math.round(progress * 100)}%`;
+        document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
+        drawPointsOnCanvas(ctx, points, alphaValue);
+      });
+      // Only clear if we completed successfully
+      if (document.getElementById('spinner').textContent.includes('100%')) {
+        toggleSpinner(false);
+        document.getElementById('pointsInView').textContent = '';
+      }
+    } catch (error) {
+      if (error.message !== 'Generation cancelled') {
+        throw error;
+      }
+      // If generation was cancelled, just continue but don't clear the spinner
+      return;
+    }
   } finally {
-    toggleSpinner(false);
     generateBtn.disabled = false;
     // Clear the regenerate timeout flag
     canvas.regenerateTimeout = null;
