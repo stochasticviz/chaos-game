@@ -137,9 +137,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       userControl: function(label, min, max, defaultValue) {
           ensureUserControls();
           const userControls = document.getElementById('userControls');
-          // Only create the control if it doesn't exist
           if (!userControlsValuesCache.has(label)) {
-              console.log(`Creating new control: ${label} (${min} to ${max}, default: ${defaultValue})`);
+              console.log(`This control does not exist yet, creating it now: ${label} (${min} to ${max}, default: ${defaultValue})`);
               const control = createUserControl(label, min, max, defaultValue);
               userControls.appendChild(control);
           }
@@ -169,9 +168,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             }
             resultSet = compiled_expressions.evaluate(scope);
             if (showStuff) {
-                console.log("currentPoint straight from scope:", scope.currentPoint);
-                console.log("nextPoint straight from scope:", scope.nextPoint);
-                console.log("the ResultSet returned from those expressions:", resultSet)
+                //console.log("currentPoint straight from scope:", scope.currentPoint);
+                //console.log("nextPoint straight from scope:", scope.nextPoint);
+                //console.log("the ResultSet returned from those expressions:", resultSet)
             }
             nextPoint = scope.nextPoint;
             // update the scope for the next iteration
