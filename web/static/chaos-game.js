@@ -1,12 +1,15 @@
 import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
 const math = create(all);
 
-let targets = [];  // TODO: these should probably be MathJS matrices
-let isDragging = false;
-let draggedVertexIndex = -1;
+// params
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
+const VERBOSE = true;
+
+let targets = [];  // TODO: these should probably be MathJS matrices
+let isDragging = false;
+let draggedVertexIndex = -1;
 
 // Store user control values
 const userControlsValuesCache = new Map();
@@ -140,7 +143,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
           ensureUserControls();
           const userControls = document.getElementById('userControls');
           if (!userControlsValuesCache.has(label)) {
-              console.log(`This control does not exist yet, creating it now: ${label} (${min} to ${max}, default: ${defaultValue})`);
+              VERBOSE && console.log(`This control does not exist yet, creating it now: ${label} (${min} to ${max}, default: ${defaultValue})`);
               const control = createUserControl(label, min, max, defaultValue);
               userControls.appendChild(control);
           }
@@ -168,17 +171,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
         if (nextVertexAndPointMathJSCodeString) {
-            if (firstTime | (i % 100000 == 0)){
-                showStuff = true;
-            }
-            else {
-                showStuff = false;
-            }
+            showStuff = (VERBOSE & (firstTime | (i % 100000 == 0)));
             resultSet = compiled_expressions.evaluate(scope);
             if (showStuff) {
-                //console.log("currentPoint straight from scope:", scope.currentPoint);
-                //console.log("nextPoint straight from scope:", scope.nextPoint);
-                //console.log("the ResultSet returned from those expressions:", resultSet)
+                console.log("currentPoint:", scope.currentPoint);
+                console.log("nextPoint:", scope.nextPoint);
+                console.log("resultSet:", resultSet)
             }
             nextPoint = scope.nextPoint;
             // update the scope for the next iteration
