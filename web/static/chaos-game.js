@@ -192,9 +192,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
         }
         nextPointArray = nextPoint.toArray()[0];
         points.push({ x: nextPointArray[0], y: nextPointArray[1] });
-        if (nextPointArray[0] >= viewLeft && nextPointArray[0] <= viewLeft + viewWidth &&
-            nextPointArray[1] >= viewTop && nextPointArray[1] <= viewTop + viewHeight) {
-          pointsInViewCount++;
+          if (nextPointArray[0] >= viewLeft && nextPointArray[0] <= viewLeft + viewWidth &&
+              nextPointArray[1] >= viewTop && nextPointArray[1] <= viewTop + viewHeight) {
+            pointsInViewCount++;
+          }
         }
       }
 
@@ -276,8 +277,6 @@ async function generateAndDraw() {
 
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
-
-
 
   try {
     if (targets.length !== vertices) {
