@@ -197,7 +197,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             pointsInViewCount++;
           }
         }
-      }
 
       currentStep = endStep;
       consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);
