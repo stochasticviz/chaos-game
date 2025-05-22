@@ -138,6 +138,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       currentTargetIndex: 1,
       // arbitary point to start is 100, 100
       currentPoint: math.matrix([[100, 100]]),
+      // Queue for storing multiple points
+      pointsQueue: [],
       userData: {},
       userControl: function(label, min, max, defaultValue) {
           ensureUserControls();
@@ -160,6 +162,29 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   let firstTime = true;
   let resultSet = null;
 
+  // Helper function to get a random point in the visible area
+  function getRandomVisiblePoint() {
+    const x = viewLeft + Math.random() * viewWidth;
+    const y = viewTop + Math.random() * viewHeight;
+    return math.matrix([[x, y]]);
+  }
+
+  // Helper function to add points to the queue
+  function addPointsToQueue(result) {
+    if (!result) return;
+
+    // If result is a matrix, convert to array
+    const pointsArray = result.toArray ? result.toArray() : result;
+
+    // If it's a single point (1D array), wrap it
+    const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
+
+    // Add each point as a matrix to the queue
+    points.forEach(point => {
+      scope.pointsQueue.push(math.matrix([point]));
+    });
+  }
+
   return new Promise((resolve, reject) => {
     function generateChunk() {
       // Check if this generation is still current
@@ -170,18 +195,25 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
 
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
+        // Get next point from queue or generate new points
+        if (scope.pointsQueue.length === 0) {
+            // If queue is  empty, use a random point
+            scope.pointsQueue.push(getRandomVisiblePoint());
+        }
         if (nextVertexAndPointMathJSCodeString) {
-            showStuff = (VERBOSE & (firstTime | (i % 100000 == 0)));
+            if (i % 100000 == 0){
+                console.log("i:", i)
+            }
+            showStuff = (VERBOSE & (firstTime | (i % 10000 == 0)));
             resultSet = compiled_expressions.evaluate(scope);
             if (showStuff) {
                 console.log("currentPoint:", scope.currentPoint);
-                console.log("nextPoint:", scope.nextPoint);
-                console.log("resultSet:", resultSet)
+                console.log("resultSet:", resultSet);
+                console.log("pointsQueue length:", scope.pointsQueue.length);
             }
-            nextPoint = scope.nextPoint;
-            // update the scope for the next iteration
-            scope.currentPoint = nextPoint;
-            scope.currentTargetIndex = scope.nextTargetIndex;
+
+            // Add points from resultSet to queue
+            addPointsToQueue(scope.nextPoint);
             firstTime = false;
         } else {
             const nextTargetIdx = Math.floor(Math.random() * targets.length);
@@ -190,13 +222,19 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             x = (x + targetX) / 2.0;
             y = (y + targetY) / 2.0;
         }
+        // Get next point from queue
+        nextPoint = scope.pointsQueue.shift();
+        // Update scope for next iteration
+        scope.currentPoint = nextPoint;
+        scope.currentTargetIndex = scope.nextTargetIndex;
+
         nextPointArray = nextPoint.toArray()[0];
         points.push({ x: nextPointArray[0], y: nextPointArray[1] });
           if (nextPointArray[0] >= viewLeft && nextPointArray[0] <= viewLeft + viewWidth &&
               nextPointArray[1] >= viewTop && nextPointArray[1] <= viewTop + viewHeight) {
             pointsInViewCount++;
           }
-        }
+      }
 
       currentStep = endStep;
       consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);
