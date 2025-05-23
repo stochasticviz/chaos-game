@@ -157,8 +157,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   let points = [];
   let pointsInViewCount = 0;
   let nextPoint = null;
-  let nextPointArray = null;
-  let showStuff = false;
+  let currentPointsArray = null;
+  let showStuff = true;
   let firstTime = true;
   let resultSet = null;
 
@@ -195,41 +195,48 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
 
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
-
+        showStuff = (VERBOSE & (firstTime | (i % 10000 == 0)));
+        if (i % 100000 == 0){
+            console.log("i:", i)
+        }
         // Get next point from queue or generate new points
         if (scope.pointsQueue.length === 0) {
             // If queue is  empty, use a random point
             scope.pointsQueue.push(getRandomVisiblePoint());
         }
-        if (i % 100000 == 0){
-            console.log("i:", i)
-        }
-        showStuff = (VERBOSE & (firstTime | (i % 10000 == 0)));
-        resultSet = compiled_expressions.evaluate(scope);
+
+        // Get current point from queue
+        scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
             console.log("currentPoint:", scope.currentPoint);
+        }
+        currentPointsArray = scope.currentPoint.toArray();
+        // save points to be plotted
+
+        currentPointsArray.forEach(function (currentPointArray, index) {
+            points.push({ x: currentPointArray[0], y: currentPointArray[1] });
+            if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
+              currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight){
+            pointsInViewCount++;
+            }
+        });
+
+        resultSet = compiled_expressions.evaluate(scope);
+        if (showStuff) {
             console.log("resultSet:", resultSet);
             console.log("pointsQueue length:", scope.pointsQueue.length);
         }
-         // Add points from resultSet to queue
+         // Add nextPoints from scope (the user sets this value) to queue
         addPointsToQueue(scope.nextPoint);
-        firstTime = false;
-        // Get next point from queue
-        nextPoint = scope.pointsQueue.shift();
-        // Update scope for next iteration
-        scope.currentPoint = nextPoint;
+
+        // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
 
-        nextPointArray = nextPoint.toArray()[0];
-        points.push({ x: nextPointArray[0], y: nextPointArray[1] });
-          if (nextPointArray[0] >= viewLeft && nextPointArray[0] <= viewLeft + viewWidth &&
-              nextPointArray[1] >= viewTop && nextPointArray[1] <= viewTop + viewHeight) {
-            pointsInViewCount++;
-          }
+        firstTime = false;
       }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);
+      consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);  // points will be plotted in consumePoints()
       points = [];
 
       if (currentStep < steps) {
