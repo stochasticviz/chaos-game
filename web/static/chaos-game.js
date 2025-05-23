@@ -170,26 +170,18 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
 
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
-        if (nextVertexAndPointMathJSCodeString) {
-            showStuff = (VERBOSE & (firstTime | (i % 100000 == 0)));
-            resultSet = compiled_expressions.evaluate(scope);
-            if (showStuff) {
-                console.log("currentPoint:", scope.currentPoint);
-                console.log("nextPoint:", scope.nextPoint);
-                console.log("resultSet:", resultSet)
-            }
-            nextPoint = scope.nextPoint;
-            // update the scope for the next iteration
-            scope.currentPoint = nextPoint;
-            scope.currentTargetIndex = scope.nextTargetIndex;
-            firstTime = false;
-        } else {
-            const nextTargetIdx = Math.floor(Math.random() * targets.length);
-            const targetX = targets[nextTargetIdx].x;
-            const targetY = targets[nextTargetIdx].y;
-            x = (x + targetX) / 2.0;
-            y = (y + targetY) / 2.0;
+        showStuff = (VERBOSE & (firstTime | (i % 100000 == 0)));
+        resultSet = compiled_expressions.evaluate(scope);
+        if (showStuff) {
+            console.log("currentPoint:", scope.currentPoint);
+            console.log("nextPoint:", scope.nextPoint);
+            console.log("resultSet:", resultSet)
         }
+        nextPoint = scope.nextPoint;
+        // update the scope for the next iteration
+        scope.currentPoint = nextPoint;
+        scope.currentTargetIndex = scope.nextTargetIndex;
+        firstTime = false;
         nextPointArray = nextPoint.toArray()[0];
         points.push({ x: nextPointArray[0], y: nextPointArray[1] });
           if (nextPointArray[0] >= viewLeft && nextPointArray[0] <= viewLeft + viewWidth &&
