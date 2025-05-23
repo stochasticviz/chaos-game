@@ -195,33 +195,25 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
 
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
+
         // Get next point from queue or generate new points
         if (scope.pointsQueue.length === 0) {
             // If queue is  empty, use a random point
             scope.pointsQueue.push(getRandomVisiblePoint());
         }
-        if (nextVertexAndPointMathJSCodeString) {
-            if (i % 100000 == 0){
-                console.log("i:", i)
-            }
-            showStuff = (VERBOSE & (firstTime | (i % 10000 == 0)));
-            resultSet = compiled_expressions.evaluate(scope);
-            if (showStuff) {
-                console.log("currentPoint:", scope.currentPoint);
-                console.log("resultSet:", resultSet);
-                console.log("pointsQueue length:", scope.pointsQueue.length);
-            }
-
-            // Add points from resultSet to queue
-            addPointsToQueue(scope.nextPoint);
-            firstTime = false;
-        } else {
-            const nextTargetIdx = Math.floor(Math.random() * targets.length);
-            const targetX = targets[nextTargetIdx].x;
-            const targetY = targets[nextTargetIdx].y;
-            x = (x + targetX) / 2.0;
-            y = (y + targetY) / 2.0;
+        if (i % 100000 == 0){
+            console.log("i:", i)
         }
+        showStuff = (VERBOSE & (firstTime | (i % 10000 == 0)));
+        resultSet = compiled_expressions.evaluate(scope);
+        if (showStuff) {
+            console.log("currentPoint:", scope.currentPoint);
+            console.log("resultSet:", resultSet);
+            console.log("pointsQueue length:", scope.pointsQueue.length);
+        }
+         // Add points from resultSet to queue
+        addPointsToQueue(scope.nextPoint);
+        firstTime = false;
         // Get next point from queue
         nextPoint = scope.pointsQueue.shift();
         // Update scope for next iteration
