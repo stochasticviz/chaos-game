@@ -160,7 +160,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   let firstTime = true;
   let resultSet = null;
 
-  // Helper function to get a random point in the visible area
+  // Helper function to get a random point well within the currently visible area
   function getRandomVisiblePoint() {
     const x = viewLeft + Math.random() * viewWidth;
     const y = viewTop + Math.random() * viewHeight;
@@ -185,8 +185,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
 
   return new Promise((resolve, reject) => {
     function generateChunk() {
-      // Check if this generation is still current
       if (generationId !== currentGenerationId) {
+        // this generation is not current, i.e. at least one other generation has been started more recently, so cancel this one
         reject(new Error('Generation cancelled'));
         return;
       }
@@ -197,20 +197,19 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
         if (i % 100000 == 0){
             console.log("i:", i)
         }
-        // Get next point from queue or generate new points
+
         if (scope.pointsQueue.length === 0) {
             // If queue is  empty, use a random point
             scope.pointsQueue.push(getRandomVisiblePoint());
         }
 
-        // Get current point from queue
+        // Get a current point from queue
         scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
             console.log("currentPoint:", scope.currentPoint);
         }
         currentPointsArray = scope.currentPoint.toArray();
         // save points to be plotted
-
         currentPointsArray.forEach(function (currentPointArray, index) {
             points.push({ x: currentPointArray[0], y: currentPointArray[1] });
             if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
