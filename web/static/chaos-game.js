@@ -164,7 +164,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   function getRandomVisiblePoint() {
     const x = viewLeft + Math.random() * viewWidth;
     const y = viewTop + Math.random() * viewHeight;
-    return math.matrix([[x, y]]);
+    return math.divide(math.matrix([[x, y]]), 2);
   }
 
   // Helper function to add points to the queue
