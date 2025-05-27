@@ -230,7 +230,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);  // points will be plotted in consumePoints()
+      consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);  // points are plotted in consumePoints()
       points = [];
 
       if (currentStep < steps) {
