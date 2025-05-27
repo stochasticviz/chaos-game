@@ -66,11 +66,12 @@ function createUserControl(label, min, max, defaultValue) {
         start: defaultValue,
         connect: true,
         range: {'min': min, 'max': max},
+        step: 0.01  // this is coupled to the .toFixed(2) calls, below
     });
 
     // Store the initial value
     userControlsValuesCache.set(label, defaultValue);
-    valueDisplay.textContent = defaultValue.toFixed(3);
+    valueDisplay.textContent = defaultValue.toFixed(2);
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
@@ -78,7 +79,7 @@ function createUserControl(label, min, max, defaultValue) {
         const oldValue = userControlsValuesCache.get(label);
         if (newValue !== oldValue) {
             userControlsValuesCache.set(label, newValue);
-            valueDisplay.textContent = newValue.toFixed(3);
+            valueDisplay.textContent = newValue.toFixed(2);
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
             canvas.regenerateTimeout = setTimeout(generateAndDraw, 200);
