@@ -65,10 +65,7 @@ function createUserControl(label, min, max, defaultValue) {
     noUiSlider.create(slider, {
         start: defaultValue,
         connect: true,
-        range: {
-            'min': min,
-            'max': max
-        }
+        range: {'min': min, 'max': max},
     });
 
     // Store the initial value
