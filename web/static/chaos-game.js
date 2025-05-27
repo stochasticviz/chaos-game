@@ -5,7 +5,7 @@ const math = create(all);
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
-const VERBOSE = true;
+const VERBOSE = false;
 
 let targets = [];  // TODO: these should probably be MathJS matrices
 let isDragging = false;
@@ -143,7 +143,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
           ensureUserControls();
           const userControls = document.getElementById('userControls');
           if (!userControlsValuesCache.has(label)) {
-              VERBOSE && console.log(`This control does not exist yet, creating it now: ${label} (${min} to ${max}, default: ${defaultValue})`);
+              VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
               const control = createUserControl(label, min, max, defaultValue);
               userControls.appendChild(control);
           }
@@ -193,11 +193,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
 
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
-        showStuff = (VERBOSE & (firstTime | (i % 10000 == 0)));
-        if (i % 100000 == 0){
-            console.log("i:", i)
-        }
-
+        showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         if (scope.pointsQueue.length === 0) {
             // If queue is  empty, use a random point
             scope.pointsQueue.push(getRandomVisiblePoint());
@@ -206,6 +202,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
         // Get a current point from queue
         scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
+            console.log("i:", i)
             console.log("currentPoint:", scope.currentPoint);
         }
         currentPointsArray = scope.currentPoint.toArray();
