@@ -194,11 +194,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
-        if (scope.pointsQueue.length === 0) {
-            // If queue is  empty, use a random point
-            scope.pointsQueue.push(getRandomVisiblePoint());
-        }
-
+        // If queue is  empty, give it a random point
+        if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
         // Get a current point from queue
         scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
@@ -210,7 +207,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
         currentPointsArray.forEach(function (currentPointArray, index) {
             points.push({ x: currentPointArray[0], y: currentPointArray[1] });
             if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
-              currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight){
+              currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
             pointsInViewCount++;
             }
         });
