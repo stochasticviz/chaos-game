@@ -134,8 +134,8 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 # ... and get its coordinates
 _nextTarget = targetPoints[nextTargetIndex, :]
 
-# Create a user control for the interpolation factor
-s = userControl("Interpolation Factor", 0, 1, 0.5)
+# Create a user control for how far to go toward the target
+s = userControl("how far to go toward the target", 0, 1, 0.5)
 
 # Make next point s% of the way to the target
 nextPoint = currentPoint + (_nextTarget - currentPoint) * s
