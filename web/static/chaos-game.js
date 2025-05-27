@@ -5,7 +5,7 @@ const math = create(all);
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
-const VERBOSE = true;
+const VERBOSE = false;
 
 let targets = [];  // TODO: these should probably be MathJS matrices
 let isDragging = false;
@@ -65,15 +65,13 @@ function createUserControl(label, min, max, defaultValue) {
     noUiSlider.create(slider, {
         start: defaultValue,
         connect: true,
-        range: {
-            'min': min,
-            'max': max
-        }
+        range: {'min': min, 'max': max},
+        step: 0.01  // this is coupled to the .toFixed(2) calls, below
     });
 
     // Store the initial value
     userControlsValuesCache.set(label, defaultValue);
-    valueDisplay.textContent = defaultValue.toFixed(3);
+    valueDisplay.textContent = defaultValue.toFixed(2);
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
@@ -81,7 +79,7 @@ function createUserControl(label, min, max, defaultValue) {
         const oldValue = userControlsValuesCache.get(label);
         if (newValue !== oldValue) {
             userControlsValuesCache.set(label, newValue);
-            valueDisplay.textContent = newValue.toFixed(3);
+            valueDisplay.textContent = newValue.toFixed(2);
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
             canvas.regenerateTimeout = setTimeout(generateAndDraw, 200);
@@ -138,12 +136,14 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       currentTargetIndex: 1,
       // arbitary point to start is 100, 100
       currentPoint: math.matrix([[100, 100]]),
+      // Queue for storing multiple points
+      pointsQueue: [],
       userData: {},
       userControl: function(label, min, max, defaultValue) {
           ensureUserControls();
           const userControls = document.getElementById('userControls');
           if (!userControlsValuesCache.has(label)) {
-              VERBOSE && console.log(`This control does not exist yet, creating it now: ${label} (${min} to ${max}, default: ${defaultValue})`);
+              VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
               const control = createUserControl(label, min, max, defaultValue);
               userControls.appendChild(control);
           }
@@ -155,51 +155,79 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   let points = [];
   let pointsInViewCount = 0;
   let nextPoint = null;
-  let nextPointArray = null;
-  let showStuff = false;
+  let currentPointsArray = null;
+  let showStuff = null;
   let firstTime = true;
   let resultSet = null;
 
+  // Helper function to get a random point well within the currently visible area
+  function getRandomVisiblePoint() {
+    const x = viewLeft + Math.random() * viewWidth;
+    const y = viewTop + Math.random() * viewHeight;
+    return math.divide(math.matrix([[x, y]]), 2);
+  }
+
+  // Helper function to add points to the queue
+  function addPointsToQueue(result) {
+    if (!result) return;
+
+    // If result is a matrix, convert to array
+    const pointsArray = result.toArray ? result.toArray() : result;
+
+    // If it's a single point (1D array), wrap it
+    const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
+
+    // Add each point as a matrix to the queue
+    points.forEach(point => {
+      scope.pointsQueue.push(math.matrix([point]));
+    });
+  }
+
   return new Promise((resolve, reject) => {
     function generateChunk() {
-      // Check if this generation is still current
       if (generationId !== currentGenerationId) {
+        // this generation is not current, i.e. at least one other generation has been started more recently, so cancel this one
         reject(new Error('Generation cancelled'));
         return;
       }
 
       const endStep = Math.min(currentStep + chunkSize, steps);
       for (let i = currentStep; i < endStep; i++) {
-        if (nextVertexAndPointMathJSCodeString) {
-            showStuff = (VERBOSE & (firstTime | (i % 100000 == 0)));
-            resultSet = compiled_expressions.evaluate(scope);
-            if (showStuff) {
-                console.log("currentPoint:", scope.currentPoint);
-                console.log("nextPoint:", scope.nextPoint);
-                console.log("resultSet:", resultSet)
-            }
-            nextPoint = scope.nextPoint;
-            // update the scope for the next iteration
-            scope.currentPoint = nextPoint;
-            scope.currentTargetIndex = scope.nextTargetIndex;
-            firstTime = false;
-        } else {
-            const nextTargetIdx = Math.floor(Math.random() * targets.length);
-            const targetX = targets[nextTargetIdx].x;
-            const targetY = targets[nextTargetIdx].y;
-            x = (x + targetX) / 2.0;
-            y = (y + targetY) / 2.0;
+        showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
+        // If queue is  empty, give it a random point
+        if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
+        // Get a current point from queue
+        scope.currentPoint = scope.pointsQueue.shift();
+        if (showStuff) {
+            console.log("i:", i)
+            console.log("currentPoint:", scope.currentPoint);
         }
-        nextPointArray = nextPoint.toArray()[0];
-        points.push({ x: nextPointArray[0], y: nextPointArray[1] });
-          if (nextPointArray[0] >= viewLeft && nextPointArray[0] <= viewLeft + viewWidth &&
-              nextPointArray[1] >= viewTop && nextPointArray[1] <= viewTop + viewHeight) {
+        currentPointsArray = scope.currentPoint.toArray();
+        // save points to be plotted
+        currentPointsArray.forEach(function (currentPointArray, index) {
+            points.push({ x: currentPointArray[0], y: currentPointArray[1] });
+            if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
+              currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
             pointsInViewCount++;
-          }
+            }
+        });
+
+        resultSet = compiled_expressions.evaluate(scope);
+        if (showStuff) {
+            console.log("resultSet:", resultSet);
+            console.log("pointsQueue length:", scope.pointsQueue.length);
         }
+         // Add nextPoints from scope (the user sets this value) to queue
+        addPointsToQueue(scope.nextPoint);
+
+        // Update special occasionally useful vars in scope for next iteration
+        scope.currentTargetIndex = scope.nextTargetIndex;
+
+        firstTime = false;
+      }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);
+      consumePoints(currentStep / steps, points, pointsInViewCount / currentStep);  // points are plotted in consumePoints()
       points = [];
 
       if (currentStep < steps) {
