@@ -108,18 +108,19 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
   <pre class="codeExample">
 # The userData object is provided for you to store arbitrary data across iterations:
 
-# Initialize previous vertex if needed
+# Initialize previous vertex if needed, i.e. if this is the first iteration
 userData["previous_vertex"] = userData["previous_vertex"] == undefined ? -1 : userData["previous_vertex"]
 
-# Get all possible indices except previous
+# Get all possible indices except the vertex we used in the last iteration
 _possibleTargetIndices = math.range(1, targetPointsLength+1)
 _possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != userData["previous_vertex"]]
 
-# Pick random target and get its coordinates
+# Pick a random target vertex
 _nextTargetIndex = math.pickRandom(_possibleTargetIndices)
+# ... and get its coordinates
 _nextTarget = targetPoints[_nextTargetIndex, :]
 
-# Calculate midpoint
+# Make next point midway to the target
 nextPoint = (currentPoint + _nextTarget) / 2
 
 # Store current vertex for next iteration
@@ -130,12 +131,13 @@ userData["previous_vertex"] = _nextTargetIndex</pre>
 <textarea id="nextVertexAndPointMathJSCode" rows="5">
 # Pick a random target vertex
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+# ... and get its coordinates
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create a user control for the interpolation factor
 s = userControl("Interpolation Factor", 0, 1, 0.5)
 
-# Move t% of the way to the chosen target
+# Make next point s% of the way to the target
 nextPoint = currentPoint + (_nextTarget - currentPoint) * s
 </textarea>
 <div>
