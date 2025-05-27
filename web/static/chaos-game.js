@@ -156,7 +156,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   let pointsInViewCount = 0;
   let nextPoint = null;
   let currentPointsArray = null;
-  let showStuff = true;
+  let showStuff = null;
   let firstTime = true;
   let resultSet = null;
 
