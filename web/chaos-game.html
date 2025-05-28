@@ -126,6 +126,16 @@ nextPoint = (currentPoint + _nextTarget) / 2
 # Store current vertex for next iteration
 userData["previous_vertex"] = _nextTargetIndex</pre>
 </div>
+<div class="codeBlock">
+  The Levy C curve:
+  <pre class="codeExample">
+# you will need to set the Zoom level to about 325
+A = matrix([[.5,  .5], [-.5, .5]])
+B = matrix([[.5, -.5], [ .5, .5]])
+point1 = transpose(multiply(A, transpose(currentPoint)))
+point2 = transpose(multiply(B, transpose(currentPoint)) - transpose(matrix([[.5, .5]])))
+nextPoint= randomInt() ? point1 : point2</pre>
+</div>
 </div> <!-- codeExplanation -->
 
 <textarea id="nextVertexAndPointMathJSCode" rows="5">
