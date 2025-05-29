@@ -114,7 +114,7 @@ function initializeVertices(n_points) {
 }
 
 let currentGenerationId = 0;
-function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints) {
+function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints) {
   const generationId = ++currentGenerationId;
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
@@ -151,7 +151,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       }
   };
 
-  const compiled_expressions = math.compile(nextVertexAndPointMathJSCodeString);
   let points = [];
   let pointsInViewCount = 0;
   let nextPoint = null;
@@ -212,7 +211,18 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             }
         });
 
-        resultSet = compiled_expressions.evaluate(scope);
+        console.log("evaling now....")
+        for (const [index, expression] of nextVertexAndPointMathJSCodeLines.entries()) {
+            try {
+                math.evaluate(expression, scope);
+            } catch (error) {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.innerHTML = `<span>Error at line ${index+1}:</span><pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${expression}</pre><span>${error.name}: ${error.message}</span>`;
+                throw error;
+            }
+        }
+
+
         if (showStuff) {
             console.log("resultSet:", resultSet);
             console.log("pointsQueue length:", scope.pointsQueue.length);
@@ -292,6 +302,10 @@ async function generateAndDraw() {
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
+  const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
+
+  // Clear any previous error message
+  document.getElementById('errorMessage').innerHTML = '';
 
   // Only clear controls if this is a fresh generation (not from slider update)
   // and if the code has changed
@@ -323,7 +337,7 @@ async function generateAndDraw() {
 
     toggleSpinner(true);
     try {
-      await generatePoints(steps, nextVertexAndPointMathJSCodeString, (progress, points, proportionInView) => {
+      await generatePoints(steps, nextVertexAndPointMathJSCodeLines, (progress, points, proportionInView) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
