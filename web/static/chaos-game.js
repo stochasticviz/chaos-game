@@ -32,8 +32,10 @@ math.import({
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
+    const debugModeDiv = document.getElementById('debugModeDiv');
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
+    debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
 });
 
 document.getElementById('customizeView').addEventListener('change', function(e) {
@@ -113,9 +115,20 @@ function initializeVertices(n_points) {
   }
 }
 
+// basic error handling. advanced handling is in the try/catch around "math.evaluate(expression, scope)", below
+function handleMathJSExpressionsError(error) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.innerHTML = `<span>${error.name}: ${error.message}.   (<i>for details, enable debug mode</i>)</span>`;
+    throw error;
+}
+
 let currentGenerationId = 0;
-function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints) {
+function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
+
+  const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
+  const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
+  console.log("compiledExpressions:", compiledExpressions);
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
@@ -124,7 +137,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
   const viewHeight = canvas.height / zoom;
   const viewLeft = centerX - viewWidth / 2;
   const viewTop = centerY - viewHeight / 2;
-
   let currentStep = 0;
 
   const scope = {
@@ -210,6 +222,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
             }
         });
 
+        if (compiledExpressions) {
+            try {
+                resultSet = compiledExpressions.evaluate(scope);
+            } catch (error) { handleMathJSExpressionsError(error); }
+        }
+        else {
         for (const [index, expression] of nextVertexAndPointMathJSCodeLines.entries()) {
             try {
                 math.evaluate(expression, scope);
@@ -237,12 +255,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
                     <span>Error at line ${index+1}:</span>
                     <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${highlightedExpression}</pre>
                     <span>${error.name}: ${error.message}</span>
-                    <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.9em;">${error.stack}</pre>`;
+                    <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.8em;">${error.stack}</pre>`;
                 throw error;
             }
         }
 
-
+        }
         if (showStuff) {
             console.log("resultSet:", resultSet);
             console.log("pointsQueue length:", scope.pointsQueue.length);
@@ -322,7 +340,7 @@ async function generateAndDraw() {
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
-  const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
+  const debugMode = document.getElementById('debugMode').checked;
 
   // Clear any previous error message
   document.getElementById('errorMessage').innerHTML = '';
@@ -357,7 +375,7 @@ async function generateAndDraw() {
 
     toggleSpinner(true);
     try {
-      await generatePoints(steps, nextVertexAndPointMathJSCodeLines, (progress, points, proportionInView) => {
+      await generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, (progress, points, proportionInView) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
