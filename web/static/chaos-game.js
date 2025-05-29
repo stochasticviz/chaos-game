@@ -32,8 +32,10 @@ math.import({
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
+    const debugModeDiv = document.getElementById('debugModeDiv');
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
+    debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
 });
 
 document.getElementById('customizeView').addEventListener('change', function(e) {
@@ -127,7 +129,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   const viewHeight = canvas.height / zoom;
   const viewLeft = centerX - viewWidth / 2;
   const viewTop = centerY - viewHeight / 2;
-
   let currentStep = 0;
 
   const scope = {
