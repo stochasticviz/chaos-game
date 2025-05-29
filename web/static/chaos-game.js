@@ -217,7 +217,11 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
                 math.evaluate(expression, scope);
             } catch (error) {
                 const errorDiv = document.getElementById('errorMessage');
-                errorDiv.innerHTML = `<span>Error at line ${index+1}:</span><pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${expression}</pre><span>${error.name}: ${error.message}</span>`;
+                errorDiv.innerHTML = `
+                    <span>Error at line ${index+1}:</span>
+                    <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${expression}</pre>
+                    <span>${error.name}: ${error.message}</span>
+                    <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.9em;">${error.stack}</pre>`;
                 throw error;
             }
         }
