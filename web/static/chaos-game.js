@@ -115,12 +115,20 @@ function initializeVertices(n_points) {
   }
 }
 
+// basic error handling. advanced handling is in the try/catch around "math.evaluate(expression, scope)", below
+function handleMathJSExpressionsError(error) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.innerHTML = `<span>${error.name}: ${error.message}.   (<i>for details, enable debug mode</i>)</span>`;
+    throw error;
+}
+
 let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
 
   const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
-  const compiledExpressions = debugMode ? null : math.compile(nextVertexAndPointMathJSCodeString);
+  const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
+  console.log("compiledExpressions:", compiledExpressions);
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
@@ -215,7 +223,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         });
 
         if (compiledExpressions) {
-            resultSet = compiledExpressions.evaluate(scope);
+            try {
+                resultSet = compiledExpressions.evaluate(scope);
+            } catch (error) { handleMathJSExpressionsError(error); }
         }
         else {
         for (const [index, expression] of nextVertexAndPointMathJSCodeLines.entries()) {
