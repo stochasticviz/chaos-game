@@ -114,8 +114,11 @@ function initializeVertices(n_points) {
 }
 
 let currentGenerationId = 0;
-function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints) {
+function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
+
+  const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
+  const compiledExpressions = debugMode ? null : math.compile(nextVertexAndPointMathJSCodeString);
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
@@ -210,6 +213,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
             }
         });
 
+        if (compiledExpressions) {
+            resultSet = compiledExpressions.evaluate(scope);
+        }
+        else {
         for (const [index, expression] of nextVertexAndPointMathJSCodeLines.entries()) {
             try {
                 math.evaluate(expression, scope);
@@ -242,7 +249,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
             }
         }
 
-
+        }
         if (showStuff) {
             console.log("resultSet:", resultSet);
             console.log("pointsQueue length:", scope.pointsQueue.length);
@@ -322,7 +329,7 @@ async function generateAndDraw() {
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
-  const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
+  const debugMode = document.getElementById('debugMode').checked;
 
   // Clear any previous error message
   document.getElementById('errorMessage').innerHTML = '';
@@ -357,7 +364,7 @@ async function generateAndDraw() {
 
     toggleSpinner(true);
     try {
-      await generatePoints(steps, nextVertexAndPointMathJSCodeLines, (progress, points, proportionInView) => {
+      await generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, (progress, points, proportionInView) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;

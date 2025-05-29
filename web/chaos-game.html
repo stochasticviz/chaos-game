@@ -141,6 +141,10 @@ s = userControl("how far to go toward the target", 0, 1, 0.5)
 nextPoint = currentPoint + (_nextTarget - currentPoint) * s
 </textarea>
 <div id="errorMessage" style="color: red; margin: 10px 0;">
+<div id="debugModeDiv" >
+    <input type="checkbox" id="debugMode" />
+    <label for="debugMode">Debug mode (slow, shows error messages)</label>
+</div>
   <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;"></pre>
 </div>
 <div>
