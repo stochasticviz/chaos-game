@@ -211,7 +211,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
             }
         });
 
-        console.log("evaling now....")
         for (const [index, expression] of nextVertexAndPointMathJSCodeLines.entries()) {
             try {
                 math.evaluate(expression, scope);
@@ -354,6 +353,8 @@ async function generateAndDraw() {
       }
     } catch (error) {
       if (error.message !== 'Generation cancelled') {
+        // Hide the spinner but keep the points
+        toggleSpinner(false);
         throw error;
       }
       // If generation was cancelled, just continue but don't clear the spinner
