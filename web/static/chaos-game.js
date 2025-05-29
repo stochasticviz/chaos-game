@@ -215,9 +215,27 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
                 math.evaluate(expression, scope);
             } catch (error) {
                 const errorDiv = document.getElementById('errorMessage');
+                let highlightedExpression = expression;
+                // Extract character position from error message if it exists
+                const charMatch = error.message.match(/\(char (\d+)\)/); // matches messages like "SyntaxError: Value expected (char 58)"
+                if (charMatch) {
+                    const charPos = parseInt(charMatch[1]) - 1;
+                    // For "Unexpected end of expression", insert and highlight a space
+                    if (error.message.includes('Unexpected end of expression')) {
+                        highlightedExpression = expression +
+                            '<span style="color: #dc3545; background-color: #ffebee; padding: 0 2px; border-radius: 2px;"> </span>';
+                    } else {
+                        // Split the expression and insert a span around the error character
+                        highlightedExpression = expression.slice(0, charPos) +
+                            '<span style="color: #dc3545; background-color: #ffebee; padding: 0 2px; border-radius: 2px;">' +
+                            expression[charPos] +
+                            '</span>' +
+                            expression.slice(charPos + 1);
+                    }
+                }
                 errorDiv.innerHTML = `
                     <span>Error at line ${index+1}:</span>
-                    <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${expression}</pre>
+                    <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${highlightedExpression}</pre>
                     <span>${error.name}: ${error.message}</span>
                     <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.9em;">${error.stack}</pre>`;
                 throw error;
