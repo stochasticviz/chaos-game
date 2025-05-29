@@ -128,7 +128,7 @@ userData["previous_vertex"] = _nextTargetIndex</pre>
 </div>
 </div> <!-- codeExplanation -->
 
-<textarea id="nextVertexAndPointMathJSCode" rows="5">
+<textarea id="nextVertexAndPointMathJSCode" rows="10">
 # Pick a random target vertex
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 # ... and get its coordinates
@@ -140,6 +140,9 @@ s = userControl("how far to go toward the target", 0, 1, 0.5)
 # Make next point s% of the way to the target
 nextPoint = currentPoint + (_nextTarget - currentPoint) * s
 </textarea>
+<div id="errorMessage" style="color: red; margin: 10px 0;">
+  <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;"></pre>
+</div>
 <div>
     <input type="checkbox" id="customizeView" />
     <label for="customizeView">Zoom and pan</label>
