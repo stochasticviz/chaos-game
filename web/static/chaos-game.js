@@ -245,7 +245,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
                     <span>Error at line ${index+1}:</span>
                     <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${highlightedExpression}</pre>
                     <span>${error.name}: ${error.message}</span>
-                    <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.9em;">${error.stack}</pre>`;
+                    <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.8em;">${error.stack}</pre>`;
                 throw error;
             }
         }
