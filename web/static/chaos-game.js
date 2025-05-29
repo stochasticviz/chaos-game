@@ -6,7 +6,7 @@ const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 const VERBOSE = false;
-
+const CHUNK_SIZE = 10000;
 let targets = [];  // TODO: these should probably be MathJS matrices
 let isDragging = false;
 let draggedVertexIndex = -1;
@@ -125,7 +125,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
   const viewLeft = centerX - viewWidth / 2;
   const viewTop = centerY - viewHeight / 2;
 
-  const chunkSize = 10000;
   let currentStep = 0;
 
   const scope = {
@@ -190,7 +189,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeLines, consumePoints)
         return;
       }
 
-      const endStep = Math.min(currentStep + chunkSize, steps);
+      const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
