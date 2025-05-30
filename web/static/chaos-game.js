@@ -6,7 +6,7 @@ const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 const VERBOSE = false;
-
+const CHUNK_SIZE = 10000;
 let targets = [];  // TODO: these should probably be MathJS matrices
 let isDragging = false;
 let draggedVertexIndex = -1;
@@ -32,8 +32,10 @@ math.import({
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
+    const debugModeDiv = document.getElementById('debugModeDiv');
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
+    debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
 });
 
 document.getElementById('customizeView').addEventListener('change', function(e) {
@@ -113,9 +115,20 @@ function initializeVertices(n_points) {
   }
 }
 
+// basic error handling. advanced handling is in the try/catch around "math.evaluate(expression, scope)", below
+function handleMathJSExpressionsError(error) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.innerHTML = `<span>${error.name}: ${error.message}.   (<i>for details, enable debug mode</i>)</span>`;
+    throw error;
+}
+
 let currentGenerationId = 0;
-function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints) {
+function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
+
+  const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
+  const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
+  console.log("compiledExpressions:", compiledExpressions);
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
@@ -124,8 +137,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
   const viewHeight = canvas.height / zoom;
   const viewLeft = centerX - viewWidth / 2;
   const viewTop = centerY - viewHeight / 2;
-
-  const chunkSize = 10000;
   let currentStep = 0;
 
   const scope = {
@@ -151,7 +162,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
       }
   };
 
-  const compiled_expressions = math.compile(nextVertexAndPointMathJSCodeString);
   let points = [];
   let pointsInViewCount = 0;
   let nextPoint = null;
@@ -191,7 +201,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
         return;
       }
 
-      const endStep = Math.min(currentStep + chunkSize, steps);
+      const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
@@ -212,7 +222,45 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, consumePoints
             }
         });
 
-        resultSet = compiled_expressions.evaluate(scope);
+        if (compiledExpressions) {
+            try {
+                resultSet = compiledExpressions.evaluate(scope);
+            } catch (error) { handleMathJSExpressionsError(error); }
+        }
+        else {
+        for (const [index, expression] of nextVertexAndPointMathJSCodeLines.entries()) {
+            try {
+                math.evaluate(expression, scope);
+            } catch (error) {
+                const errorDiv = document.getElementById('errorMessage');
+                let highlightedExpression = expression;
+                // Extract character position from error message if it exists
+                const charMatch = error.message.match(/\(char (\d+)\)/); // matches messages like "SyntaxError: Value expected (char 58)"
+                if (charMatch) {
+                    const charPos = parseInt(charMatch[1]) - 1;
+                    // For "Unexpected end of expression", insert and highlight a space
+                    if (error.message.includes('Unexpected end of expression')) {
+                        highlightedExpression = expression +
+                            '<span style="color: #dc3545; background-color: #ffebee; padding: 0 2px; border-radius: 2px;"> </span>';
+                    } else {
+                        // Split the expression and insert a span around the error character
+                        highlightedExpression = expression.slice(0, charPos) +
+                            '<span style="color: #dc3545; background-color: #ffebee; padding: 0 2px; border-radius: 2px;">' +
+                            expression[charPos] +
+                            '</span>' +
+                            expression.slice(charPos + 1);
+                    }
+                }
+                errorDiv.innerHTML = `
+                    <span>Error at line ${index+1}:</span>
+                    <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${highlightedExpression}</pre>
+                    <span>${error.name}: ${error.message}</span>
+                    <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.8em;">${error.stack}</pre>`;
+                throw error;
+            }
+        }
+
+        }
         if (showStuff) {
             console.log("resultSet:", resultSet);
             console.log("pointsQueue length:", scope.pointsQueue.length);
@@ -292,6 +340,10 @@ async function generateAndDraw() {
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
+  const debugMode = document.getElementById('debugMode').checked;
+
+  // Clear any previous error message
+  document.getElementById('errorMessage').innerHTML = '';
 
   // Only clear controls if this is a fresh generation (not from slider update)
   // and if the code has changed
@@ -323,7 +375,7 @@ async function generateAndDraw() {
 
     toggleSpinner(true);
     try {
-      await generatePoints(steps, nextVertexAndPointMathJSCodeString, (progress, points, proportionInView) => {
+      await generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, (progress, points, proportionInView) => {
         document.getElementById('spinner').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
@@ -336,6 +388,8 @@ async function generateAndDraw() {
       }
     } catch (error) {
       if (error.message !== 'Generation cancelled') {
+        // Hide the spinner but keep the points
+        toggleSpinner(false);
         throw error;
       }
       // If generation was cancelled, just continue but don't clear the spinner
