@@ -241,11 +241,11 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
                     // Check if the character position is at the end of the line
                     if (charPos === expression.length) {
                         highlightedExpression = expression +
-                            '<span style="color: #dc3545; background-color: #ffebee; padding: 0 2px; border-radius: 2px;"> </span>';
+                            '<span class="error-highlight"> </span>';
                     } else {
                         // Split the expression and insert a span around the error character
                         highlightedExpression = expression.slice(0, charPos) +
-                            '<span style="color: #dc3545; background-color: #ffebee; padding: 0 2px; border-radius: 2px;">' +
+                            '<span class="error-highlight">' +
                             expression[charPos] +
                             '</span>' +
                             expression.slice(charPos + 1);
@@ -253,9 +253,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
                 }
                 errorDiv.innerHTML = `
                     <span>Error at line ${index+1}:</span>
-                    <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;">${highlightedExpression}</pre>
+                    <pre class="error-message">${highlightedExpression}</pre>
                     <span>${error.name}: ${error.message}</span>
-                    <pre style="color: #665; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 0.8em;">${error.stack}</pre>`;
+                    <pre class="error-stack">${error.stack}</pre>`;
                 throw error;
             }
         }
