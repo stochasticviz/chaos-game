@@ -238,8 +238,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
                 const charMatch = error.message.match(/\(char (\d+)\)/); // matches messages like "SyntaxError: Value expected (char 58)"
                 if (charMatch) {
                     const charPos = parseInt(charMatch[1]) - 1;
-                    // For "Unexpected end of expression", insert and highlight a space
-                    if (error.message.includes('Unexpected end of expression')) {
+                    // Check if the character position is at the end of the line
+                    if (charPos === expression.length) {
                         highlightedExpression = expression +
                             '<span style="color: #dc3545; background-color: #ffebee; padding: 0 2px; border-radius: 2px;"> </span>';
                     } else {
