@@ -159,7 +159,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
   const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
   const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
-  console.log("compiledExpressions:", compiledExpressions);
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
