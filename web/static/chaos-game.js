@@ -118,7 +118,7 @@ function initializeVertices(n_points) {
 // basic error handling. advanced handling is in the try/catch around "math.evaluate(expression, scope)", below
 function handleMathJSExpressionsError(error) {
     const errorDiv = document.getElementById('errorMessage');
-    errorDiv.innerHTML = `<span>${error.name}: ${error.message}.   (<i>for details, enable debug mode</i>)</span>`;
+    errorDiv.innerHTML = `<span>${error.name}: ${error.message}.<br/><br/><i>for details, enable debug mode and try again</i></span>`;
     throw error;
 }
 
