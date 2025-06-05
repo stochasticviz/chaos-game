@@ -109,7 +109,7 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
 # The userData object is provided for you to store arbitrary data across iterations
 
 # Initialize previous vertex if needed, i.e. if this is the first iteration
-userData["previous_vertex"] = userData["previous_vertex"] == undefined ? -1 : userData["previous_vertex"]
+userData["previous_vertex"] = hasKey(userData, "previous_vertex") ? userData["previous_vertex"] : -1
 
 # Get all possible indices except the vertex we used in the last iteration
 _possibleTargetIndices = math.range(1, targetPointsLength+1)

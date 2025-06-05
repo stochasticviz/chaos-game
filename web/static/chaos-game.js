@@ -118,8 +118,39 @@ function initializeVertices(n_points) {
 // basic error handling. advanced handling is in the try/catch around "math.evaluate(expression, scope)", below
 function handleMathJSExpressionsError(error) {
     const errorDiv = document.getElementById('errorMessage');
-    errorDiv.innerHTML = `<span>${error.name}: ${error.message}.   (<i>for details, enable debug mode</i>)</span>`;
+    errorDiv.innerHTML = `<span>${error.name}: ${error.message}.<br/><br/><i>for details, enable debug mode and try again</i></span>`;
     throw error;
+}
+
+
+function hasKey(obj, key) {
+  // this may be overkill. just doing a obj[key] in a try catch can let you assume the problem is with the obj, not the key, except in the most obscure situations, which probably aren't even possible in a MathJS expressions context.
+  const type = obj === null ? 'null' : typeof obj;
+  const className = (obj && obj.constructor && obj.constructor.name) || type;
+
+  const valueStr = (
+    obj === null || obj === undefined
+      ? ', i.e. nothing'
+      : ', ' + math.format(obj)
+  );
+
+  if (
+    typeof obj !== 'object' ||
+    obj === null ||
+    Object.getPrototypeOf(obj) !== Object.prototype
+  ) {
+    throw new Error(
+      `First argument to hasKey() must be a plain Object, like {"foo": 123}, instead got a ${className}${valueStr}.`
+    );
+  }
+
+  try {
+    void obj[key]; // access to provoke key errors if any
+  } catch (e) {
+    throw new Error(`Key "${math.format(key)}" is not usable as a property key: ${e.message}`);
+  }
+
+  return key in obj;
 }
 
 let currentGenerationId = 0;
@@ -128,7 +159,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
   const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
   const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
-  console.log("compiledExpressions:", compiledExpressions);
   // Start near origin
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
@@ -150,6 +180,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       // Queue for storing multiple points
       pointsQueue: [],
       userData: {},
+      hasKey: hasKey,
       userControl: function(label, min, max, defaultValue) {
           ensureUserControls();
           const userControls = document.getElementById('userControls');
@@ -222,7 +253,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
             }
         });
 
-        if (compiledExpressions) {
+        if (! debugMode) {
             try {
                 resultSet = compiledExpressions.evaluate(scope);
             } catch (error) { handleMathJSExpressionsError(error); }
