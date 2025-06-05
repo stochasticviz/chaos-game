@@ -258,7 +258,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
             }
         });
 
-        if (compiledExpressions) {
+        if (! debugMode) {
             try {
                 resultSet = compiledExpressions.evaluate(scope);
             } catch (error) { handleMathJSExpressionsError(error); }
