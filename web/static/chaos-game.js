@@ -122,6 +122,47 @@ function handleMathJSExpressionsError(error) {
     throw error;
 }
 
+
+function hasKey(obj, key) {
+  const type = obj === null ? 'null' : typeof obj;
+  const className = (obj && obj.constructor && obj.constructor.name) || type;
+
+  const valueStr = (
+    obj === null || obj === undefined
+      ? ''
+      : `, ${JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v))}`
+  );
+
+  if (
+    typeof obj !== 'object' ||
+    obj === null ||
+    Object.getPrototypeOf(obj) !== Object.prototype
+  ) {
+    throw new Error(
+      `First argument must be a plain Object, like {"foo": "bar"}, instead got a ${className}${valueStr}.`
+    );
+  }
+
+  if (Array.isArray(obj)) {
+    throw new Error(
+      `First argument must be a plain Object, like {"foo": "bar"}, instead got an Array, ${JSON.stringify(obj)}.`
+    );
+  }
+
+  try {
+    void obj[key]; // access to provoke key errors if any
+  } catch (e) {
+    throw new Error(`Key "${String(key)}" is not usable as a property key: ${e.message}`);
+  }
+
+  return key in obj;
+}
+
+
+// const hasKey = math.typed("myKey", {
+//     'Object, any': function(obj, key) { return key in obj }
+//     })
+
 let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
@@ -150,6 +191,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       // Queue for storing multiple points
       pointsQueue: [],
       userData: {},
+      hasKey: hasKey,
       userControl: function(label, min, max, defaultValue) {
           ensureUserControls();
           const userControls = document.getElementById('userControls');
