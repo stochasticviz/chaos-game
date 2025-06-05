@@ -130,7 +130,7 @@ function hasKey(obj, key) {
   const valueStr = (
     obj === null || obj === undefined
       ? ''
-      : `, ${JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v))}`
+      : ', ' + math.format(obj)
   );
 
   if (
@@ -139,25 +139,25 @@ function hasKey(obj, key) {
     Object.getPrototypeOf(obj) !== Object.prototype
   ) {
     throw new Error(
-      `First argument must be a plain Object, like {"foo": "bar"}, instead got a ${className}${valueStr}.`
+      `First argument must be a plain Object, like {"foo": 123}, instead got a ${className}${valueStr}.`
     );
   }
 
   if (Array.isArray(obj)) {
+    // i think this never executes
     throw new Error(
-      `First argument must be a plain Object, like {"foo": "bar"}, instead got an Array, ${JSON.stringify(obj)}.`
+      `First argument must be a plain Object, like {"foo": 123}, instead got a Javascript Array, ${JSON.stringify(obj)}    ${valueStr}.`
     );
   }
 
   try {
     void obj[key]; // access to provoke key errors if any
   } catch (e) {
-    throw new Error(`Key "${String(key)}" is not usable as a property key: ${e.message}`);
+    throw new Error(`Key "${math.format(key)}" is not usable as a property key: ${e.message}`);
   }
 
   return key in obj;
 }
-
 
 // const hasKey = math.typed("myKey", {
 //     'Object, any': function(obj, key) { return key in obj }
