@@ -143,13 +143,6 @@ function hasKey(obj, key) {
     );
   }
 
-  if (Array.isArray(obj)) {
-    // i think this never executes
-    throw new Error(
-      `First argument must be a plain Object, like {"foo": 123}, instead got a Javascript Array, ${JSON.stringify(obj)}    ${valueStr}.`
-    );
-  }
-
   try {
     void obj[key]; // access to provoke key errors if any
   } catch (e) {
