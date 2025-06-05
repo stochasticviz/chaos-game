@@ -124,6 +124,7 @@ function handleMathJSExpressionsError(error) {
 
 
 function hasKey(obj, key) {
+  // this may be overkill. just doing a obj[key] in a try catch can let you assume the problem is with the obj, not the key, except in the most obscure situations, which probably aren't even possible in a MathJS expressions context.
   const type = obj === null ? 'null' : typeof obj;
   const className = (obj && obj.constructor && obj.constructor.name) || type;
 
@@ -139,7 +140,7 @@ function hasKey(obj, key) {
     Object.getPrototypeOf(obj) !== Object.prototype
   ) {
     throw new Error(
-      `First argument must be a plain Object, like {"foo": 123}, instead got a ${className}${valueStr}.`
+      `First argument to hasKey() must be a plain Object, like {"foo": 123}, instead got a ${className}${valueStr}.`
     );
   }
 
