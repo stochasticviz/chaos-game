@@ -153,10 +153,6 @@ function hasKey(obj, key) {
   return key in obj;
 }
 
-// const hasKey = math.typed("myKey", {
-//     'Object, any': function(obj, key) { return key in obj }
-//     })
-
 let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
