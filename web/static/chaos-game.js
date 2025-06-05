@@ -260,12 +260,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
             } catch (error) { handleMathJSExpressionsError(error); }
         }
         else {
-        // Create a new ResultSet to collect results from individual expressions
-        resultSet = new math.ResultSet();
         for (const [index, expression] of nextVertexAndPointMathJSCodeLines.entries()) {
             try {
-                const result = math.evaluate(expression, scope);
-                result && resultSet.entries.push(result);
+                math.evaluate(expression, scope);
             } catch (error) {
                 const errorDiv = document.getElementById('errorMessage');
                 let highlightedExpression = expression;
