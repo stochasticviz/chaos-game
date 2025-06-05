@@ -129,7 +129,7 @@ function hasKey(obj, key) {
 
   const valueStr = (
     obj === null || obj === undefined
-      ? ''
+      ? ', i.e. nothing'
       : ', ' + math.format(obj)
   );
 
