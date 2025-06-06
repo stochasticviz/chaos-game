@@ -153,6 +153,25 @@ function hasKey(obj, key) {
   return key in obj;
 }
 
+// DOM output tracking
+let domOutputDiv = null;
+let lastIterationOutput = [];
+let currentIterationOutput = [];
+let repetitionCount = 1;
+
+function writeToDOM(text) {
+  if (!domOutputDiv) {
+    domOutputDiv = document.createElement('div');
+    domOutputDiv.style.cssText = 'background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap;';
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.parentNode.insertBefore(domOutputDiv, errorDiv);
+  }
+
+  const textNode = document.createTextNode(text + '\n');
+  domOutputDiv.appendChild(textNode);
+  currentIterationOutput.push(text);
+}
+
 let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
@@ -181,6 +200,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       pointsQueue: [],
       userData: {},
       hasKey: hasKey,
+      write: writeToDOM,
       userControl: function(label, min, max, defaultValue) {
           ensureUserControls();
           const userControls = document.getElementById('userControls');
@@ -234,6 +254,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
+        // Reset current iteration output at the start of each iteration
+        currentIterationOutput = [];
+
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
         if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
@@ -301,6 +324,35 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
+
+        // Check if current iteration output matches last iteration
+        if (currentIterationOutput.length === lastIterationOutput.length &&
+            currentIterationOutput.every((val, idx) => val === lastIterationOutput[idx])) {
+          // Remove the lines we just wrote
+          if (domOutputDiv) {
+            const lines = domOutputDiv.childNodes;
+            for (let j = 0; j < currentIterationOutput.length; j++) {
+              if (lines.length > 0) {
+                domOutputDiv.removeChild(lines[lines.length - 1]);
+              }
+            }
+            // Update or add repetition count
+            if (repetitionCount > 1) {
+              // Remove the previous (x n) line
+              if (lines.length > 0) {
+                domOutputDiv.removeChild(lines[lines.length - 1]);
+              }
+            }
+            repetitionCount++;
+            const countNode = document.createElement('i');
+            countNode.textContent = `(x ${repetitionCount})\n`;
+            domOutputDiv.appendChild(countNode);
+          }
+        } else {
+          // Different output, reset repetition count
+          repetitionCount = 1;
+          lastIterationOutput = [...currentIterationOutput];
+        }
 
         firstTime = false;
       }
