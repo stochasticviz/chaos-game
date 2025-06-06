@@ -154,22 +154,22 @@ function hasKey(obj, key) {
 }
 
 // DOM output tracking
-let domOutputDiv = null;
-let lastIterationOutput = [];
-let currentIterationOutput = [];
-let repetitionCount = 1;
+let writeToDOMDiv = null;
+let writeToDOMLastOutput = [];
+let writeToDOMCurrentOutput = [];
+let writeToDOMRepetitionCount = 1;
 
 function writeToDOM(text) {
-  if (!domOutputDiv) {
-    domOutputDiv = document.createElement('div');
-    domOutputDiv.style.cssText = 'background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap;';
+  if (!writeToDOMDiv) {
+    writeToDOMDiv = document.createElement('div');
+    writeToDOMDiv.style.cssText = 'background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap;';
     const errorDiv = document.getElementById('errorMessage');
-    errorDiv.parentNode.insertBefore(domOutputDiv, errorDiv);
+    errorDiv.parentNode.insertBefore(writeToDOMDiv, errorDiv);
   }
 
-  const textNode = document.createTextNode(text + '\n');
-  domOutputDiv.appendChild(textNode);
-  currentIterationOutput.push(text);
+  const writeToDOMTextNode = document.createTextNode(text + '\n');
+  writeToDOMDiv.appendChild(writeToDOMTextNode);
+  writeToDOMCurrentOutput.push(text);
 }
 
 let currentGenerationId = 0;
@@ -255,8 +255,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         // Reset current iteration output at the start of each iteration
-        currentIterationOutput = [];
-
+        writeToDOMCurrentOutput = [];
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
         if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
@@ -326,32 +325,32 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         scope.currentTargetIndex = scope.nextTargetIndex;
 
         // Check if current iteration output matches last iteration
-        if (currentIterationOutput.length === lastIterationOutput.length &&
-            currentIterationOutput.every((val, idx) => val === lastIterationOutput[idx])) {
+        if (writeToDOMCurrentOutput.length === writeToDOMLastOutput.length &&
+            writeToDOMCurrentOutput.every((val, idx) => val === writeToDOMLastOutput[idx])) {
           // Remove the lines we just wrote
-          if (domOutputDiv) {
-            const lines = domOutputDiv.childNodes;
-            for (let j = 0; j < currentIterationOutput.length; j++) {
+          if (writeToDOMDiv) {
+            const lines = writeToDOMDiv.childNodes;
+            for (let j = 0; j < writeToDOMCurrentOutput.length; j++) {
               if (lines.length > 0) {
-                domOutputDiv.removeChild(lines[lines.length - 1]);
+                writeToDOMDiv.removeChild(lines[lines.length - 1]);
               }
             }
             // Update or add repetition count
-            if (repetitionCount > 1) {
+            if (writeToDOMRepetitionCount > 1) {
               // Remove the previous (x n) line
               if (lines.length > 0) {
-                domOutputDiv.removeChild(lines[lines.length - 1]);
+                writeToDOMDiv.removeChild(lines[lines.length - 1]);
               }
             }
-            repetitionCount++;
+            writeToDOMRepetitionCount++;
             const countNode = document.createElement('i');
-            countNode.textContent = `(x ${repetitionCount})\n`;
-            domOutputDiv.appendChild(countNode);
+            countNode.textContent = `(x ${writeToDOMRepetitionCount})\n`;
+            writeToDOMDiv.appendChild(countNode);
           }
         } else {
           // Different output, reset repetition count
-          repetitionCount = 1;
-          lastIterationOutput = [...currentIterationOutput];
+          writeToDOMRepetitionCount = 1;
+          writeToDOMLastOutput = [...writeToDOMCurrentOutput];
         }
 
         firstTime = false;
