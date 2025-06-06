@@ -153,6 +153,25 @@ function hasKey(obj, key) {
   return key in obj;
 }
 
+// DOM output tracking
+let writeToDOMDiv = null;
+let writeToDOMLastOutput = [];
+let writeToDOMCurrentOutput = [];
+let writeToDOMRepetitionCount = 1;
+
+function writeToDOM(text) {
+  if (!writeToDOMDiv) {
+    writeToDOMDiv = document.createElement('div');
+    writeToDOMDiv.style.cssText = 'background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap;';
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.parentNode.insertBefore(writeToDOMDiv, errorDiv);
+  }
+
+  const writeToDOMTextNode = document.createTextNode(text + '\n');
+  writeToDOMDiv.appendChild(writeToDOMTextNode);
+  writeToDOMCurrentOutput.push(text);
+}
+
 let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
@@ -181,6 +200,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       pointsQueue: [],
       userData: {},
       hasKey: hasKey,
+      write: writeToDOM,
       userControl: function(label, min, max, defaultValue) {
           ensureUserControls();
           const userControls = document.getElementById('userControls');
@@ -234,6 +254,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
+        // Reset current iteration output at the start of each iteration
+        writeToDOMCurrentOutput = [];
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
         if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
@@ -301,6 +323,35 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
+
+        // Check if current iteration output matches last iteration
+        if (writeToDOMCurrentOutput.length === writeToDOMLastOutput.length &&
+            writeToDOMCurrentOutput.every((val, idx) => val === writeToDOMLastOutput[idx])) {
+          // Remove the lines we just wrote
+          if (writeToDOMDiv) {
+            const lines = writeToDOMDiv.childNodes;
+            for (let j = 0; j < writeToDOMCurrentOutput.length; j++) {
+              if (lines.length > 0) {
+                writeToDOMDiv.removeChild(lines[lines.length - 1]);
+              }
+            }
+            // Update or add repetition count
+            if (writeToDOMRepetitionCount > 1) {
+              // Remove the previous (x n) line
+              if (lines.length > 0) {
+                writeToDOMDiv.removeChild(lines[lines.length - 1]);
+              }
+            }
+            writeToDOMRepetitionCount++;
+            const countNode = document.createElement('i');
+            countNode.textContent = `(x ${writeToDOMRepetitionCount})\n`;
+            writeToDOMDiv.appendChild(countNode);
+          }
+        } else {
+          // Different output, reset repetition count
+          writeToDOMRepetitionCount = 1;
+          writeToDOMLastOutput = [...writeToDOMCurrentOutput];
+        }
 
         firstTime = false;
       }
