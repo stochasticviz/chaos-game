@@ -68,11 +68,11 @@ Write your own code to calculate where the next point should be. The default cod
         <li><code>min</code>: The minimum value</li>
         <li><code>max</code>: The maximum value</li>
       </ul>
-      For example: <code>t = userControl("t (scalar)", -4, 4, 2)</code> will create a slider labeled "t (scalar)". You can then use <code>t</code> anywhere in your code to give your end user 'live' control over some value, with a range for -4 to 4 and a starting value of 2.
+      For example: <code>t = userControl("t (scalar)", -1, 4, 3)</code> will create a slider labeled "t (scalar)". You can then use <code>t</code> anywhere in your code to give your end user 'live' control over any value. In this case the slider will range over -1 to 4 and start at 3.
     </li>
   </ol>
 
-  <h4>Advanced example - The Corcoran art function:</h4>
+  <h4>Advanced example - The Corcoran Attractor:</h4>
   <div class="codeBlock">
     <pre class="codeExample">
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
@@ -80,7 +80,7 @@ _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create user controls for the parameters
 sine_shift = userControl("Sine shift", 0, 2*math.pi, math.pi*29/25)
-sine_scale = userControl("Sine scale", -3/2, 4, 1/2)  # try 1/3 and 12 vertices with a 3 million points and 0.1 opacity
+sine_scale = userControl("Sine scale", -3/2, 4, 1/2)  # try 1/3 and 12 vertices with a 3 million points and 0.1 opacity!
 sine_offset = userControl("Sine offset", -1, 4, 1/2)
 
 displacement_factors = math.matrix([
