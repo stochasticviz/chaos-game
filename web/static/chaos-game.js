@@ -166,10 +166,11 @@ function writeToDOM(text) {
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.parentNode.insertBefore(writeToDOMDiv, errorDiv);
   }
-
+  text = String(text)
   const writeToDOMTextNode = document.createTextNode(text + '\n');
   writeToDOMDiv.appendChild(writeToDOMTextNode);
   writeToDOMCurrentOutput.push(text);
+  return "write: " + text
 }
 
 let currentGenerationId = 0;
