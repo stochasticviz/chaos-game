@@ -7,7 +7,7 @@ const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
 const VERBOSE = false;
 const CHUNK_SIZE = 10000;
-let targets = [];  // TODO: these should probably be MathJS matrices
+let targets = [];
 let isDragging = false;
 let draggedVertexIndex = -1;
 
@@ -153,7 +153,6 @@ function hasKey(obj, key) {
   return key in obj;
 }
 
-// DOM output tracking
 let writeToDOMDiv = null;
 let writeToDOMLastOutput = [];
 let writeToDOMCurrentOutput = [];
