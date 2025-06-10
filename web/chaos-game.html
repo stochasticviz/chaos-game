@@ -152,7 +152,7 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create a user control for how far to go toward the target
-s = userControl("how far to go toward the target", -0.1, 1.8, .5)
+s = userControl("how far to go toward the target (try sliding slowly)", 0.02, 1.4, .5)
 
 # Make next point s% of the way to the target
 nextPoint = currentPoint + (_nextTarget - currentPoint) * s
