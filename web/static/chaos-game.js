@@ -466,7 +466,6 @@ async function generateAndDraw() {
       // Only clear if we completed successfully
       if (document.getElementById('spinner').textContent.includes('100%')) {
         toggleSpinner(false);
-        document.getElementById('pointsInView').textContent = '';
       }
     } catch (error) {
       if (error.message !== 'Generation cancelled') {
