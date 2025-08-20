@@ -254,8 +254,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
-        // Reset current iteration output at the start of each iteration
-        writeToDOMCurrentOutput = [];
+        writeToDOMCurrentOutput = [];  // this is this iteration's logging
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
         if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
