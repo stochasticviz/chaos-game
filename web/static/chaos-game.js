@@ -30,9 +30,11 @@ math.import({
 });
 
 document.getElementById('customizeFunction').addEventListener('change', function(e) {
+    const initializationInput = document.getElementById('initializationMathJSCode');
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
     const debugModeDiv = document.getElementById('debugModeDiv');
+    initializationInput.style.display = e.target.checked ? 'block' : 'none';
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
     debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
@@ -176,6 +178,10 @@ let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
 
+  const initializationMathJSCodeString = document.getElementById("initializationMathJSCode").value;
+  const initializationMathJSCodeLines = initializationMathJSCodeString.split('\n');
+  const initializationCompiledExpressions = debugMode ? null : (() => { try { return math.compile(initializationMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
+
   const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
   const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
   // Start near origin
@@ -242,6 +248,31 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
     points.forEach(point => {
       scope.pointsQueue.push(math.matrix([point]));
     });
+  }
+
+  // Execute initialization code once per generation
+  if (initializationMathJSCodeString.trim()) {
+    if (!debugMode) {
+      try {
+        initializationCompiledExpressions.evaluate(scope);
+      } catch (error) { handleMathJSExpressionsError(error); }
+    } else {
+      for (const [index, expression] of initializationMathJSCodeLines.entries()) {
+        if (expression.trim()) {
+          try {
+            math.evaluate(expression, scope);
+          } catch (error) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `
+              <span>Error in initialization code at line ${index+1}:</span>
+              <pre class="error-message">${expression}</pre>
+              <span>${error.name}: ${error.message}</span>
+              <pre class="error-stack">${error.stack}</pre>`;
+            throw error;
+          }
+        }
+      }
+    }
   }
 
   return new Promise((resolve, reject) => {
