@@ -91,6 +91,10 @@ label[for="nextVertexAndPointMathJSCode"] {
   display: none;
 }
 
+#codeSpacing {
+  display: none;
+}
+
 #codeExplanation {
     display: none;
     margin: 10px 0;
