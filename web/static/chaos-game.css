@@ -74,7 +74,6 @@ pre.codeExample {
   display: none;
   width: 100%;
   max-width: 1000px;  /* Match canvas width */
-  height: 200px;  /* Make it taller */
   margin-top: 10px;
   font-family: monospace;
   font-size: 14px;
@@ -84,6 +83,12 @@ pre.codeExample {
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
+}
+
+/* Hide the labels for the code inputs by default */
+label[for="initializationMathJSCode"],
+label[for="nextVertexAndPointMathJSCode"] {
+  display: none;
 }
 
 #codeExplanation {
