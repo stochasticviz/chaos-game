@@ -30,11 +30,15 @@ math.import({
 });
 
 document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
+    const initializationLabel = document.querySelector('label[for="initializationMathJSCode"]');
     const initializationInput = document.getElementById('initializationMathJSCode');
+    const functionLabel = document.querySelector('label[for="nextVertexAndPointMathJSCode"]');
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
     const debugModeDiv = document.getElementById('debugModeDiv');
+    initializationLabel.style.display = e.target.checked ? 'block' : 'none';
     initializationInput.style.display = e.target.checked ? 'block' : 'none';
+    functionLabel.style.display = e.target.checked ? 'block' : 'none';
     functionInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
     debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
