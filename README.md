@@ -1,19 +1,27 @@
-# Chaos Game Explorer
+# Interactive Chaos Game
 
-Fun tools for exploring the [Chaos Game](https://www.youtube.com/watch?v=k3V72Qvcn94).
+These are fun tools for exploring the [Chaos Game](https://www.youtube.com/watch?v=k3V72Qvcn94).
 
-## [chaos-game.html](web/chaos-game.html)
-Try it live [here](https://stochasticviz.github.io/chaos-game/chaos-game.html). Originally ported from bokeh-app.py mostly by ChatGPT, but has grown since. 
+## 2D
+Hosted, live: [chaos-game.html](https://herdrick.github.io/chaos-game/chaos-game.html)
 
-## [chaos-game-3d.html](web/chaos-game-3d.html)
-Try it live [here](https://stochasticviz.github.io/chaos-game/chaos-game-3d.html).
+[Source](web/chaos-game.html)
 
-## [bokeh-app.py](sierpinski_triangle/bokeh-app.py)
+## 3D
+Hosted, live: [chaos-game-3d.html](https://herdrick.github.io/chaos-game/chaos-game-3d.html)
+
+[Source](web/chaos-game-3d.html)
+
+
+
+## Archives
+
+### [bokeh-app.py](sierpinski_triangle/bokeh-app.py)
 Original implementation using Bokeh/Panel.
 
 Requires: numpy, holoviews, panel, bokeh
 
-### Installation
+#### Installation
 Using conda:
 
 ```
@@ -22,7 +30,7 @@ conda env create -f sierpinski_triangle/environment.yml
 conda activate chaos-game
 ```
 
-### Run
+#### Run
 ```
 bokeh serve --show bokeh-app.py
 ```
