@@ -46,8 +46,8 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
   <button id="resetBtn">Reset Vertices</button>
 </div>
 <div>
-  <input type="checkbox" id="customizeFunction" />
-  <label for="customizeFunction">Customize the "next point" code</label>
+  <input type="checkbox" id="customizeMathJSCode" />
+  <label for="customizeMathJSCode">Customize the "next point" code</label>
 </div>
 
 <div id="codeExplanation">
@@ -161,7 +161,7 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create a user control for how far to go toward the target
-s = userControl("how far to go toward the target (try sliding slowly)", 0.02, 1.4, .5)
+s = userControl("how far to go toward the target", 0.02, 1.4, .5)
 
 # Make next point s% of the way to the target
 nextPoint = currentPoint + (_nextTarget - currentPoint) * s

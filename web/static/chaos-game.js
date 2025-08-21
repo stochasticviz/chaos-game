@@ -29,7 +29,7 @@ math.import({
   }
 });
 
-document.getElementById('customizeFunction').addEventListener('change', function(e) {
+document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
     const initializationInput = document.getElementById('initializationMathJSCode');
     const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
