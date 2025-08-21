@@ -30,16 +30,16 @@ math.import({
 });
 
 document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
-    const initializationLabel = document.querySelector('label[for="initializationMathJSCode"]');
-    const initializationInput = document.getElementById('initializationMathJSCode');
-    const functionLabel = document.querySelector('label[for="nextVertexAndPointMathJSCode"]');
-    const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
+    const initializationMathJSCodeLabel = document.querySelector('label[for="initializationMathJSCode"]');
+    const initializationMathJSCodeInput = document.getElementById('initializationMathJSCode');
+    const mainCodeLabel = document.querySelector('label[for="nextVertexAndPointMathJSCode"]');
+    const mainCodeInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
     const debugModeDiv = document.getElementById('debugModeDiv');
-    initializationLabel.style.display = e.target.checked ? 'block' : 'none';
-    initializationInput.style.display = e.target.checked ? 'block' : 'none';
-    functionLabel.style.display = e.target.checked ? 'block' : 'none';
-    functionInput.style.display = e.target.checked ? 'block' : 'none';
+    initializationMathJSCodeLabel.style.display = e.target.checked ? 'block' : 'none';
+    initializationMathJSCodeInput.style.display = e.target.checked ? 'block' : 'none';
+    mainCodeLabel.style.display = e.target.checked ? 'block' : 'none';
+    mainCodeInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
     debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
 });
