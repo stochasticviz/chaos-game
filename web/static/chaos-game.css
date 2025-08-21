@@ -47,7 +47,7 @@ pre.codeExample {
 }
 
 #advanced-docs-toggle {
-  display: none;
+  /* Now showing as a normal checkbox */
 }
 
 .advanced-docs {
@@ -58,16 +58,14 @@ pre.codeExample {
   display: block;
 }
 
+/* Show the initialization code textarea when advanced docs are visible */
+#advanced-docs-toggle:checked ~ .advanced-docs #initializationMathJSCode {
+  display: block;
+}
+
 #advanced-docs-label {
   font-size: smaller;
-}
-
-#advanced-docs-label::after {
-  content: 'Show advanced docs';
-}
-
-#advanced-docs-toggle:checked ~ #advanced-docs-label::after {
-  content: 'Hide advanced docs';
+  cursor: pointer;
 }
 
 .mathJSCode {
@@ -86,8 +84,13 @@ pre.codeExample {
 }
 
 /* Hide the labels for the code inputs by default */
-label[for="initializationMathJSCode"],
 label[for="nextVertexAndPointMathJSCode"] {
+  display: none;
+}
+
+/* Initialization code label is now inside advanced docs, so it shows when advanced docs are visible */
+
+#codeSpacing {
   display: none;
 }
 

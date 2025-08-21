@@ -54,7 +54,7 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
 Write your own code to calculate where the next point should be. The default code simply picks one of the vertices at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target vertex,  <code>targetPoints</code>. Both are matrices. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em><br/>
 
 <input type="checkbox" id="advanced-docs-toggle">
-<a href="#" id="advanced-docs-label" onclick="document.getElementById('advanced-docs-toggle').click(); return false;"></a>
+<label for="advanced-docs-toggle" id="advanced-docs-label">Show advanced docs</label>
 
 <div class="advanced-docs">
   <ol>
@@ -75,6 +75,10 @@ Write your own code to calculate where the next point should be. The default cod
       For example, <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
     </li>
   </ol>
+
+  <label for="initializationMathJSCode">First time code (runs once):</label>
+  <textarea class="mathJSCode" id="initializationMathJSCode" rows="5">
+  </textarea>
 
   <h4>Advanced example - The Corcoran Attractor:</h4>
   <div class="codeBlock">
@@ -150,9 +154,7 @@ nextPoint= randomInt() ? point1 : point2</pre>
 </div>
 </div> <!-- codeExplanation -->
 
-<label for="initializationMathJSCode">First time code (runs once):</label>
-<textarea class="mathJSCode" id="initializationMathJSCode" rows="5">
-</textarea>
+
 <label for="nextVertexAndPointMathJSCode">Main code (runs each iteration):</label>
 <textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
 # Pick a random target vertex
