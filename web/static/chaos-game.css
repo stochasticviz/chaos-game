@@ -46,28 +46,44 @@ pre.codeExample {
   white-space: pre;
 }
 
-#advanced-docs-toggle {
+#advanced-stuff-toggle {
+  /* Now showing as a normal checkbox */
+}
+
+.advanced-stuff {
   display: none;
 }
 
-.advanced-docs {
-  display: none;
-}
-
-#advanced-docs-toggle:checked ~ .advanced-docs {
+#advanced-stuff-toggle:checked ~ .advanced-stuff {
   display: block;
 }
 
-#advanced-docs-label {
+/* Show the initialization code textarea when advanced docs are visible */
+#advanced-stuff-toggle:checked ~ .advanced-stuff #initializationMathJSCode {
+  display: block;
+}
+
+/* Advanced examples section styling */
+.advanced-examples {
+  display: none;
+}
+
+#advanced-examples-toggle:checked ~ .advanced-examples {
+  display: block;
+}
+
+/* Examples section styling */
+.examples-docs {
+  display: none;
+}
+
+#examples-toggle:checked ~ .examples-docs {
+  display: block;
+}
+
+.child-checkbox-label {
   font-size: smaller;
-}
-
-#advanced-docs-label::after {
-  content: 'Show advanced docs';
-}
-
-#advanced-docs-toggle:checked ~ #advanced-docs-label::after {
-  content: 'Hide advanced docs';
+  cursor: pointer;
 }
 
 .mathJSCode {
@@ -86,7 +102,6 @@ pre.codeExample {
 }
 
 /* Hide the labels for the code inputs by default */
-label[for="initializationMathJSCode"],
 label[for="nextVertexAndPointMathJSCode"] {
   display: none;
 }
