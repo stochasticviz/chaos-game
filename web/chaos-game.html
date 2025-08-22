@@ -79,10 +79,6 @@ Write your own code to calculate where the next point should be. The default cod
     </li>
   </ol>
 
-  <label for="initializationMathJSCode">First time code (runs once):</label>
-  <textarea class="mathJSCode" id="initializationMathJSCode" rows="5">
-  </textarea>
-
   <h4>Advanced example - The Corcoran Attractor:</h4>
   <div class="codeBlock">
     <pre class="codeExample">
@@ -103,6 +99,12 @@ displacement_factors = math.matrix([
 displacement_to_target = _nextTarget - currentPoint
 nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
   </div>
+
+  <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
+  <textarea class="mathJSCode" id="initializationMathJSCode" rows="5">
+  </textarea>
+
+
 </div>
 
 <div class="examples-docs">
