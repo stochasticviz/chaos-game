@@ -90,8 +90,6 @@ Write your own code to calculate where the next point should be. The default cod
   <div class="codeBlock">
     Advanced example - Avoid previous target vertex:
     <pre class="codeExample">
-# The userData object is provided for you to store arbitrary data across iterations
-
 # IMPORTANT! Put this line in the "Optional initialization code" pane.
 userData["previous_vertex"] = -1  # start with a non-existing vertex
 
@@ -183,10 +181,10 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create a user control for how far to go toward the target
-s = userControl("how far to go toward the target", 0.02, 1.4, .5)
+slider = userControl("how far to go toward the target", 0.02, 1.4, .5)
 
 # Make next point s% of the way to the target
-nextPoint = currentPoint + (_nextTarget - currentPoint) * s
+nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 </textarea>
 <div id="debugModeDiv" >
     <input type="checkbox" id="debugMode" />
