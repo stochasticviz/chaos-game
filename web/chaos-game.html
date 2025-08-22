@@ -88,6 +88,31 @@ Write your own code to calculate where the next point should be. The default cod
 
   <div class="advanced-examples">
     <h4>Advanced example - The Corcoran Attractor:</h4>
+  <div class="codeBlock">
+    Advanced example - Avoid previous target vertex:
+    <pre class="codeExample">
+# The userData object is provided for you to store arbitrary data across iterations
+
+# IMPORTANT! Put this line in the "Optional initialization code" pane".
+userData["previous_vertex"] = -1  # start with a non-existing vertex
+
+# The rest of this code goes in the main pane
+
+# Get all possible indices except the vertex we used in the last iteration
+_possibleTargetIndices = math.range(1, targetPointsLength+1)
+_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != userData["previous_vertex"]]
+
+# Pick a random target vertex
+_nextTargetIndex = math.pickRandom(_possibleTargetIndices)
+# ... and get its coordinates
+_nextTarget = targetPoints[_nextTargetIndex, :]
+
+# Make next point midway to the target
+nextPoint = (currentPoint + _nextTarget) / 2
+
+# Store current vertex for next iteration
+userData["previous_vertex"] = _nextTargetIndex</pre>
+  </div>
     <div class="codeBlock">
       <pre class="codeExample">
 # try sine_scale of 1/3 and 12 vertices with a 3 million points and 0.1 opacity!
@@ -136,29 +161,6 @@ rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), m
 nextPoint = math.multiply(midpoint, rotation)</pre>
   </div>
 
-  <div class="codeBlock">
-    Avoid previous target vertex:
-    <pre class="codeExample">
-# The userData object is provided for you to store arbitrary data across iterations
-
-# Initialize previous vertex if needed, i.e. if this is the first iteration
-userData["previous_vertex"] = hasKey(userData, "previous_vertex") ? userData["previous_vertex"] : -1
-
-# Get all possible indices except the vertex we used in the last iteration
-_possibleTargetIndices = math.range(1, targetPointsLength+1)
-_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != userData["previous_vertex"]]
-
-# Pick a random target vertex
-_nextTargetIndex = math.pickRandom(_possibleTargetIndices)
-# ... and get its coordinates
-_nextTarget = targetPoints[_nextTargetIndex, :]
-
-# Make next point midway to the target
-nextPoint = (currentPoint + _nextTarget) / 2
-
-# Store current vertex for next iteration
-userData["previous_vertex"] = _nextTargetIndex</pre>
-  </div>
   <div class="codeBlock">
     The Levy C curve fractal:
     <pre class="codeExample">
