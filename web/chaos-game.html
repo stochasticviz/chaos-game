@@ -54,10 +54,10 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
 Write your own code to calculate where the next point should be. The default code simply picks one of the vertices at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target vertex,  <code>targetPoints</code>. Both are matrices. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em><br/>
 
 <input type="checkbox" id="examples-toggle">
-<label for="examples-toggle" id="examples-label">Show examples</label>
+<label for="examples-toggle" class="child-checkbox-label">Show examples</label>
 <br>
 <input type="checkbox" id="advanced-docs-toggle">
-<label for="advanced-docs-toggle" id="advanced-docs-label">Show advanced docs</label>
+<label for="advanced-docs-toggle" class="child-checkbox-label">Show advanced docs</label>
 
 <div class="advanced-docs">
   <ol>
@@ -175,7 +175,7 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * s
 </textarea>
 <div id="debugModeDiv" >
     <input type="checkbox" id="debugMode" />
-    <label for="debugMode">Debug mode (slow, shows error messages)</label>
+    <label for="debugMode" class="child-checkbox-label">Debug mode (slow, shows error messages)</label>
 </div>
 <div id="errorMessage">
   <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;"></pre>

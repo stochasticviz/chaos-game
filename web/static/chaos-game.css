@@ -72,12 +72,7 @@ pre.codeExample {
   display: block;
 }
 
-#examples-label {
-  font-size: smaller;
-  cursor: pointer;
-}
-
-#advanced-docs-label {
+.child-checkbox-label {
   font-size: smaller;
   cursor: pointer;
 }
