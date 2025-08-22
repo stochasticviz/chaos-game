@@ -46,20 +46,20 @@ pre.codeExample {
   white-space: pre;
 }
 
-#advanced-docs-toggle {
+#advanced-stuff-toggle {
   /* Now showing as a normal checkbox */
 }
 
-.advanced-docs {
+.advanced-stuff {
   display: none;
 }
 
-#advanced-docs-toggle:checked ~ .advanced-docs {
+#advanced-stuff-toggle:checked ~ .advanced-stuff {
   display: block;
 }
 
 /* Show the initialization code textarea when advanced docs are visible */
-#advanced-docs-toggle:checked ~ .advanced-docs #initializationMathJSCode {
+#advanced-stuff-toggle:checked ~ .advanced-stuff #initializationMathJSCode {
   display: block;
 }
 
