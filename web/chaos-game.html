@@ -60,34 +60,33 @@ Write your own code to calculate where the next point should be. The default cod
 <label for="advanced-stuff-toggle" class="child-checkbox-label">Show advanced</label>
 
 <div class="advanced-stuff">
-  <ol>
+  <ul>
     <li>
-      <strong>write() function</strong>: Use this function to output text to the console. Example: <code>write("Current point:", currentPoint)</code>
+      <strong>write() function</strong> Use this function to output text to the console. Example: <code>write("Current point:", currentPoint)</code>
     </li>
     <li>
-      <strong>userData object</strong>: Put data in this that you want to save for your use in a future iteration. From the "Avoid previous target vertex" example, below: <code>userData["previous_vertex"] = _nextTargetIndex</code>
+      <strong>userData object</strong> Put data in this that you want to save for your use in a future iteration. From the "Avoid previous target vertex" example, below: <code>userData["previous_vertex"] = _nextTargetIndex</code>
     </li>
     <li>
-      <strong>userControl function</strong>: Create a custom UI control. Use these parameters:
+      <strong>userControl function</strong> Create a custom UI control. Use these parameters:
       <ul>
-        <li><code>label</code>: The label to show for the control</li>
-        <li><code>min</code>: The minimum value</li>
-        <li><code>max</code>: The maximum value</li>
-        <li><code>starting</code>: The starting value</li>
+        <li><code>label</code> The label to show for the control</li>
+        <li><code>min</code> The minimum value</li>
+        <li><code>max</code> The maximum value</li>
+        <li><code>starting</code> The starting value</li>
       </ul>
       For example, <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
     </li>
-  </ol>
     <li>
       <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
     </li>
 
+  </ul>
 
   <input type="checkbox" id="advanced-examples-toggle">
   <label for="advanced-examples-toggle" class="child-checkbox-label">Show advanced examples</label>
 
   <div class="advanced-examples">
-    <h4>Advanced example - The Corcoran Attractor:</h4>
   <div class="codeBlock">
     Advanced example - Avoid previous target vertex:
     <pre class="codeExample">
@@ -113,6 +112,7 @@ nextPoint = (currentPoint + _nextTarget) / 2
 # Store current vertex for next iteration
 userData["previous_vertex"] = _nextTargetIndex</pre>
   </div>
+    Advanced example - The Corcoran Attractor:
     <div class="codeBlock">
       <pre class="codeExample">
 # try sine_scale of 1/3 and 12 vertices with a 3 million points and 0.1 opacity!
