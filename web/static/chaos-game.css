@@ -106,8 +106,6 @@ label[for="nextVertexAndPointMathJSCode"] {
   display: none;
 }
 
-/* Initialization code label is now inside advanced docs, so it shows when advanced docs are visible */
-
 #codeSpacing {
   display: none;
 }
