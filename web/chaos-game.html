@@ -79,9 +79,13 @@ Write your own code to calculate where the next point should be. The default cod
     </li>
   </ol>
 
-  <h4>Advanced example - The Corcoran Attractor:</h4>
-  <div class="codeBlock">
-    <pre class="codeExample">
+  <input type="checkbox" id="advanced-examples-toggle">
+  <label for="advanced-examples-toggle" class="child-checkbox-label">Show advanced examples</label>
+
+  <div class="advanced-examples">
+    <h4>Advanced example - The Corcoran Attractor:</h4>
+    <div class="codeBlock">
+      <pre class="codeExample">
 # try sine_scale of 1/3 and 12 vertices with a 3 million points and 0.1 opacity!
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
@@ -98,8 +102,11 @@ displacement_factors = math.matrix([
 # Apply the factors to the displacement
 displacement_to_target = _nextTarget - currentPoint
 nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
+    </div>
   </div>
 
+  <br/>
+  <br/>
   <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
   <textarea class="mathJSCode" id="initializationMathJSCode" rows="5">
   </textarea>

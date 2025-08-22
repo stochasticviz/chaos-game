@@ -63,6 +63,15 @@ pre.codeExample {
   display: block;
 }
 
+/* Advanced examples section styling */
+.advanced-examples {
+  display: none;
+}
+
+#advanced-examples-toggle:checked ~ .advanced-examples {
+  display: block;
+}
+
 /* Examples section styling */
 .examples-docs {
   display: none;
