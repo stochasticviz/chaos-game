@@ -63,6 +63,20 @@ pre.codeExample {
   display: block;
 }
 
+/* Examples section styling */
+.examples-docs {
+  display: none;
+}
+
+#examples-toggle:checked ~ .examples-docs {
+  display: block;
+}
+
+#examples-label {
+  font-size: smaller;
+  cursor: pointer;
+}
+
 #advanced-docs-label {
   font-size: smaller;
   cursor: pointer;

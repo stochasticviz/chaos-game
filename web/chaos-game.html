@@ -53,6 +53,9 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
 <div id="codeExplanation">
 Write your own code to calculate where the next point should be. The default code simply picks one of the vertices at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target vertex,  <code>targetPoints</code>. Both are matrices. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em><br/>
 
+<input type="checkbox" id="examples-toggle">
+<label for="examples-toggle" id="examples-label">Show examples</label>
+
 <input type="checkbox" id="advanced-docs-toggle">
 <label for="advanced-docs-toggle" id="advanced-docs-label">Show advanced docs</label>
 
@@ -102,26 +105,27 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
   </div>
 </div>
 
-<h4>Examples:</h4>
-<div class="codeBlock">
-  Add 1 to both x and y:
-  <pre class="codeExample">
+<div class="examples-docs">
+  <h4>Examples:</h4>
+  <div class="codeBlock">
+    Add 1 to both x and y:
+    <pre class="codeExample">
 nextPoint = currentPoint + 1</pre>
-</div>
+  </div>
 
-<div class="codeBlock">
-  With rotation:
-  <pre class="codeExample">
+  <div class="codeBlock">
+    With rotation:
+    <pre class="codeExample">
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 midpoint = (currentPoint + _nextTarget) / 2
 rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), math.cos(math.pi/4)]]
 nextPoint = math.multiply(midpoint, rotation)</pre>
-</div>
+  </div>
 
-<div class="codeBlock">
-  Avoid previous target vertex:
-  <pre class="codeExample">
+  <div class="codeBlock">
+    Avoid previous target vertex:
+    <pre class="codeExample">
 # The userData object is provided for you to store arbitrary data across iterations
 
 # Initialize previous vertex if needed, i.e. if this is the first iteration
@@ -141,16 +145,17 @@ nextPoint = (currentPoint + _nextTarget) / 2
 
 # Store current vertex for next iteration
 userData["previous_vertex"] = _nextTargetIndex</pre>
-</div>
-<div class="codeBlock">
-  The Levy C curve fractal:
-  <pre class="codeExample">
+  </div>
+  <div class="codeBlock">
+    The Levy C curve fractal:
+    <pre class="codeExample">
 # you will need to set the Zoom level to about 325
 A = matrix([[.5,  .5], [-.5, .5]])
 B = matrix([[.5, -.5], [ .5, .5]])
 point1 = transpose(multiply(A, transpose(currentPoint)))
 point2 = transpose(multiply(B, transpose(currentPoint)) - transpose(matrix([[.5, .5]])))
 nextPoint= randomInt() ? point1 : point2</pre>
+  </div>
 </div>
 </div> <!-- codeExplanation -->
 
