@@ -22,18 +22,14 @@ ctx.translate(canvas.width / 2, canvas.height / 2);
 // Flip Y axis so positive is up
 ctx.scale(1, -1);
 
-// Register userControl function with MathJS
-math.import({
-  userControl: function(label, min, max) {
-    return userControlsValuesCache.get(label) || (min + max) / 2;
-  }
-});
 
-document.getElementById('customizeFunction').addEventListener('change', function(e) {
-    const functionInput = document.getElementById('nextVertexAndPointMathJSCode');
+document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
+    const mainCodeLabel = document.querySelector('label[for="nextVertexAndPointMathJSCode"]');
+    const mainCodeInput = document.getElementById('nextVertexAndPointMathJSCode');
     const explanation = document.getElementById('codeExplanation');
     const debugModeDiv = document.getElementById('debugModeDiv');
-    functionInput.style.display = e.target.checked ? 'block' : 'none';
+    mainCodeLabel.style.display = e.target.checked ? 'block' : 'none';
+    mainCodeInput.style.display = e.target.checked ? 'block' : 'none';
     explanation.style.display = e.target.checked ? 'block' : 'none';
     debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
 });
@@ -52,7 +48,7 @@ function createUserControl(label, min, max, defaultValue) {
     labelContainer.className = 'label-container';
 
     const labelElem = document.createElement('label');
-    labelElem.textContent = label + ': ';
+    labelElem.textContent = label + ': \u00A0\u00A0\u00A0';
     labelContainer.appendChild(labelElem);
 
     const valueDisplay = document.createElement('span');
@@ -73,7 +69,7 @@ function createUserControl(label, min, max, defaultValue) {
 
     // Store the initial value
     userControlsValuesCache.set(label, defaultValue);
-    valueDisplay.textContent = defaultValue.toFixed(2);
+    valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
@@ -81,7 +77,7 @@ function createUserControl(label, min, max, defaultValue) {
         const oldValue = userControlsValuesCache.get(label);
         if (newValue !== oldValue) {
             userControlsValuesCache.set(label, newValue);
-            valueDisplay.textContent = newValue.toFixed(2);
+            valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>' ;
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
             canvas.regenerateTimeout = setTimeout(generateAndDraw, 200);
@@ -176,6 +172,10 @@ let currentGenerationId = 0;
 function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
 
+  const initializationMathJSCodeString = document.getElementById("initializationMathJSCode").value;
+  const initializationMathJSCodeLines = initializationMathJSCodeString.split('\n');
+  const initializationCompiledExpressions = debugMode ? null : (() => { try { return math.compile(initializationMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
+
   const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
   const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
   // Start near origin
@@ -244,6 +244,31 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
     });
   }
 
+  // Execute initialization code once per generation
+  if (initializationMathJSCodeString.trim()) {
+    if (!debugMode) {
+      try {
+        initializationCompiledExpressions.evaluate(scope);
+      } catch (error) { handleMathJSExpressionsError(error); }
+    } else {
+      for (const [index, expression] of initializationMathJSCodeLines.entries()) {
+        if (expression.trim()) {
+          try {
+            math.evaluate(expression, scope);
+          } catch (error) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `
+              <span>Error in initialization code at line ${index+1}:</span>
+              <pre class="error-message">${expression}</pre>
+              <span>${error.name}: ${error.message}</span>
+              <pre class="error-stack">${error.stack}</pre>`;
+            throw error;
+          }
+        }
+      }
+    }
+  }
+
   return new Promise((resolve, reject) => {
     function generateChunk() {
       if (generationId !== currentGenerationId) {
@@ -254,8 +279,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
-        // Reset current iteration output at the start of each iteration
-        writeToDOMCurrentOutput = [];
+        writeToDOMCurrentOutput = [];  // this is this iteration's logging
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
         if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
@@ -412,9 +436,9 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   ctx.restore();
 }
 
-function toggleSpinner(show) {
-  const spinner = document.getElementById('spinner');
-  spinner.style.display = show ? 'block' : 'none';
+function toggleProgressIndicator(show) {
+  const progressIndicator = document.getElementById('progress-indicator');
+  progressIndicator.style.display = show ? 'block' : 'none';
 }
 
 async function generateAndDraw() {
@@ -455,25 +479,25 @@ async function generateAndDraw() {
     drawVerticesOnCanvas(ctx);
     await new Promise(resolve => setTimeout(resolve, 5));
 
-    toggleSpinner(true);
+    toggleProgressIndicator(true);
     try {
       await generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, (progress, points, proportionInView) => {
-        document.getElementById('spinner').textContent =
+        document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
         drawPointsOnCanvas(ctx, points, alphaValue);
       });
       // Only clear if we completed successfully
-      if (document.getElementById('spinner').textContent.includes('100%')) {
-        toggleSpinner(false);
+      if (document.getElementById('progress-indicator').textContent.includes('100%')) {
+        toggleProgressIndicator(false);
       }
     } catch (error) {
       if (error.message !== 'Generation cancelled') {
-        // Hide the spinner but keep the points
-        toggleSpinner(false);
+        // Hide the progress indicator but keep the points
+        toggleProgressIndicator(false);
         throw error;
       }
-      // If generation was cancelled, just continue but don't clear the spinner
+      // If generation was cancelled, just continue but don't clear the progress-indicator
       return;
     }
   } finally {

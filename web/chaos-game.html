@@ -31,7 +31,7 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
 </script>
 </head>
 <body>
-<h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a>!&nbsp;&nbsp;&nbsp;&nbsp;<small><a href="https://github.com/herdrick/chaos-game/blob/main/web/chaos-game.html">source</a>&nbsp;&nbsp;<a href="chaos-game-3d.html">3D version</a></small></h1>
+<h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a>!</h1>
 <div id="controls">
   <label for="vertices">Vertices:</label>
   <input type="number" id="vertices" value="3" min="1"/>
@@ -46,77 +46,54 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
   <button id="resetBtn">Reset Vertices</button>
 </div>
 <div>
-  <input type="checkbox" id="customizeFunction" />
-  <label for="customizeFunction">Customize the "next point" code</label>
+  <input type="checkbox" id="customizeMathJSCode" />
+  <label for="customizeMathJSCode">Customize the "next point" code</label>
 </div>
 
 <div id="codeExplanation">
 Write your own code to calculate where the next point should be. The default code simply picks one of the vertices at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target vertex,  <code>targetPoints</code>. Both are matrices. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em><br/>
 
-<input type="checkbox" id="advanced-docs-toggle">
-<a href="#" id="advanced-docs-label" onclick="document.getElementById('advanced-docs-toggle').click(); return false;"></a>
+<input type="checkbox" id="examples-toggle">
+<label for="examples-toggle" class="child-checkbox-label">Show examples</label>
+<br>
+<input type="checkbox" id="advanced-stuff-toggle">
+<label for="advanced-stuff-toggle" class="child-checkbox-label">Show advanced</label>
 
-<div class="advanced-docs">
-  <ol>
+<div class="advanced-stuff">
+  <ul>
     <li>
-      <strong>write() function</strong>: Use this function to output text to the console. Example: <code>write("Current point:", currentPoint)</code>
+      <strong>write() function</strong> Use this function to output text to the console. Example: <code>write("Current point:", currentPoint)</code>
     </li>
     <li>
-      <strong>userControl function</strong>: Create custom UI controls with these parameters:
+      <strong>userData object</strong> Put data in this that you want to save for your use in a future iteration. From the "Avoid previous target vertex" example, below: <code>userData["previous_vertex"] = _nextTargetIndex</code>
+    </li>
+    <li>
+      <strong>userControl function</strong> Create a custom UI control. Use these parameters:
       <ul>
-        <li><code>label</code>: The label to show for the control</li>
-        <li><code>min</code>: The minimum value</li>
-        <li><code>max</code>: The maximum value</li>
+        <li><code>label</code> The label to show for the control</li>
+        <li><code>min</code> The minimum value</li>
+        <li><code>max</code> The maximum value</li>
+        <li><code>starting</code> The starting value</li>
       </ul>
-      For example: <code>t = userControl("some number", -1, 4, 3)</code> will create a slider labeled "some number". You can then use <code>t</code> anywhere in your code to give your end user 'live' control over any value. In this case the slider will range over -1 to 4 and start at 3.
+      For example, <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
     </li>
-  </ol>
+    <li>
+      <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
+    </li>
 
-  <h4>Advanced example - The Corcoran Attractor:</h4>
+  </ul>
+
+  <input type="checkbox" id="advanced-examples-toggle">
+  <label for="advanced-examples-toggle" class="child-checkbox-label">Show advanced examples</label>
+
+  <div class="advanced-examples">
   <div class="codeBlock">
+    Advanced example - Avoid previous target vertex:
     <pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
+# IMPORTANT! Put this line in the "Optional initialization code" pane.
+userData["previous_vertex"] = -1  # start with a non-existing vertex
 
-# Create user controls for the parameters
-sine_shift = userControl("Sine shift", 0, 2*math.pi, math.pi*29/25)
-sine_scale = userControl("Sine scale", -3/2, 4, 1/2)  # try 1/3 and 12 vertices with a 3 million points and 0.1 opacity!
-sine_offset = userControl("Sine offset", -1, 7/4, 1/2)
-
-displacement_factors = math.matrix([
-  [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
-   math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset]
-])
-# Apply the factors to the displacement
-displacement_to_target = _nextTarget - currentPoint
-nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
-  </div>
-</div>
-
-<h4>Examples:</h4>
-<div class="codeBlock">
-  Add 1 to both x and y:
-  <pre class="codeExample">
-nextPoint = currentPoint + 1</pre>
-</div>
-
-<div class="codeBlock">
-  With rotation:
-  <pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
-midpoint = (currentPoint + _nextTarget) / 2
-rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), math.cos(math.pi/4)]]
-nextPoint = math.multiply(midpoint, rotation)</pre>
-</div>
-
-<div class="codeBlock">
-  Avoid previous target vertex:
-  <pre class="codeExample">
-# The userData object is provided for you to store arbitrary data across iterations
-
-# Initialize previous vertex if needed, i.e. if this is the first iteration
-userData["previous_vertex"] = hasKey(userData, "previous_vertex") ? userData["previous_vertex"] : -1
+# The rest of this code goes in the main pane
 
 # Get all possible indices except the vertex we used in the last iteration
 _possibleTargetIndices = math.range(1, targetPointsLength+1)
@@ -132,34 +109,86 @@ nextPoint = (currentPoint + _nextTarget) / 2
 
 # Store current vertex for next iteration
 userData["previous_vertex"] = _nextTargetIndex</pre>
+  </div>
+    Advanced example - The Corcoran Attractor:
+    <div class="codeBlock">
+      <pre class="codeExample">
+# try sine_scale of 1/3 and 12 vertices with a 3 million points and 0.1 opacity!
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+
+# Create user controls for the parameters
+sine_shift = userControl("Sine shift", 0, 2*math.pi, math.pi*29/25)
+sine_scale = userControl("Sine scale", -3/2, 4, 1/2)
+sine_offset = userControl("Sine offset", -1, 7/4, 1/2)
+
+displacement_factors = math.matrix([
+  [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
+   math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset]
+])
+# Apply the factors to the displacement
+displacement_to_target = _nextTarget - currentPoint
+nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
+    </div>
+  </div>
+
+  <br/>
+  <br/>
+  <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
+  <textarea class="mathJSCode" id="initializationMathJSCode" rows="3">
+  </textarea>
+
+
 </div>
-<div class="codeBlock">
-  The Levy C curve fractal:
-  <pre class="codeExample">
+
+<div class="examples-docs">
+  <h4>Examples:</h4>
+  <div class="codeBlock">
+    Add 1 to both x and y:
+    <pre class="codeExample">
+nextPoint = currentPoint + 1</pre>
+  </div>
+
+  <div class="codeBlock">
+    With rotation:
+    <pre class="codeExample">
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+midpoint = (currentPoint + _nextTarget) / 2
+rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), math.cos(math.pi/4)]]
+nextPoint = math.multiply(midpoint, rotation)</pre>
+  </div>
+
+  <div class="codeBlock">
+    The Levy C curve fractal:
+    <pre class="codeExample">
 # you will need to set the Zoom level to about 325
 A = matrix([[.5,  .5], [-.5, .5]])
 B = matrix([[.5, -.5], [ .5, .5]])
 point1 = transpose(multiply(A, transpose(currentPoint)))
 point2 = transpose(multiply(B, transpose(currentPoint)) - transpose(matrix([[.5, .5]])))
 nextPoint= randomInt() ? point1 : point2</pre>
+  </div>
 </div>
 </div> <!-- codeExplanation -->
 
-<textarea id="nextVertexAndPointMathJSCode" rows="10">
+
+<label for="nextVertexAndPointMathJSCode">Code to calculate the next point:</label>
+<textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
 # Pick a random target vertex
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 # ... and get its coordinates
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create a user control for how far to go toward the target
-s = userControl("how far to go toward the target (try sliding slowly)", 0.02, 1.4, .5)
+slider = userControl("how far to go toward the target", 0.02, 1.4, .5)
 
 # Make next point s% of the way to the target
-nextPoint = currentPoint + (_nextTarget - currentPoint) * s
+nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 </textarea>
 <div id="debugModeDiv" >
     <input type="checkbox" id="debugMode" />
-    <label for="debugMode">Debug mode (slow, shows error messages)</label>
+    <label for="debugMode" class="child-checkbox-label">Debug mode (slow, shows error messages)</label>
 </div>
 <div id="errorMessage">
   <pre style="color: black; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 5px 0;"></pre>
@@ -168,7 +197,6 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * s
     <input type="checkbox" id="customizeView" />
     <label for="customizeView">Zoom and pan</label>
 </div>
-
 <div id="viewSettings">
     <label for="centerX">Center X:</label>
     <input type="number" id="centerX" value="0" />
@@ -180,10 +208,10 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * s
     <input type="number" id="zoom" value="1" step="0.1"/>
     <span id="pointsInView"></span>
 </div>
-
 <div id="userControls"></div>
-<div id="spinner"></div>
+<div id="progress-indicator"></div>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
 <script type="module" src="static/chaos-game.js"></script>
+<div><small><a href="https://github.com/herdrick/chaos-game/blob/main/web/chaos-game.html">source</a>&nbsp;&nbsp;&nbsp;<a href="chaos-game-3d.html">3D version</a></small></div>
 </body>
 </html>

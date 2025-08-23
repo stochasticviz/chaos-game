@@ -19,11 +19,11 @@ a:hover {
   cursor: default;
 }
 
-#spinner {
+#progress-indicator {
   display: none;
   position: fixed;
-  top: 20%;
   left: 20%;
+  top: 10%;
   transform: translate(-50%, -50%);
   font-size: 2em;
   color: #555;
@@ -46,35 +46,50 @@ pre.codeExample {
   white-space: pre;
 }
 
-#advanced-docs-toggle {
+#advanced-stuff-toggle {
+  /* Now showing as a normal checkbox */
+}
+
+.advanced-stuff {
   display: none;
 }
 
-.advanced-docs {
-  display: none;
-}
-
-#advanced-docs-toggle:checked ~ .advanced-docs {
+#advanced-stuff-toggle:checked ~ .advanced-stuff {
   display: block;
 }
 
-#advanced-docs-label {
+/* Show the initialization code textarea when advanced docs are visible */
+#advanced-stuff-toggle:checked ~ .advanced-stuff #initializationMathJSCode {
+  display: block;
+}
+
+/* Advanced examples section styling */
+.advanced-examples {
+  display: none;
+}
+
+#advanced-examples-toggle:checked ~ .advanced-examples {
+  display: block;
+}
+
+/* Examples section styling */
+.examples-docs {
+  display: none;
+}
+
+#examples-toggle:checked ~ .examples-docs {
+  display: block;
+}
+
+.child-checkbox-label {
   font-size: smaller;
+  cursor: pointer;
 }
 
-#advanced-docs-label::after {
-  content: 'Show advanced docs';
-}
-
-#advanced-docs-toggle:checked ~ #advanced-docs-label::after {
-  content: 'Hide advanced docs';
-}
-
-#nextVertexAndPointMathJSCode {
+.mathJSCode {
   display: none;
   width: 100%;
   max-width: 1000px;  /* Match canvas width */
-  height: 200px;  /* Make it taller */
   margin-top: 10px;
   font-family: monospace;
   font-size: 14px;
@@ -84,6 +99,15 @@ pre.codeExample {
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
+}
+
+/* Hide the labels for the code inputs by default */
+label[for="nextVertexAndPointMathJSCode"] {
+  display: none;
+}
+
+#codeSpacing {
+  display: none;
 }
 
 #codeExplanation {
@@ -107,10 +131,8 @@ pre.codeExample {
 #userControls {
   width: 100%;
   max-width: 1000px;  /* Match canvas width */
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  margin-top: 5px;
+  padding: 5px;
   box-sizing: border-box;
 }
 
