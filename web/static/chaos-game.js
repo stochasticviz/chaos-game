@@ -442,9 +442,9 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   ctx.restore();
 }
 
-function toggleSpinner(show) {
-  const spinner = document.getElementById('spinner');
-  spinner.style.display = show ? 'block' : 'none';
+function toggleProgressIndicator(show) {
+  const progressIndicator = document.getElementById('progress-indicator');
+  progressIndicator.style.display = show ? 'block' : 'none';
 }
 
 async function generateAndDraw() {
@@ -485,25 +485,25 @@ async function generateAndDraw() {
     drawVerticesOnCanvas(ctx);
     await new Promise(resolve => setTimeout(resolve, 5));
 
-    toggleSpinner(true);
+    toggleProgressIndicator(true);
     try {
       await generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, (progress, points, proportionInView) => {
-        document.getElementById('spinner').textContent =
+        document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
         drawPointsOnCanvas(ctx, points, alphaValue);
       });
       // Only clear if we completed successfully
-      if (document.getElementById('spinner').textContent.includes('100%')) {
-        toggleSpinner(false);
+      if (document.getElementById('progress-indicator').textContent.includes('100%')) {
+        toggleProgressIndicator(false);
       }
     } catch (error) {
       if (error.message !== 'Generation cancelled') {
-        // Hide the spinner but keep the points
-        toggleSpinner(false);
+        // Hide the progress indicator but keep the points
+        toggleProgressIndicator(false);
         throw error;
       }
-      // If generation was cancelled, just continue but don't clear the spinner
+      // If generation was cancelled, just continue but don't clear the progress-indicator
       return;
     }
   } finally {

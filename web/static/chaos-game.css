@@ -19,7 +19,7 @@ a:hover {
   cursor: default;
 }
 
-#spinner {
+#progress-indicator {
   display: none;
   position: fixed;
   top: 20%;
