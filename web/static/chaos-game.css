@@ -22,8 +22,8 @@ a:hover {
 #progress-indicator {
   display: none;
   position: fixed;
-  top: 20%;
   left: 20%;
+  top: 10%;
   transform: translate(-50%, -50%);
   font-size: 2em;
   color: #555;
