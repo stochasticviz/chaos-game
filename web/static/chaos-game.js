@@ -210,6 +210,18 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
               userControls.appendChild(control);
           }
           return userControlsValuesCache.get(label) || defaultValue;
+      },
+      zoom: function(zoomLevel) {
+          const zoomInput = document.getElementById('zoom');
+          zoomInput.value = zoomLevel;
+          return zoomLevel;
+      },
+      pan: function(centerX, centerY) {
+          const centerXInput = document.getElementById('centerX');
+          const centerYInput = document.getElementById('centerY');
+          centerXInput.value = centerX;
+          centerYInput.value = centerY;
+          return [centerX, centerY];
       }
   };
 

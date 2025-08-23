@@ -78,6 +78,12 @@ Write your own code to calculate where the next point should be. The default cod
       For example, <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
     </li>
     <li>
+      <strong>zoom function</strong> Set the zoom level programmatically. Usually called in initialization code. Example: <code>zoom(2.5)</code> will set the zoom to 2.5x.
+    </li>
+    <li>
+      <strong>pan function</strong> Set the center point of the view programmatically. Usually called in initialization code. Example: <code>pan(100, -50)</code> will center the view at coordinates (100, -50).
+    </li>
+    <li>
       <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
     </li>
 
