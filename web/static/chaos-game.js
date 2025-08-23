@@ -22,12 +22,6 @@ ctx.translate(canvas.width / 2, canvas.height / 2);
 // Flip Y axis so positive is up
 ctx.scale(1, -1);
 
-// Register userControl function with MathJS
-math.import({
-  userControl: function(label, min, max) {
-    return userControlsValuesCache.get(label) || (min + max) / 2;
-  }
-});
 
 document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
     const mainCodeLabel = document.querySelector('label[for="nextVertexAndPointMathJSCode"]');
