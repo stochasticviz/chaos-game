@@ -227,10 +227,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
                   // It's a MathJS matrix
                   const arr = point.toArray();
                   if (arr.length === 2) {
-                      [x, y] = arr;
+                      [centerX, centerY] = arr;
                       console.log('arr.length === 2   1 axis array');
-                  } else if (arr.length === 1 && arr[0].length === 2) {gg
-                      [x, y] = arr[0];
+                  } else if (arr.length === 1 && arr[0].length === 2) {
+                      [centerX, centerY] = arr[0];
                   } else {
                       console.log('ERROR!!');
                       throw new Error('pan() matrix argument must be 2D point, got: ' + math.format(point));
@@ -238,19 +238,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
               } else if (Array.isArray(point) && point.length === 2) {
                   // It's a regular Javascript array
                   console.log(' a regular array')
-                  [x, y] = point;
+                  [centerX, centerY] = point;
               } else {
                   console.log('  error  !!');
                   throw new Error('pan() single argument must be a 2-element array or 2D matrix, got: ' + math.format(point));
               }
-
-              const centerXInput = document.getElementById('centerX');
-              const centerYInput = document.getElementById('centerY');
-              centerXInput.value = x;
-              centerYInput.value = y;
-              return [x, y];
           }
-          console.log("two arg case")
           // Handle two argument case: pan(x, y)
           const centerXInput = document.getElementById('centerX');
           const centerYInput = document.getElementById('centerY');
