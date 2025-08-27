@@ -488,7 +488,6 @@ async function generateAndDraw() {
     // restore the transform
     ctx.restore();
 
-    drawVerticesOnCanvas(ctx);
     await new Promise(resolve => setTimeout(resolve, 5));
 
     toggleProgressIndicator(true);
@@ -498,6 +497,8 @@ async function generateAndDraw() {
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
         drawPointsOnCanvas(ctx, points, alphaValue);
+        // Redraw vertices after each chunk to ensure they use updated zoom/pan values
+        drawVerticesOnCanvas(ctx);
       });
       // Only clear if we completed successfully
       if (document.getElementById('progress-indicator').textContent.includes('100%')) {
