@@ -5,7 +5,7 @@ const math = create(all);
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
-const VERBOSE = false;
+const VERBOSE = true;
 const CHUNK_SIZE = 10000;
 let targets = [];
 let isDragging = false;
@@ -17,10 +17,38 @@ const userControlsValuesCache = new Map();
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
-// Transform the context to move origin to center
+
+// Create vertices layer canvas
+const verticesCanvas = document.createElement('canvas');
+verticesCanvas.id = 'verticesCanvas';
+verticesCanvas.width = canvas.width;
+verticesCanvas.height = canvas.height;
+verticesCanvas.style.position = 'absolute';
+verticesCanvas.style.pointerEvents = 'none'; // Allow mouse events to pass through to main canvas
+verticesCanvas.style.zIndex = '1'; // Ensure it's on top
+verticesCanvas.style.left = '0';
+verticesCanvas.style.top = '0';
+
+// Create a container div to hold both canvases
+const canvasContainer = document.createElement('div');
+canvasContainer.style.position = 'relative';
+canvasContainer.style.display = 'inline-block';
+
+// Insert the container before the main canvas
+canvas.parentNode.insertBefore(canvasContainer, canvas);
+
+// Move both canvases into the container
+canvasContainer.appendChild(canvas);
+canvasContainer.appendChild(verticesCanvas);
+
+const verticesCtx = verticesCanvas.getContext('2d');
+
+// Transform both contexts to move origin to center
 ctx.translate(canvas.width / 2, canvas.height / 2);
+verticesCtx.translate(verticesCanvas.width / 2, verticesCanvas.height / 2);
 // Flip Y axis so positive is up
 ctx.scale(1, -1);
+verticesCtx.scale(1, -1);
 
 
 document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
@@ -210,6 +238,50 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
               userControls.appendChild(control);
           }
           return userControlsValuesCache.get(label) || defaultValue;
+      },
+      zoom: function(zoomLevel) {
+          const zoomInput = document.getElementById('zoom');
+          zoomInput.value = zoomLevel;
+          // Redraw vertices with new zoom level
+          drawVerticesOnCanvas();
+          return zoomLevel;
+      },
+      pan: function(centerX, centerY) {
+          if (arguments.length === 1 && centerY === undefined) {
+              // Handle single argument case: pan([x, y]) or pan(matrix)
+              const point = centerX;
+              let x, y;
+
+              if (point && typeof point.toArray === 'function') {
+                  // It's a MathJS matrix
+                  const arr = point.toArray();
+                  if (arr.length === 2) {
+                      [centerX, centerY] = arr;
+                      console.log('arr.length === 2   1 axis array');
+                  } else if (arr.length === 1 && arr[0].length === 2) {
+                      [centerX, centerY] = arr[0];
+                  } else {
+                      console.log('ERROR!!');
+                      throw new Error('pan() matrix argument must be 2D point, got: ' + math.format(point));
+                  }
+              } else if (Array.isArray(point) && point.length === 2) {
+                  // It's a regular Javascript array
+                  console.log(' a regular array')
+                  [centerX, centerY] = point;
+              } else {
+                  console.log('  error  !!');
+                  throw new Error('pan() single argument must be a 2-element array or 2D matrix, got: ' + math.format(point));
+              }
+          }
+          // Handle two argument case: pan(x, y)
+          const centerXInput = document.getElementById('centerX');
+          const centerYInput = document.getElementById('centerY');
+          centerXInput.value = centerX;
+          centerYInput.value = centerY;
+          // Redraw vertices with new center position
+          drawVerticesOnCanvas();
+          return [centerX, centerY];
+
       }
   };
 
@@ -288,6 +360,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         if (showStuff) {
             console.log("i:", i)
             console.log("currentPoint:", scope.currentPoint);
+            console.log(scope.currentPan)
         }
         currentPointsArray = scope.currentPoint.toArray();
         // save points to be plotted
@@ -395,29 +468,40 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   });
 }
 
-function drawVerticesOnCanvas(ctx) {
+function clearVerticesLayer() {
+    // Clear the vertices canvas
+    verticesCtx.save();
+    verticesCtx.setTransform(1, 0, 0, 1, 0, 0);
+    verticesCtx.clearRect(0, 0, verticesCanvas.width, verticesCanvas.height);
+    verticesCtx.restore();
+}
+
+function drawVerticesOnCanvas() {
     const centerX = parseFloat(document.getElementById('centerX').value);
     const centerY = parseFloat(document.getElementById('centerY').value);
     const zoom = parseFloat(document.getElementById('zoom').value);
 
-    ctx.save();
-    ctx.scale(zoom, zoom);
-    ctx.translate(-centerX, -centerY);
+    // Clear the vertices layer first
+    clearVerticesLayer();
+
+    verticesCtx.save();
+    verticesCtx.scale(zoom, zoom);
+    verticesCtx.translate(-centerX, -centerY);
 
     targets.forEach((target, i) => {
         // Draw handle
-        ctx.beginPath();
-        ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-        ctx.arc(target.x, target.y, HANDLE_RADIUS / zoom, 0, 2 * Math.PI);
-        ctx.fill();
+        verticesCtx.beginPath();
+        verticesCtx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+        verticesCtx.arc(target.x, target.y, HANDLE_RADIUS / zoom, 0, 2 * Math.PI);
+        verticesCtx.fill();
 
         // Draw vertex
-        ctx.beginPath();
-        ctx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
-        ctx.arc(target.x, target.y, VERTEX_RADIUS / zoom, 0, 2 * Math.PI);
-        ctx.fill();
+        verticesCtx.beginPath();
+        verticesCtx.fillStyle = i === draggedVertexIndex ? '#A2D5F4' : '#4285F4';
+        verticesCtx.arc(target.x, target.y, VERTEX_RADIUS / zoom, 0, 2 * Math.PI);
+        verticesCtx.fill();
     });
-    ctx.restore();
+    verticesCtx.restore();
 }
 
 function drawPointsOnCanvas(ctx, points, alphaValue) {
@@ -476,7 +560,8 @@ async function generateAndDraw() {
     // restore the transform
     ctx.restore();
 
-    drawVerticesOnCanvas(ctx);
+    // Draw vertices on their layer
+    drawVerticesOnCanvas();
     await new Promise(resolve => setTimeout(resolve, 5));
 
     toggleProgressIndicator(true);
@@ -538,17 +623,9 @@ function handleMouseMove(e) {
 
   if (isDragging && draggedVertexIndex !== -1) {
     targets[draggedVertexIndex] = screenToWorld(screenX, screenY);
-    const alphaValue = parseFloat(document.getElementById('alpha').value);
 
-    // save the current transformation matrix
-    ctx.save();
-    // use the identity matrix while clearing the canvas
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // restore the transform
-    ctx.restore();
-
-    drawVerticesOnCanvas(ctx);
+    // Redraw vertices immediately during drag
+    drawVerticesOnCanvas();
 
     clearTimeout(canvas.regenerateTimeout);
     canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
@@ -594,7 +671,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   // restore the transform
   ctx.restore();
 
-  drawVerticesOnCanvas(ctx);
+  drawVerticesOnCanvas();
 });
 
 generateAndDraw();
