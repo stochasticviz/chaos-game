@@ -217,9 +217,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           return zoomLevel;
       },
       pan: function(centerX, centerY) {
-          console.log('panning...');
-          // Handle single argument case: pan([x, y]) or pan(matrix)
           if (arguments.length === 1 && centerY === undefined) {
+              // Handle single argument case: pan([x, y]) or pan(matrix)
               const point = centerX;
               let x, y;
 
