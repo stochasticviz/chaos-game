@@ -99,9 +99,9 @@ nextPoint = randomInt() ? point1 : point2</pre>
   <div class="codeBlock">
     Advanced example - Avoid previous target vertex:
     <pre class="codeExample">
-# IMPORTANT! Put this line in the "Optional initialization code" pane.
+# IMPORTANT! Put these two lines in the "Optional initialization code" pane.
 previous_vertex = -1  # start with a non-existing vertex
-
+slider = userControl("how far to go toward the target", -2, 1.4, .5)
 
 # The rest of this code goes in the main pane
 
@@ -115,7 +115,7 @@ _nextTargetIndex = math.pickRandom(_possibleTargetIndices)
 _nextTarget = targetPoints[_nextTargetIndex, :]
 
 # Make next point midway to the target
-nextPoint = (currentPoint + _nextTarget) / 2
+nextPoint = (currentPoint + _nextTarget) * slider
 
 # Store current vertex for next iteration
 previous_vertex = _nextTargetIndex</pre>
