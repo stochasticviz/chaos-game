@@ -214,6 +214,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       zoom: function(zoomLevel) {
           const zoomInput = document.getElementById('zoom');
           zoomInput.value = zoomLevel;
+          // Trigger input event to update UI
+          zoomInput.dispatchEvent(new Event('input', { bubbles: true }));
           return zoomLevel;
       },
       pan: function(centerX, centerY) {
@@ -248,6 +250,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           const centerYInput = document.getElementById('centerY');
           centerXInput.value = centerX;
           centerYInput.value = centerY;
+          // Trigger input events to update UI
+          centerXInput.dispatchEvent(new Event('input', { bubbles: true }));
+          centerYInput.dispatchEvent(new Event('input', { bubbles: true }));
           return [centerX, centerY];
       }
   };
