@@ -94,6 +94,16 @@ Write your own code to calculate where the next point should be. The default cod
 
   <div class="advanced-examples">
   <div class="codeBlock">
+    Advanced example - The Levy C curve fractal:
+    <pre class="codeExample">
+zoom(325)
+A = matrix([[.5,  .5], [-.5, .5]])
+B = matrix([[.5, -.5], [ .5, .5]])
+point1 = transpose(multiply(A, transpose(currentPoint)))
+point2 = transpose(multiply(B, transpose(currentPoint)) - transpose(matrix([[.5, .5]])))
+nextPoint = randomInt() ? point1 : point2</pre>
+  </div>
+  <div class="codeBlock">
     Advanced example - Avoid previous target vertex:
     <pre class="codeExample">
 # IMPORTANT! Put this line in the "Optional initialization code" pane.
@@ -165,16 +175,6 @@ rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), m
 nextPoint = math.multiply(midpoint, rotation)</pre>
   </div>
 
-  <div class="codeBlock">
-    The Levy C curve fractal:
-    <pre class="codeExample">
-# you will need to set the Zoom level to about 325
-A = matrix([[.5,  .5], [-.5, .5]])
-B = matrix([[.5, -.5], [ .5, .5]])
-point1 = transpose(multiply(A, transpose(currentPoint)))
-point2 = transpose(multiply(B, transpose(currentPoint)) - transpose(matrix([[.5, .5]])))
-nextPoint= randomInt() ? point1 : point2</pre>
-  </div>
 </div>
 </div> <!-- codeExplanation -->
 
