@@ -198,7 +198,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       currentPoint: math.matrix([[100, 100]]),
       // Queue for storing multiple points
       pointsQueue: [],
-      userData: {},
       hasKey: hasKey,
       write: writeToDOM,
       userControl: function(label, min, max, defaultValue) {

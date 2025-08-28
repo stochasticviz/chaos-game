@@ -62,10 +62,9 @@ Write your own code to calculate where the next point should be. The default cod
 <div class="advanced-stuff">
   <ul>
     <li>
+      <strong>userControl() function</strong> Create a custom UI control. Example: <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
     </li>
     <li>
-      <strong>userData object</strong> Put data in this that you want to save for your use in a future iteration. From the "Avoid previous target vertex" example, below: <code>userData["previous_vertex"] = _nextTargetIndex</code>
-      <strong>userControl() function</strong> Create a custom UI control. Example: <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
       <strong>write() function</strong> Use this function to output text to the console. Example: <code>write("Current point:", currentPoint)</code>
     </li>
     <li>
@@ -73,6 +72,9 @@ Write your own code to calculate where the next point should be. The default cod
     </li>
     <li>
       <strong>pan() function</strong> Set the center point of the view programmatically. Usually called in initialization code. Example: <code>pan(100, -50)</code> will center the view at coordinates (100, -50).
+    </li>
+    <li>
+      <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target vertex" in the advanced examples, below.
     </li>
     <li>
       <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
@@ -98,13 +100,14 @@ nextPoint = randomInt() ? point1 : point2</pre>
     Advanced example - Avoid previous target vertex:
     <pre class="codeExample">
 # IMPORTANT! Put this line in the "Optional initialization code" pane.
-userData["previous_vertex"] = -1  # start with a non-existing vertex
+previous_vertex = -1  # start with a non-existing vertex
+
 
 # The rest of this code goes in the main pane
 
 # Get all possible indices except the vertex we used in the last iteration
 _possibleTargetIndices = math.range(1, targetPointsLength+1)
-_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != userData["previous_vertex"]]
+_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != previous_vertex]
 
 # Pick a random target vertex
 _nextTargetIndex = math.pickRandom(_possibleTargetIndices)
@@ -115,7 +118,7 @@ _nextTarget = targetPoints[_nextTargetIndex, :]
 nextPoint = (currentPoint + _nextTarget) / 2
 
 # Store current vertex for next iteration
-userData["previous_vertex"] = _nextTargetIndex</pre>
+previous_vertex = _nextTargetIndex</pre>
   </div>
     Advanced example - The Corcoran Attractor:
     <div class="codeBlock">
