@@ -51,7 +51,7 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
 </div>
 
 <div id="codeExplanation">
-Write your own code to calculate where the next point should be. The default code simply picks one of the vertices at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, or whatever else you can find in MathJS. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target vertex,  <code>targetPoints</code>. Both are matrices. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em><br/>
+Write your own code to calculate where the next point should be. The default code simply picks one of the vertices at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target vertex,  <code>targetPoints</code>. Both are matrices. <em>All you must do is set the <code>nextPoint</code> variable to either an array of two numbers like [100, 200] or a matrix like [[100, 200]].</em><br/>
 
 <input type="checkbox" id="examples-toggle">
 <label for="examples-toggle" class="child-checkbox-label">Show examples</label>
@@ -68,20 +68,13 @@ Write your own code to calculate where the next point should be. The default cod
       <strong>userData object</strong> Put data in this that you want to save for your use in a future iteration. From the "Avoid previous target vertex" example, below: <code>userData["previous_vertex"] = _nextTargetIndex</code>
     </li>
     <li>
-      <strong>userControl function</strong> Create a custom UI control. Use these parameters:
-      <ul>
-        <li><code>label</code> The label to show for the control</li>
-        <li><code>min</code> The minimum value</li>
-        <li><code>max</code> The maximum value</li>
-        <li><code>starting</code> The starting value</li>
-      </ul>
-      For example, <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
+      <strong>userControl() function</strong> Create a custom UI control. Example: <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
     </li>
     <li>
-      <strong>zoom function</strong> Set the zoom level programmatically. Usually called in initialization code. Example: <code>zoom(2.5)</code> will set the zoom to 2.5x.
+      <strong>zoom() function</strong> Set the zoom level programmatically. Usually called in initialization code. Example: <code>zoom(2.5)</code> will set the zoom to 2.5x.
     </li>
     <li>
-      <strong>pan function</strong> Set the center point of the view programmatically. Usually called in initialization code. Example: <code>pan(100, -50)</code> will center the view at coordinates (100, -50).
+      <strong>pan() function</strong> Set the center point of the view programmatically. Usually called in initialization code. Example: <code>pan(100, -50)</code> will center the view at coordinates (100, -50).
     </li>
     <li>
       <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
