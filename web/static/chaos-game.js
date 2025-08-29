@@ -5,7 +5,7 @@ const math = create(all);
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
-const VERBOSE = false;
+const VERBOSE = true;
 const CHUNK_SIZE = 10000;
 let targets = [];
 let isDragging = false;
@@ -253,6 +253,15 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           centerXInput.dispatchEvent(new Event('input', { bubbles: true }));
           centerYInput.dispatchEvent(new Event('input', { bubbles: true }));
           return [centerX, centerY];
+      },
+      setVertices: function(numVertices) {
+          const verticesInput = document.getElementById('vertices');
+          verticesInput.value = numVertices;
+          // Trigger input event to update UI
+          verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
+          // Initialize vertices immediately
+          initializeVertices(numVertices);
+          return numVertices;
       }
   };
 
