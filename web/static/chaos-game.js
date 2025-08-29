@@ -50,7 +50,6 @@ function createUserControl(label, min, max, defaultValue) {
     const labelElem = document.createElement('label');
     labelElem.textContent = label + ': \u00A0\u00A0\u00A0';
     labelContainer.appendChild(labelElem);
-
     const valueDisplay = document.createElement('span');
     valueDisplay.className = 'value-display';
     labelContainer.appendChild(valueDisplay);
@@ -100,15 +99,6 @@ function getCircleCoord(theta) {
   const x = CIRCLE_RADIUS * Math.cos(theta);
   const y = CIRCLE_RADIUS * Math.sin(theta);
   return { x, y };
-}
-
-function initializeVertices(n_points) {
-  targets = [];
-  for (let i = 0; i < n_points; i++) {
-    const shift = n_points == 2 ? Math.PI/6 : 0;
-    const theta = (i / n_points) * 2 * Math.PI + shift;
-    targets.push(getCircleCoord(theta));
-  }
 }
 
 // basic error handling. advanced handling is in the try/catch around "math.evaluate(expression, scope)", below
@@ -166,6 +156,28 @@ function writeToDOM(text) {
   writeToDOMDiv.appendChild(writeToDOMTextNode);
   writeToDOMCurrentOutput.push(text);
   return "write: " + text
+}
+
+
+function setTargetsLocations(verticesCount) {
+    targets = []; // global
+    for (let i = 0; i < verticesCount; i++) {
+        const shift = verticesCount == 2 ? Math.PI/6 : 0;
+        const theta = (i / verticesCount) * 2 * Math.PI + shift;
+        targets.push(getCircleCoord(theta));
+    }
+
+}
+
+
+function setVerticesCount(verticesCount) {
+    setTargetsLocations(verticesCount);
+    // update the "Vertices" HTML field
+    const verticesInput = document.getElementById('vertices');
+    verticesInput.value = verticesCount;
+    // Trigger input event to update UI
+    verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
+    return verticesCount;
 }
 
 let currentGenerationId = 0;
@@ -253,18 +265,13 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           centerXInput.dispatchEvent(new Event('input', { bubbles: true }));
           centerYInput.dispatchEvent(new Event('input', { bubbles: true }));
           return [centerX, centerY];
-      },
-      setVertices: function(numVertices) {
-          const verticesInput = document.getElementById('vertices');
-          verticesInput.value = numVertices;
-          // Trigger input event to update UI
-          verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
-          // Initialize vertices immediately
-          initializeVertices(numVertices);
-          return numVertices;
       }
   };
-
+  scope['setVertices'] = function(numVertices) {
+      setVerticesCount(numVertices)
+      scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
+      scope['targetPointsLength'] = targets.length;
+  }
   let points = [];
   let pointsInViewCount = 0;
   let nextPoint = null;
@@ -516,10 +523,9 @@ async function generateAndDraw() {
   generateBtn.disabled = true;
 
   try {
-    if (targets.length !== vertices) {
-      initializeVertices(vertices);
-    }
-
+      if (targets.length !== vertices) {
+          setVerticesCount(vertices);
+      }
     // save the current transformation matrix
     ctx.save();
     // use the identity matrix while clearing the canvas
@@ -637,7 +643,7 @@ canvas.addEventListener('mouseleave', handleMouseUp);
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
 document.getElementById('resetBtn').addEventListener('click', () => {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
-  initializeVertices(vertices);
+  setTargetsLocations(vertices); // this evenly distributes the vertices on a circle
 
   // save the current transformation matrix
   ctx.save();
