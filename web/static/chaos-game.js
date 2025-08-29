@@ -5,7 +5,7 @@ const math = create(all);
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
-const VERBOSE = true;
+const VERBOSE = false;
 const CHUNK_SIZE = 10000;
 let targets = [];
 let isDragging = false;
@@ -79,7 +79,7 @@ function createUserControl(label, min, max, defaultValue) {
             valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>' ;
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
-            canvas.regenerateTimeout = setTimeout(generateAndDraw, 200);
+            canvas.regenerateTimeout = setTimeout(generateAndDrawWithoutInit, 200);
         }
     });
 
@@ -160,28 +160,32 @@ function writeToDOM(text) {
 
 
 function setTargetsLocations(verticesCount) {
+    console.log("--------   setTargetsLocations called with verticesCount:", verticesCount);
     targets = []; // global
     for (let i = 0; i < verticesCount; i++) {
         const shift = verticesCount == 2 ? Math.PI/6 : 0;
         const theta = (i / verticesCount) * 2 * Math.PI + shift;
         targets.push(getCircleCoord(theta));
     }
-
+    console.log("--------   setTargetsLocations finished, targets:", targets.map(t => `(${t.x.toFixed(1)}, ${t.y.toFixed(1)})`));
 }
 
 
 function setVerticesCount(verticesCount) {
+    console.log("--------   setVerticesCount called with verticesCount:", verticesCount);
     setTargetsLocations(verticesCount);
     // update the "Vertices" HTML field
     const verticesInput = document.getElementById('vertices');
     verticesInput.value = verticesCount;
     // Trigger input event to update UI
     verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
+    console.log("--------   setVerticesCount finished");
     return verticesCount;
 }
 
 let currentGenerationId = 0;
-function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
+function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints, skipInitialization = false) {
+  console.log('generatePoints()    skipInitialization:'+skipInitialization);
   const generationId = ++currentGenerationId;
 
   const initializationMathJSCodeString = document.getElementById("initializationMathJSCode").value;
@@ -268,9 +272,11 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       }
   };
   scope['setVertices'] = function(numVertices) {
+      console.log("--------   scope.setVertices called with numVertices:", numVertices);
       setVerticesCount(numVertices)
       scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
       scope['targetPointsLength'] = targets.length;
+      console.log("--------   scope.setVertices finished");
   }
   let points = [];
   let pointsInViewCount = 0;
@@ -304,7 +310,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   }
 
   // Execute initialization code once per generation
-  if (initializationMathJSCodeString.trim()) {
+  if (initializationMathJSCodeString.trim() && !skipInitialization) {
+    console.log("--------   executing initialization code");
+    console.log("--------   targets before init:", targets.map((t, i) => `vertex ${i}: (${t.x.toFixed(1)}, ${t.y.toFixed(1)})`));
     if (!debugMode) {
       try {
         initializationCompiledExpressions.evaluate(scope);
@@ -326,6 +334,11 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         }
       }
     }
+    console.log("--------   targets after init:", targets.map((t, i) => `vertex ${i}: (${t.x.toFixed(1)}, ${t.y.toFixed(1)})`));
+  }
+
+  if (skipInitialization) {
+    console.log("--------   skipping initialization code (regeneration from drag/slider)");
   }
 
   return new Promise((resolve, reject) => {
@@ -500,7 +513,18 @@ function toggleProgressIndicator(show) {
   progressIndicator.style.display = show ? 'block' : 'none';
 }
 
-async function generateAndDraw() {
+// Wrapper function for regenerations that should skip initialization
+async function generateAndDrawWithoutInit() {
+  console.log("--------   generateAndDrawWithoutInit called");
+  return generateAndDraw(true);
+}
+
+async function generateAndDraw(skipInitialization = false) {
+  // Handle case where this is called as an event handler and gets passed an event object
+  if (typeof skipInitialization === 'object') {
+    skipInitialization = false;
+  }
+  console.log("--------   generateAndDraw called, skipInitialization:", skipInitialization);
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
@@ -524,6 +548,7 @@ async function generateAndDraw() {
 
   try {
       if (targets.length !== vertices) {
+          console.log("--------   targets.length !== vertices, calling setVerticesCount");
           setVerticesCount(vertices);
       }
     // save the current transformation matrix
@@ -545,7 +570,7 @@ async function generateAndDraw() {
         drawPointsOnCanvas(ctx, points, alphaValue);
         // Redraw vertices after each chunk to ensure they use updated zoom/pan values
         drawVerticesOnCanvas(ctx);
-      });
+      }, skipInitialization);
       // Only clear if we completed successfully
       if (document.getElementById('progress-indicator').textContent.includes('100%')) {
         toggleProgressIndicator(false);
@@ -596,7 +621,9 @@ function handleMouseMove(e) {
   const screenY = e.clientY - rect.top;
 
   if (isDragging && draggedVertexIndex !== -1) {
-    targets[draggedVertexIndex] = screenToWorld(screenX, screenY);
+    const newPosition = screenToWorld(screenX, screenY);
+    console.log("--------   dragging vertex", draggedVertexIndex, "to position:", newPosition);
+    targets[draggedVertexIndex] = newPosition;
     const alphaValue = parseFloat(document.getElementById('alpha').value);
 
     // save the current transformation matrix
@@ -610,7 +637,8 @@ function handleMouseMove(e) {
     drawVerticesOnCanvas(ctx);
 
     clearTimeout(canvas.regenerateTimeout);
-    canvas.regenerateTimeout = setTimeout(generateAndDraw, 100);
+    console.log("--------   scheduling regeneration after drag");
+    canvas.regenerateTimeout = setTimeout(generateAndDrawWithoutInit, 100);
   } else {
     const hoveredIndex = getVertexAtPosition(screenX, screenY);
     canvas.style.cursor = hoveredIndex !== -1 ? 'move' : 'default';
@@ -624,12 +652,17 @@ function handleMouseDown(e) {
 
   draggedVertexIndex = getVertexAtPosition(x, y);
   if (draggedVertexIndex !== -1) {
+    console.log("--------   mouseDown: starting drag of vertex", draggedVertexIndex);
     isDragging = true;
     canvas.classList.add('dragging');
   }
 }
 
 function handleMouseUp() {
+  if (isDragging) {
+    console.log("--------   mouseUp: ending drag of vertex", draggedVertexIndex);
+    console.log("--------   mouseUp: final targets positions:", targets.map((t, i) => `vertex ${i}: (${t.x.toFixed(1)}, ${t.y.toFixed(1)})`));
+  }
   isDragging = false;
   draggedVertexIndex = -1;
   canvas.classList.remove('dragging');
