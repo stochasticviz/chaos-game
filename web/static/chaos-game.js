@@ -5,7 +5,7 @@ const math = create(all);
 const VERTEX_RADIUS = 8;
 const HANDLE_RADIUS = 15;
 const CIRCLE_RADIUS = 475;
-const VERBOSE = true;
+const VERBOSE = false;
 const CHUNK_SIZE = 10000;
 let targets = [];
 let isDragging = false;
@@ -242,6 +242,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
                       [centerX, centerY] = arr;
                       console.log('arr.length === 2   1 axis array');
                   } else if (arr.length === 1 && arr[0].length === 2) {
+                      // TODO: I think it is always this. Remove the other condition branches.
                       [centerX, centerY] = arr[0];
                   } else {
                       console.log('ERROR!!');
@@ -268,9 +269,11 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       }
   };
   scope['setVertices'] = function(numVertices) {
-      setVerticesCount(numVertices)
-      scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
-      scope['targetPointsLength'] = targets.length;
+      if (targets.length !== numVertices) {
+          setVerticesCount(numVertices)
+          scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
+          scope['targetPointsLength'] = targets.length;
+      }
   }
   let points = [];
   let pointsInViewCount = 0;
