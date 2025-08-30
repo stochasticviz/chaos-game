@@ -159,7 +159,7 @@ function writeToDOM(text) {
 }
 
 
-function setTargetsLocations(verticesCount) {
+function resetTargetsLocations(verticesCount) {
     targets = []; // global
     for (let i = 0; i < verticesCount; i++) {
         const shift = verticesCount == 2 ? Math.PI/6 : 0;
@@ -171,7 +171,7 @@ function setTargetsLocations(verticesCount) {
 
 
 function setVerticesCount(verticesCount) {
-    setTargetsLocations(verticesCount);
+    resetTargetsLocations(verticesCount);
     // update the "Vertices" HTML field
     const verticesInput = document.getElementById('vertices');
     verticesInput.value = verticesCount;
@@ -646,7 +646,7 @@ canvas.addEventListener('mouseleave', handleMouseUp);
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
 document.getElementById('resetBtn').addEventListener('click', () => {
   const vertices = parseInt(document.getElementById('vertices').value, 10);
-  setTargetsLocations(vertices); // this evenly distributes the vertices on a circle
+  resetTargetsLocations(vertices); // this evenly distributes the vertices on a circle
 
   // save the current transformation matrix
   ctx.save();
