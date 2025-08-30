@@ -268,7 +268,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           return [centerX, centerY];
       }
   };
-  scope['setVertices'] = function(numVertices) {
+  scope['vertices'] = function(numVertices) {
       if (targets.length !== numVertices) {
           setVerticesCount(numVertices)
           scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
