@@ -664,10 +664,16 @@ function generateShareableLink() {
   const initCode = document.getElementById('initializationMathJSCode').value;
   const mainCode = document.getElementById('nextVertexAndPointMathJSCode').value;
   
-  // Create an object with the code data
+  // Create an object with the code data and form field values
   const shareData = {
     initCode: initCode,
-    mainCode: mainCode
+    mainCode: mainCode,
+    vertices: document.getElementById('vertices').value,
+    steps: document.getElementById('steps').value,
+    alpha: document.getElementById('alpha').value,
+    centerX: document.getElementById('centerX').value,
+    centerY: document.getElementById('centerY').value,
+    zoom: document.getElementById('zoom').value
   };
   
   // Encode the data as a URL parameter
@@ -746,6 +752,36 @@ function loadSharedCode() {
       
       if (shareData.mainCode !== undefined) {
         document.getElementById('nextVertexAndPointMathJSCode').value = shareData.mainCode;
+      }
+      
+      // Restore form field values
+      if (shareData.vertices !== undefined) {
+        document.getElementById('vertices').value = shareData.vertices;
+      }
+      
+      if (shareData.steps !== undefined) {
+        document.getElementById('steps').value = shareData.steps;
+      }
+      
+      if (shareData.alpha !== undefined) {
+        document.getElementById('alpha').value = shareData.alpha;
+      }
+      
+      if (shareData.centerX !== undefined) {
+        document.getElementById('centerX').value = shareData.centerX;
+        // Show view settings if center values are not default
+        if (shareData.centerX !== '0' || shareData.centerY !== '0' || shareData.zoom !== '1') {
+          document.getElementById('customizeView').checked = true;
+          document.getElementById('customizeView').dispatchEvent(new Event('change'));
+        }
+      }
+      
+      if (shareData.centerY !== undefined) {
+        document.getElementById('centerY').value = shareData.centerY;
+      }
+      
+      if (shareData.zoom !== undefined) {
+        document.getElementById('zoom').value = shareData.zoom;
       }
       
       // If there's shared code, enable the customize checkbox so users can see it
