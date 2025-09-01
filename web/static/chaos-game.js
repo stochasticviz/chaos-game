@@ -659,4 +659,113 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   drawVerticesOnCanvas(ctx);
 });
 
+// Share functionality
+function generateShareableLink() {
+  const initCode = document.getElementById('initializationMathJSCode').value;
+  const mainCode = document.getElementById('nextVertexAndPointMathJSCode').value;
+  
+  // Create an object with the code data
+  const shareData = {
+    initCode: initCode,
+    mainCode: mainCode
+  };
+  
+  // Encode the data as a URL parameter
+  const encodedData = btoa(JSON.stringify(shareData));
+  
+  // Generate the shareable URL
+  const baseUrl = window.location.origin + window.location.pathname;
+  const shareUrl = `${baseUrl}?code=${encodedData}`;
+  
+  return shareUrl;
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (err) {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return true;
+    } catch (err) {
+      document.body.removeChild(textArea);
+      return false;
+    }
+  }
+}
+
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const shareBtn = document.getElementById('shareBtn');
+  const originalText = shareBtn.textContent;
+  
+  try {
+    const shareUrl = generateShareableLink();
+    const success = await copyToClipboard(shareUrl);
+    
+    if (success) {
+      shareBtn.textContent = 'Link copied!';
+      setTimeout(() => {
+        shareBtn.textContent = originalText;
+      }, 2000);
+    } else {
+      // Show the URL in a prompt as fallback
+      prompt('Copy this link to share:', shareUrl);
+    }
+  } catch (error) {
+    console.error('Error generating share link:', error);
+    shareBtn.textContent = 'Error';
+    setTimeout(() => {
+      shareBtn.textContent = originalText;
+    }, 2000);
+  }
+});
+
+// Function to load shared code from URL parameters
+function loadSharedCode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const encodedCode = urlParams.get('code');
+  
+  if (encodedCode) {
+    try {
+      const shareData = JSON.parse(atob(encodedCode));
+      
+      if (shareData.initCode !== undefined) {
+        document.getElementById('initializationMathJSCode').value = shareData.initCode;
+      }
+      
+      if (shareData.mainCode !== undefined) {
+        document.getElementById('nextVertexAndPointMathJSCode').value = shareData.mainCode;
+      }
+      
+      // If there's shared code, enable the customize checkbox so users can see it
+      if (shareData.mainCode || shareData.initCode) {
+        document.getElementById('customizeMathJSCode').checked = true;
+        // Trigger the change event to show the code areas
+        document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
+      }
+      
+      // Clean up the URL by removing the code parameter
+      const newUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+      
+    } catch (error) {
+      console.error('Error loading shared code:', error);
+    }
+  }
+}
+
+// Load shared code when the page loads
+loadSharedCode();
+
 generateAndDraw();
