@@ -266,6 +266,20 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           centerXInput.dispatchEvent(new Event('input', { bubbles: true }));
           centerYInput.dispatchEvent(new Event('input', { bubbles: true }));
           return [centerX, centerY];
+      },
+      points: function(numPoints) {
+          const stepsInput = document.getElementById('steps');
+          stepsInput.value = numPoints;
+          // Trigger input event to update UI
+          stepsInput.dispatchEvent(new Event('input', { bubbles: true }));
+          return numPoints;
+      },
+      opacity: function(alphaValue) {
+          const alphaInput = document.getElementById('alpha');
+          alphaInput.value = alphaValue;
+          // Trigger input event to update UI
+          alphaInput.dispatchEvent(new Event('input', { bubbles: true }));
+          return alphaValue;
       }
   };
   // vertices() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
