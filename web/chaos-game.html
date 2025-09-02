@@ -69,21 +69,21 @@ Write your own code to calculate where the next point should be. The default cod
       <strong>write() function</strong> Use this function to output text to the console. Example: <code>write("Current point:", currentPoint)</code>
     </li>
     <li>
-      <strong>zoom() function</strong> Set the zoom level programmatically. Usually called in initialization code. Example: <code>zoom(2.5)</code> will set the zoom to 2.5x.
-    </li>
-    <li>
-      <strong>pan() function</strong> Set the center point of the view programmatically. Usually called in initialization code. Example: <code>pan(100, -50)</code> will center the view at coordinates (100, -50).
-    </li>
-    <li>
-      <strong>vertices() function</strong> Set number of vertices programmatically. Usually called in initialization code. Example: <code>vertices(5)</code> will give five vertices (targets).
-    </li>
-    <li>
       <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target vertex" in the advanced examples, below.
     </li>
     <li>
       <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
     </li>
+  </ul>
+The following functions are usually used in the optional initialization code:
 
+  <ul>
+    <li>
+      <strong>vertices(), points(), and opacity() functions</strong> Set the fields seen above, programmatically. Example: <code>vertices(5)</code> will set the Vertices field to 5.
+    </li>
+    <li>
+      <strong>zoom() and pan() functions</strong> Set the zoom level or center of view fields (see below) programmatically.
+    </li>
   </ul>
 
   <input type="checkbox" id="advanced-examples-toggle">
