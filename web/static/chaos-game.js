@@ -410,8 +410,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
 
-        // Check if current iteration output matches last iteration
-        if (writeToDOMCurrentOutput.length === writeToDOMLastOutput.length &&
+        // Check if current iteration output matches last iteration (only if there's actual output)
+        if (writeToDOMCurrentOutput.length > 0 &&
+            writeToDOMCurrentOutput.length === writeToDOMLastOutput.length &&
             writeToDOMCurrentOutput.every((val, idx) => val === writeToDOMLastOutput[idx])) {
           // Remove the lines we just wrote
           if (writeToDOMDiv) {
