@@ -516,6 +516,14 @@ async function generateAndDraw() {
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
   const debugMode = document.getElementById('debugMode').checked;
 
+  // Clear the write() log
+  if (writeToDOMDiv) {
+    writeToDOMDiv.innerHTML = '';
+  }
+  writeToDOMLastOutput = [];
+  writeToDOMCurrentOutput = [];
+  writeToDOMRepetitionCount = 1;
+
   // Clear any previous error message
   document.getElementById('errorMessage').innerHTML = '';
 
