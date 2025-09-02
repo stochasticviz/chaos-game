@@ -268,6 +268,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           return [centerX, centerY];
       }
   };
+  // vertices() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
   scope['vertices'] = function(numVertices) {
       if (targets.length !== numVertices) {
           setVerticesCount(numVertices)
