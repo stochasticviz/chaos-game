@@ -663,7 +663,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 function generateShareableLink() {
   const initCode = document.getElementById('initializationMathJSCode').value;
   const mainCode = document.getElementById('nextVertexAndPointMathJSCode').value;
-  
+
   // Create an object with the code data and form field values
   const shareData = {
     initCode: initCode,
@@ -675,14 +675,14 @@ function generateShareableLink() {
     centerY: document.getElementById('centerY').value,
     zoom: document.getElementById('zoom').value
   };
-  
+
   // Encode the data as a URL parameter
   const encodedData = btoa(JSON.stringify(shareData));
-  
+
   // Generate the shareable URL
   const baseUrl = window.location.origin + window.location.pathname;
   const shareUrl = `${baseUrl}?code=${encodedData}`;
-  
+
   return shareUrl;
 }
 
@@ -714,11 +714,11 @@ async function copyToClipboard(text) {
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const shareBtn = document.getElementById('shareBtn');
   const originalText = shareBtn.textContent;
-  
+
   try {
     const shareUrl = generateShareableLink();
     const success = await copyToClipboard(shareUrl);
-    
+
     if (success) {
       shareBtn.textContent = 'Link copied!';
       setTimeout(() => {
@@ -741,32 +741,32 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
 function loadSharedCode() {
   const urlParams = new URLSearchParams(window.location.search);
   const encodedCode = urlParams.get('code');
-  
+
   if (encodedCode) {
     try {
       const shareData = JSON.parse(atob(encodedCode));
-      
+
       if (shareData.initCode !== undefined) {
         document.getElementById('initializationMathJSCode').value = shareData.initCode;
       }
-      
+
       if (shareData.mainCode !== undefined) {
         document.getElementById('nextVertexAndPointMathJSCode').value = shareData.mainCode;
       }
-      
+
       // Restore form field values
       if (shareData.vertices !== undefined) {
         document.getElementById('vertices').value = shareData.vertices;
       }
-      
+
       if (shareData.steps !== undefined) {
         document.getElementById('steps').value = shareData.steps;
       }
-      
+
       if (shareData.alpha !== undefined) {
         document.getElementById('alpha').value = shareData.alpha;
       }
-      
+
       if (shareData.centerX !== undefined) {
         document.getElementById('centerX').value = shareData.centerX;
         // Show view settings if center values are not default
@@ -775,26 +775,26 @@ function loadSharedCode() {
           document.getElementById('customizeView').dispatchEvent(new Event('change'));
         }
       }
-      
+
       if (shareData.centerY !== undefined) {
         document.getElementById('centerY').value = shareData.centerY;
       }
-      
+
       if (shareData.zoom !== undefined) {
         document.getElementById('zoom').value = shareData.zoom;
       }
-      
+
       // If there's shared code, enable the customize checkbox so users can see it
       if (shareData.mainCode || shareData.initCode) {
         document.getElementById('customizeMathJSCode').checked = true;
         // Trigger the change event to show the code areas
         document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
       }
-      
+
       // Clean up the URL by removing the code parameter
       const newUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
-      
+
     } catch (error) {
       console.error('Error loading shared code:', error);
     }
