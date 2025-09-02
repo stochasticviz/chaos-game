@@ -46,10 +46,6 @@ pre.codeExample {
   white-space: pre;
 }
 
-#advanced-stuff-toggle {
-  /* Now showing as a normal checkbox */
-}
-
 .advanced-stuff {
   display: none;
 }
