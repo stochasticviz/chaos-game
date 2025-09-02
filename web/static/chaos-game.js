@@ -431,7 +431,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
             }
             writeToDOMRepetitionCount++;
             const countNode = document.createElement('i');
-            countNode.textContent = `(x ${writeToDOMRepetitionCount})\n`;
+            if (writeToDOMLastOutput.length === 1) {
+              countNode.textContent = `(repeated "${writeToDOMLastOutput[0]}" x ${writeToDOMRepetitionCount})\n`;
+            } else {
+              const statementsText = writeToDOMLastOutput.map(s => s).join('\n');
+              countNode.textContent = `(repeated ${writeToDOMLastOutput.length} writes:\n${statementsText}\nx ${writeToDOMRepetitionCount})\n`;
+            }
             writeToDOMDiv.appendChild(countNode);
           }
         } else {
