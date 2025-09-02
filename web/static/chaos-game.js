@@ -268,6 +268,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           return [centerX, centerY];
       }
   };
+  // vertices() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
   scope['vertices'] = function(numVertices) {
       if (targets.length !== numVertices) {
           setVerticesCount(numVertices)
@@ -410,8 +411,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
 
-        // Check if current iteration output matches last iteration
-        if (writeToDOMCurrentOutput.length === writeToDOMLastOutput.length &&
+        // Check if current iteration output matches last iteration (only if there's actual output)
+        if (writeToDOMCurrentOutput.length > 0 &&
+            writeToDOMCurrentOutput.length === writeToDOMLastOutput.length &&
             writeToDOMCurrentOutput.every((val, idx) => val === writeToDOMLastOutput[idx])) {
           // Remove the lines we just wrote
           if (writeToDOMDiv) {
@@ -430,7 +432,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
             }
             writeToDOMRepetitionCount++;
             const countNode = document.createElement('i');
-            countNode.textContent = `(x ${writeToDOMRepetitionCount})\n`;
+            if (writeToDOMLastOutput.length === 1) {
+              countNode.textContent = `(repeated "${writeToDOMLastOutput[0]}" x ${writeToDOMRepetitionCount})\n`;
+            } else {
+              const statementsText = writeToDOMLastOutput.map(s => s).join('\n');
+              countNode.textContent = `(repeated ${writeToDOMLastOutput.length} writes:\n${statementsText}\nx ${writeToDOMRepetitionCount})\n`;
+            }
             writeToDOMDiv.appendChild(countNode);
           }
         } else {
@@ -509,6 +516,14 @@ async function generateAndDraw() {
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
   const debugMode = document.getElementById('debugMode').checked;
+
+  // Clear the write() log
+  if (writeToDOMDiv) {
+    writeToDOMDiv.innerHTML = '';
+  }
+  writeToDOMLastOutput = [];
+  writeToDOMCurrentOutput = [];
+  writeToDOMRepetitionCount = 1;
 
   // Clear any previous error message
   document.getElementById('errorMessage').innerHTML = '';
@@ -658,5 +673,150 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
   drawVerticesOnCanvas(ctx);
 });
+
+// Share functionality
+function generateShareableLink() {
+  const initCode = document.getElementById('initializationMathJSCode').value;
+  const mainCode = document.getElementById('nextVertexAndPointMathJSCode').value;
+
+  // Create an object with the code data and form field values
+  const shareData = {
+    initCode: initCode,
+    mainCode: mainCode,
+    vertices: document.getElementById('vertices').value,
+    steps: document.getElementById('steps').value,
+    alpha: document.getElementById('alpha').value,
+    centerX: document.getElementById('centerX').value,
+    centerY: document.getElementById('centerY').value,
+    zoom: document.getElementById('zoom').value
+  };
+
+  // Encode the data as a URL parameter
+  const encodedData = btoa(JSON.stringify(shareData));
+
+  // Generate the shareable URL
+  const baseUrl = window.location.origin + window.location.pathname;
+  const shareUrl = `${baseUrl}?code=${encodedData}`;
+
+  return shareUrl;
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (err) {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return true;
+    } catch (err) {
+      document.body.removeChild(textArea);
+      return false;
+    }
+  }
+}
+
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const shareBtn = document.getElementById('shareBtn');
+  const originalText = shareBtn.textContent;
+
+  try {
+    const shareUrl = generateShareableLink();
+    const success = await copyToClipboard(shareUrl);
+
+    if (success) {
+      shareBtn.textContent = 'Link copied!';
+      setTimeout(() => {
+        shareBtn.textContent = originalText;
+      }, 2000);
+    } else {
+      // Show the URL in a prompt as fallback
+      prompt('Copy this link to share:', shareUrl);
+    }
+  } catch (error) {
+    console.error('Error generating share link:', error);
+    shareBtn.textContent = 'Error';
+    setTimeout(() => {
+      shareBtn.textContent = originalText;
+    }, 2000);
+  }
+});
+
+// Function to load shared code from URL parameters
+function loadSharedCode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const encodedCode = urlParams.get('code');
+
+  if (encodedCode) {
+    try {
+      const shareData = JSON.parse(atob(encodedCode));
+
+      if (shareData.initCode !== undefined) {
+        document.getElementById('initializationMathJSCode').value = shareData.initCode;
+      }
+
+      if (shareData.mainCode !== undefined) {
+        document.getElementById('nextVertexAndPointMathJSCode').value = shareData.mainCode;
+      }
+
+      // Restore form field values
+      if (shareData.vertices !== undefined) {
+        document.getElementById('vertices').value = shareData.vertices;
+      }
+
+      if (shareData.steps !== undefined) {
+        document.getElementById('steps').value = shareData.steps;
+      }
+
+      if (shareData.alpha !== undefined) {
+        document.getElementById('alpha').value = shareData.alpha;
+      }
+
+      if (shareData.centerX !== undefined) {
+        document.getElementById('centerX').value = shareData.centerX;
+        // Show view settings if center values are not default
+        if (shareData.centerX !== '0' || shareData.centerY !== '0' || shareData.zoom !== '1') {
+          document.getElementById('customizeView').checked = true;
+          document.getElementById('customizeView').dispatchEvent(new Event('change'));
+        }
+      }
+
+      if (shareData.centerY !== undefined) {
+        document.getElementById('centerY').value = shareData.centerY;
+      }
+
+      if (shareData.zoom !== undefined) {
+        document.getElementById('zoom').value = shareData.zoom;
+      }
+
+      // If there's shared code, enable the customize checkbox so users can see it
+      if (shareData.mainCode || shareData.initCode) {
+        document.getElementById('customizeMathJSCode').checked = true;
+        // Trigger the change event to show the code areas
+        document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
+      }
+
+      // Clean up the URL by removing the code parameter
+      const newUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+
+    } catch (error) {
+      console.error('Error loading shared code:', error);
+    }
+  }
+}
+
+// Load shared code when the page loads
+loadSharedCode();
 
 generateAndDraw();
