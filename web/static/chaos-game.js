@@ -210,6 +210,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       currentPoint: math.matrix([[100, 100]]),
       // Queue for storing multiple points
       pointsQueue: [],
+      // Color variables for point coloring
+      currentPointColor: null,
+      nextPointColor: undefined,
       hasKey: hasKey,
       write: writeToDOM,
       userControl: function(label, min, max, defaultValue) {
@@ -369,7 +372,13 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         currentPointsArray = scope.currentPoint.toArray();
         // save points to be plotted
         currentPointsArray.forEach(function (currentPointArray, index) {
-            points.push({ x: currentPointArray[0], y: currentPointArray[1] });
+            // Use current point color if available, otherwise default to black
+            const pointColor = scope.currentPointColor || 'rgba(0, 0, 0, 1)';
+            points.push({ 
+                x: currentPointArray[0], 
+                y: currentPointArray[1], 
+                color: pointColor 
+            });
             if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
               currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
             pointsInViewCount++;
@@ -421,6 +430,13 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         }
          // Add nextPoints from scope (the user sets this value) to queue
         addPointsToQueue(scope.nextPoint);
+
+        // Update color for next iteration if nextPointColor was set
+        if (scope.nextPointColor !== undefined) {
+            scope.currentPointColor = scope.nextPointColor;
+            // Clear nextPointColor so it doesn't persist unless explicitly set again
+            scope.nextPointColor = undefined;
+        }
 
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
@@ -512,10 +528,52 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   ctx.scale(zoom, zoom);
   ctx.translate(-centerX, -centerY);
 
-  ctx.fillStyle = `rgba(0, 0, 0, ${alphaValue})`;
+  // Group points by color for efficient drawing
+  const pointsByColor = new Map();
   for (let i = 0; i < points.length; i++) {
-    ctx.fillRect(points[i].x, points[i].y, 1/zoom, 1/zoom);
+    const point = points[i];
+    let color = point.color || `rgba(0, 0, 0, ${alphaValue})`;
+    
+    // If the color doesn't have alpha, apply the global alpha
+    if (color && !color.includes('rgba') && !color.includes('hsla')) {
+      // Convert hex or named colors to rgba with alpha
+      if (color.startsWith('#')) {
+        const r = parseInt(color.slice(1, 3), 16);
+        const g = parseInt(color.slice(3, 5), 16);
+        const b = parseInt(color.slice(5, 7), 16);
+        color = `rgba(${r}, ${g}, ${b}, ${alphaValue})`;
+      } else if (color.startsWith('rgb(')) {
+        // Convert rgb() to rgba()
+        color = color.replace('rgb(', 'rgba(').replace(')', `, ${alphaValue})`);
+      } else {
+        // For named colors, we'll use a canvas context to convert
+        ctx.fillStyle = color;
+        const computedColor = ctx.fillStyle;
+        if (computedColor.startsWith('#')) {
+          const r = parseInt(computedColor.slice(1, 3), 16);
+          const g = parseInt(computedColor.slice(3, 5), 16);
+          const b = parseInt(computedColor.slice(5, 7), 16);
+          color = `rgba(${r}, ${g}, ${b}, ${alphaValue})`;
+        } else {
+          color = `rgba(0, 0, 0, ${alphaValue})`; // fallback
+        }
+      }
+    }
+    
+    if (!pointsByColor.has(color)) {
+      pointsByColor.set(color, []);
+    }
+    pointsByColor.get(color).push(point);
   }
+  
+  // Draw points grouped by color
+  for (const [color, colorPoints] of pointsByColor) {
+    ctx.fillStyle = color;
+    for (const point of colorPoints) {
+      ctx.fillRect(point.x, point.y, 1/zoom, 1/zoom);
+    }
+  }
+  
   ctx.restore();
 }
 
