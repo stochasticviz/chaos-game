@@ -430,7 +430,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
-        
+
         // Update currentPointColor for next iteration if nextPointColor was set
         if (scope.nextPointColor !== undefined) {
           scope.currentPointColor = scope.nextPointColor;
@@ -515,6 +515,36 @@ function drawVerticesOnCanvas(ctx) {
     ctx.restore();
 }
 
+// Helper function to apply alpha to named colors
+function applyAlphaToColor(color, alpha) {
+  if (!color) return `rgba(0, 0, 0, ${alpha})`;
+  
+  // For named colors, use canvas to convert to rgb then apply alpha
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = color;
+  const computedColor = ctx.fillStyle; // This normalizes the color to hex or rgb
+  
+  // If it's a hex color, convert to rgba
+  const hexMatch = computedColor.match(/^#([0-9a-f]{6})$/i);
+  if (hexMatch) {
+    const hex = hexMatch[1];
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  
+  // If it's rgb format from canvas normalization
+  const rgbMatch = computedColor.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  if (rgbMatch) {
+    return `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${alpha})`;
+  }
+  
+  // Fallback - return the original color (might not have alpha applied)
+  return color;
+}
+
 function drawPointsOnCanvas(ctx, points, alphaValue) {
   const centerX = parseFloat(document.getElementById('centerX').value);
   const centerY = parseFloat(document.getElementById('centerY').value);
@@ -528,11 +558,12 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   const pointsByColor = new Map();
   for (let i = 0; i < points.length; i++) {
     const point = points[i];
-    const color = point.color || `rgba(0, 0, 0, ${alphaValue})`;
-    if (!pointsByColor.has(color)) {
-      pointsByColor.set(color, []);
+    const baseColor = point.color;
+    const colorWithAlpha = applyAlphaToColor(baseColor, alphaValue);
+    if (!pointsByColor.has(colorWithAlpha)) {
+      pointsByColor.set(colorWithAlpha, []);
     }
-    pointsByColor.get(color).push(point);
+    pointsByColor.get(colorWithAlpha).push(point);
   }
 
   // Draw points grouped by color
