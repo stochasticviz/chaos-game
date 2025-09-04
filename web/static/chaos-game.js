@@ -529,7 +529,7 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   const pointsByColor = new Map();
   for (let i = 0; i < points.length; i++) {
     const point = points[i];
-    const color = point.color || 'black';
+    const color = point.color;
     if (!pointsByColor.has(color)) {
       pointsByColor.set(color, []);
     }
