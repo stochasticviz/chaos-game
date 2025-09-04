@@ -208,6 +208,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       currentTargetIndex: 1,
       // arbitary point to start is 100, 100
       currentPoint: math.matrix([[100, 100]]),
+      // default color for current point (black)
+      currentPointColor: 'rgba(0, 0, 0, 1)',
+      // optional color for next point (undefined means use currentPointColor)
+      nextPointColor: undefined,
       // Queue for storing multiple points
       pointsQueue: [],
       hasKey: hasKey,
@@ -369,7 +373,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         currentPointsArray = scope.currentPoint.toArray();
         // save points to be plotted
         currentPointsArray.forEach(function (currentPointArray, index) {
-            points.push({ x: currentPointArray[0], y: currentPointArray[1] });
+            // Determine the color to use: nextPointColor if set, otherwise currentPointColor
+            const pointColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
+            points.push({ x: currentPointArray[0], y: currentPointArray[1], color: pointColor });
             if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
               currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
             pointsInViewCount++;
@@ -424,6 +430,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
+        
+        // Update currentPointColor for next iteration if nextPointColor was set
+        if (scope.nextPointColor !== undefined) {
+          scope.currentPointColor = scope.nextPointColor;
+          scope.nextPointColor = undefined; // Reset nextPointColor
+        }
 
         // Check if current iteration output matches last iteration (only if there's actual output)
         if (writeToDOMCurrentOutput.length > 0 &&
@@ -512,9 +524,23 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   ctx.scale(zoom, zoom);
   ctx.translate(-centerX, -centerY);
 
-  ctx.fillStyle = `rgba(0, 0, 0, ${alphaValue})`;
+  // Group points by color to minimize fillStyle changes
+  const pointsByColor = new Map();
   for (let i = 0; i < points.length; i++) {
-    ctx.fillRect(points[i].x, points[i].y, 1/zoom, 1/zoom);
+    const point = points[i];
+    const color = point.color || `rgba(0, 0, 0, ${alphaValue})`;
+    if (!pointsByColor.has(color)) {
+      pointsByColor.set(color, []);
+    }
+    pointsByColor.get(color).push(point);
+  }
+
+  // Draw points grouped by color
+  for (const [color, colorPoints] of pointsByColor) {
+    ctx.fillStyle = color;
+    for (let i = 0; i < colorPoints.length; i++) {
+      ctx.fillRect(colorPoints[i].x, colorPoints[i].y, 1/zoom, 1/zoom);
+    }
   }
   ctx.restore();
 }
