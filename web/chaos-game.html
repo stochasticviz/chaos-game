@@ -184,10 +184,9 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 # ... and get its coordinates
 _nextTarget = targetPoints[nextTargetIndex, :]
 
-# Create a user control for how far to go toward the target
 slider = userControl("how far to go toward the target", 0.02, 1.4, .5)
+# Create a slider to let the user control how far to go toward the target
 
-# Make next point s% of the way to the target
 nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 </textarea>
 <div id="debugModeDiv" >
