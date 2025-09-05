@@ -86,15 +86,6 @@ function createUserControl(label, min, max, defaultValue) {
     return container;
 }
 
-// Function to ensure UI controls exist
-function ensureUserControls() {
-    const userControls = document.getElementById('userControls');
-    if (userControls.children.length === 0) {
-        userControls.innerHTML = '';
-        userControlsValuesCache.clear();
-    }
-}
-
 function getCircleCoord(theta) {
   const x = CIRCLE_RADIUS * Math.cos(theta);
   const y = CIRCLE_RADIUS * Math.sin(theta);
@@ -213,7 +204,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       hasKey: hasKey,
       write: writeToDOM,
       userControl: function(label, min, max, defaultValue) {
-          ensureUserControls();
           const userControls = document.getElementById('userControls');
           if (!userControlsValuesCache.has(label)) {
               VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
