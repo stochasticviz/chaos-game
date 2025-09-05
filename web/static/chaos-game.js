@@ -233,7 +233,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           if (arguments.length === 1 && centerY === undefined) {
               // Handle single argument case: pan([x, y]) or pan(matrix)
               const point = centerX;
-              let x, y;
 
               if (point && typeof point.toArray === 'function') {
                   // It's a MathJS matrix
@@ -292,7 +291,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   }
   let points = [];
   let pointsInViewCount = 0;
-  let nextPoint = null;
   let currentPointsArray = null;
   let showStuff = null;
   let firstTime = true;
@@ -368,7 +366,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         }
         currentPointsArray = scope.currentPoint.toArray();
         // save points to be plotted
-        currentPointsArray.forEach(function (currentPointArray, index) {
+        currentPointsArray.forEach(function (currentPointArray) {
             points.push({ x: currentPointArray[0], y: currentPointArray[1] });
             if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
               currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
