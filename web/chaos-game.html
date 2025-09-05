@@ -62,7 +62,7 @@ Write your own code to calculate where the next point should be. The default cod
 <div class="advanced-stuff">
   <ul>
     <li>
-      <strong>userControl() function</strong> Create a custom UI control. Example: <code>t = userControl("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
+      <strong>createSlider() function</strong> Create a custom UI control. Example: <code>t = createSlider("some number", -1, 4, 3)</code> will create a slider ranging over -1 to 4 and starting at 3. You can then use <code>t</code> anywhere in your code to give your end user 'live' control over something.
     </li>
     <li>
       <strong>write() function</strong> Use this function to output text to the console. Example: <code>write(currentPoint)</code>
@@ -104,7 +104,7 @@ nextPoint = randomInt() ? point1 : point2</pre>
     <pre class="codeExample">
 # IMPORTANT! Put these two lines in the "Optional initialization code" pane.
 previous_vertex = -1  # start with a non-existing vertex
-slider = userControl("how far to go toward the target", -2, 1.4, .5)
+slider = createSlider("how far to go toward the target", -2, 1.4, .5)
 
 # The rest of this code goes in the main pane
 
@@ -131,9 +131,9 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create user controls for the parameters
-sine_shift = userControl("Sine shift", 0, 2*math.pi, math.pi*29/25)
-sine_scale = userControl("Sine scale", -3/2, 4, 1/2)
-sine_offset = userControl("Sine offset", -1, 7/4, 1/2)
+sine_shift = createSlider("Sine shift", 0, 2*math.pi, math.pi*29/25)
+sine_scale = createSlider("Sine scale", -3/2, 4, 1/2)
+sine_offset = createSlider("Sine offset", -1, 7/4, 1/2)
 
 displacement_factors = math.matrix([
   [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
@@ -184,8 +184,8 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 # ... and get its coordinates
 _nextTarget = targetPoints[nextTargetIndex, :]
 
-slider = userControl("how far to go toward the target", 0.02, 1.4, .5)
 # Create a slider to let the user control how far to go toward the target
+slider = createSlider("how far to go toward the target", 0.02, 1.4, .5)
 
 nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 </textarea>
@@ -210,7 +210,7 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
     <input type="number" id="zoom" value="1" step="0.1"/>
     <span id="pointsInView"></span>
 </div>
-<div id="userControls"></div>
+<div id="sliders"></div>
 <div id="progress-indicator"></div>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
 <script type="module" src="static/chaos-game.js?v=72dd7"></script>

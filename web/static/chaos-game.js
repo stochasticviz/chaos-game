@@ -12,7 +12,7 @@ let isDragging = false;
 let draggedVertexIndex = -1;
 
 // Store user control values
-const userControlsValuesCache = new Map();
+const slidersValuesCache = new Map();
 
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
@@ -42,7 +42,7 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 // Function to create a user control
 function createUserControl(label, min, max, defaultValue) {
     const container = document.createElement('div');
-    container.className = 'userControl';
+    container.className = 'slider';
 
     const labelContainer = document.createElement('div');
     labelContainer.className = 'label-container';
@@ -67,15 +67,15 @@ function createUserControl(label, min, max, defaultValue) {
     });
 
     // Store the initial value
-    userControlsValuesCache.set(label, defaultValue);
+    slidersValuesCache.set(label, defaultValue);
     valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
         const newValue = parseFloat(values[0]);
-        const oldValue = userControlsValuesCache.get(label);
+        const oldValue = slidersValuesCache.get(label);
         if (newValue !== oldValue) {
-            userControlsValuesCache.set(label, newValue);
+            slidersValuesCache.set(label, newValue);
             valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>' ;
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
@@ -203,14 +203,14 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       pointsQueue: [],
       hasKey: hasKey,
       write: writeToDOM,
-      userControl: function(label, min, max, defaultValue) {
-          const userControls = document.getElementById('userControls');
-          if (!userControlsValuesCache.has(label)) {
+      createSlider: function(label, min, max, defaultValue) {
+          const sliders = document.getElementById('sliders');
+          if (!slidersValuesCache.has(label)) {
               VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
               const control = createUserControl(label, min, max, defaultValue);
-              userControls.appendChild(control);
+              sliders.appendChild(control);
           }
-          return userControlsValuesCache.get(label) || defaultValue;
+          return slidersValuesCache.get(label) || defaultValue;
       },
       zoom: function(zoomLevel) {
           const zoomInput = document.getElementById('zoom');
@@ -533,9 +533,9 @@ async function generateAndDraw() {
   // Only clear controls if this is a fresh generation (not from slider update)
   // and if the code has changed
   if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
-    const userControls = document.getElementById('userControls');
-    userControls.innerHTML = '';
-    userControlsValuesCache.clear();
+    const sliders = document.getElementById('sliders');
+    sliders.innerHTML = '';
+    slidersValuesCache.clear();
     canvas.lastCode = nextVertexAndPointMathJSCodeString;
   }
 
