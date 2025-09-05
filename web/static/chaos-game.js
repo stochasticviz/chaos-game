@@ -669,22 +669,7 @@ canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseleave', handleMouseUp);
-
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
-document.getElementById('resetBtn').addEventListener('click', () => {
-  const vertices = parseInt(document.getElementById('vertices').value, 10);
-  resetTargetsLocations(vertices); // this evenly distributes the vertices on a circle
-
-  // save the current transformation matrix
-  ctx.save();
-  // use the identity matrix while clearing the canvas
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // restore the transform
-  ctx.restore();
-
-  drawVerticesOnCanvas(ctx);
-});
 
 // Share functionality
 function generateShareableLink() {
