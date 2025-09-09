@@ -294,8 +294,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   }
 
   // Helper function to add points to the queue
-  function addPointsToQueue(result) {
-    if (!result) return;
+  function addPointsToQueue(pointOrPoints) {
+    //if (!pointOrPoints) return;
 
     // If result is a matrix, convert to array
     const pointsArray = result.toArray ? result.toArray() : result;
