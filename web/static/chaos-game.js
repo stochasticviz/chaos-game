@@ -198,7 +198,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       // arbitrary index. mathJS uses 1-index.
       currentTargetIndex: 1,
       // arbitary point to start is 100, 100
-      currentPoint: math.matrix([[100, 100]]),
+      //currentPoint: math.matrix([[100, 100]]),
       // Queue for storing multiple points
       pointsQueue: [],
       hasKey: hasKey,
@@ -297,16 +297,28 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   function addPointsToQueue(pointOrPoints) {
     //if (!pointOrPoints) return;
 
-    // If result is a matrix, convert to array
-    const pointsArray = result.toArray ? result.toArray() : result;
+    // Ensure pointsQueue is still an array before we modify it
+    //if (!Array.isArray(scope.pointsQueue)) {
+    //      console.warn("1st pointsQueue corruption check failed.");
+    //  console.warn("addPointsToQueue: pointsQueue was corrupted: ", pointsQueue)
+    //  console.warn("... resetting to empty array");
+    //  scope.pointsQueue = [];
+    //}
+
+    // If pointOrPoints is a matrix, convert to array
+    const pointsArray = pointOrPoints.toArray ? pointOrPoints.toArray() : pointOrPoints;
 
     // If it's a single point (1D array), wrap it
     const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
+
+    //console.log("addPointsToQueue: adding points:", points);
 
     // Add each point as a matrix to the queue
     points.forEach(point => {
       scope.pointsQueue.push(math.matrix([point]));
     });
+
+    //console.log("addPointsToQueue: pointsQueue after adding:", scope.pointsQueue);
   }
 
   // Execute initialization code once per generation
@@ -333,6 +345,13 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       }
     }
   }
+  if (scope.currentPoint && scope.pointsQueue.length === 0) {
+      console.log("currentPoint is set and pointsQueue is empty")
+      addPointsToQueue(scope.currentPoint)
+  }
+  else {
+      console.log("no currentPoint!")
+  }
 
   return new Promise((resolve, reject) => {
     function generateChunk() {
@@ -346,9 +365,23 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       for (let i = currentStep; i < endStep; i++) {
         writeToDOMCurrentOutput = [];  // this is this iteration's logging
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
-        // If queue is  empty, give it a random point
+        // Ensure pointsQueue is always an array (fix corruption if it became a matrix)
+        if (!Array.isArray(scope.pointsQueue)) {
+          console.warn("2nd pointsQueue corruption check failed.");
+            console.warn("addPointsToQueue: pointsQueue was corrupted: ")
+            console.warn(scope.pointsQueue)
+            console.warn("... resetting to empty array");
+
+          scope.pointsQueue = [];
+        }
+
+        // If queue is empty, give it a random point
+        //console.log("scope.pointsQueue before checking length:", scope.pointsQueue)
         if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
         // Get a current point from queue
+        //console.log("scope.pointsQueue after adding a random point if needed:", scope.pointsQueue)
+        //console.log("scope.currentPoint:", scope.currentPoint)
+
         scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
             console.log("i:", i)
@@ -807,3 +840,7 @@ function loadSharedCode() {
 loadSharedCode();
 
 generateAndDraw();
+
+
+
+// WIWL: probably need to switch to doing a special case of, after evaluate() on the init code, check to see if currentPoint is set.
