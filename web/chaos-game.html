@@ -62,7 +62,9 @@ Write your own code to calculate where the next point should be. The default cod
 <div class="advanced-stuff">
   <ul>
     <li>
-      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then, for example, <code>nextPoint = currentPoint + t</code> gives your end user 'live' control over the scalar value to add to currentPoint.
+      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then if you have <code>nextPoint = currentPoint + t</code>, this gives your end user 'live' control over the scalar value, t, to add to currentPoint. See also this: <code>slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)</code> in the default code, below.
+     </li>
+
     </li>
     <li>
       <strong>write() function</strong> Write text to the page. Example: <code>write(currentPoint)</code>
@@ -104,7 +106,7 @@ nextPoint = randomInt() ? point1 : point2</pre>
     <pre class="codeExample">
 # IMPORTANT! Put these two lines in the "Optional initialization code" pane.
 previous_vertex = -1  # start with a non-existing vertex
-slider = createSlider("how far to go toward the target", -2, 1.4, .5)
+slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
 
 # The rest of this code goes in the main pane
 
@@ -185,7 +187,7 @@ nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 # Create a slider to let the user control how far to go toward the target
-slider = createSlider("how far to go toward the target", 0.02, 1.4, .5)
+slider = createSlider("how far to go toward the target", 0.02, 1.4, 0.5)
 
 nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 </textarea>
