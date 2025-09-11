@@ -297,8 +297,8 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   function addPointsToQueue(pointOrPoints) {
     //if (!pointOrPoints) return;
 
-    // If result is a matrix, convert to array
-    const pointsArray = result.toArray ? result.toArray() : result;
+    // If pointOrPoints is a matrix, convert to array
+    const pointsArray = pointOrPoints.toArray ? pointOrPoints.toArray() : pointOrPoints;
 
     // If it's a single point (1D array), wrap it
     const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
