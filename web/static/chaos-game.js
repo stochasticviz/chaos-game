@@ -197,8 +197,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       targetPointsLength: targets.length,
       // arbitrary index. mathJS uses 1-index.
       currentTargetIndex: 1,
-      // arbitary point to start is 100, 100
-      currentPoint: math.matrix([[100, 100]]),
       // Queue for storing multiple points
       pointsQueue: [],
       hasKey: hasKey,
@@ -294,11 +292,11 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   }
 
   // Helper function to add points to the queue
-  function addPointsToQueue(result) {
-    if (!result) return;
+  function addPointsToQueue(pointOrPoints) {
+    //if (!pointOrPoints) return;
 
-    // If result is a matrix, convert to array
-    const pointsArray = result.toArray ? result.toArray() : result;
+    // If pointOrPoints is a matrix, convert to array
+    const pointsArray = pointOrPoints.toArray ? pointOrPoints.toArray() : pointOrPoints;
 
     // If it's a single point (1D array), wrap it
     const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
@@ -334,6 +332,18 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
     }
   }
 
+  // If currentPoint was set in initialization code, add it to pointsQueue
+  if (scope.currentPoint !== undefined) {
+    // Handle both matrix and array formats
+    if (scope.currentPoint.toArray && typeof scope.currentPoint.toArray === 'function') {
+      // It's a matrix
+      scope.pointsQueue.push(scope.currentPoint);
+    } else if (Array.isArray(scope.currentPoint)) {
+      // It's an array, convert to matrix
+      scope.pointsQueue.push(math.matrix([scope.currentPoint]));
+    }
+  }
+
   return new Promise((resolve, reject) => {
     function generateChunk() {
       if (generationId !== currentGenerationId) {
@@ -347,7 +357,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         writeToDOMCurrentOutput = [];  // this is this iteration's logging
         showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
-        if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
+        if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  } // consider throwing an error here and moving the push of a random point to the above code block where we call scope.pointsQueue.push()
         // Get a current point from queue
         scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
