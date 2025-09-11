@@ -62,10 +62,10 @@ Write your own code to calculate where the next point should be. The default cod
 <div class="advanced-stuff">
   <ul>
     <li>
-      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then, <code>nextPoint = currentPoint + t</code> gives your end user 'live' control over a scalar added to currentPoint.
+      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then, for example, <code>nextPoint = currentPoint + t</code> gives your end user 'live' control over the scalar value to add to currentPoint.
     </li>
     <li>
-      <strong>write() function</strong> Output text to the console. Example: <code>write(currentPoint)</code>
+      <strong>write() function</strong> Write text to the page. Example: <code>write(currentPoint)</code>
     </li>
     <li>
       <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target vertex" in the advanced examples, below.
@@ -213,7 +213,7 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 <div id="sliders"></div>
 <div id="progress-indicator"></div>
 <canvas id="myCanvas" width="1000" height="1000"></canvas>
-<script type="module" src="static/chaos-game.js?v=dbca35a1"></script>
+<script type="module" src="static/chaos-game.js?v=c8dc5c5493"></script>
 <div><small><a href="https://github.com/herdrick/chaos-game/">source</a>&nbsp;&nbsp;&nbsp;<a href="chaos-game-3d.html">3D version</a></small></div>
 </body>
 </html>
