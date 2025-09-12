@@ -17,7 +17,7 @@ Hosted, live: [chaos-game-3d.html](https://herdrick.github.io/chaos-game/chaos-g
 ## Archives
 
 ### [bokeh-app.py](sierpinski_triangle/bokeh-app.py)
-Original implementation using Bokeh/Panel.
+Original implementation using Python Bokeh and Panel.
 
 Requires: numpy, holoviews, panel, bokeh
 
