@@ -291,9 +291,25 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
     return math.divide(math.matrix([[x, y]]), 2);
   }
 
+  // Helper function to convert complex number to [x, y] array
+  function complexToPoint(complex) {
+    return [complex.re, complex.im];
+  }
+
+  function isMathJSComplexNumber(o) {
+      return o && typeof o === 'object' && o.re !== undefined && o.im !== undefined
+  }
+
   // Helper function to add points to the queue
   function addPointsToQueue(pointOrPoints) {
     //if (!pointOrPoints) return;
+
+    // Handle MathJS complex numbers
+    if (isMathJSComplexNumber(pointOrPoints)) {
+      const point = complexToPoint(pointOrPoints);
+      scope.pointsQueue.push(math.matrix([point]));
+      return;
+    }
 
     // If pointOrPoints is a matrix, convert to array
     const pointsArray = pointOrPoints.toArray ? pointOrPoints.toArray() : pointOrPoints;
@@ -303,6 +319,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
     // Add each point as a matrix to the queue
     points.forEach(point => {
+      // Handle complex numbers within arrays
+      if (isMathJSComplexNumber(point)) {
+        point = complexToPoint(point);
+      }
       scope.pointsQueue.push(math.matrix([point]));
     });
   }
