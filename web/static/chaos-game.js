@@ -709,7 +709,8 @@ function generateShareableLink() {
   };
 
   // Encode the data as a URL parameter
-  const encodedData = btoa(JSON.stringify(shareData));
+  // Use encodeURIComponent to handle special characters properly
+  const encodedData = encodeURIComponent(btoa(JSON.stringify(shareData)));
 
   // Generate the shareable URL
   const baseUrl = window.location.origin + window.location.pathname;
@@ -776,6 +777,7 @@ function loadSharedCode() {
 
   if (encodedCode) {
     try {
+      // URLSearchParams.get() already URL-decodes, so just do base64 and JSON
       const shareData = JSON.parse(atob(encodedCode));
 
       if (shareData.initCode !== undefined) {
