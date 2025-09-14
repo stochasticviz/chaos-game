@@ -12,7 +12,7 @@ let isDragging = false;
 let draggedVertexIndex = -1;
 
 // Store user control values
-const userControlsValuesCache = new Map();
+const slidersValuesCache = new Map();
 
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
@@ -42,7 +42,7 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 // Function to create a user control
 function createUserControl(label, min, max, defaultValue) {
     const container = document.createElement('div');
-    container.className = 'userControl';
+    container.className = 'slider';
 
     const labelContainer = document.createElement('div');
     labelContainer.className = 'label-container';
@@ -67,15 +67,15 @@ function createUserControl(label, min, max, defaultValue) {
     });
 
     // Store the initial value
-    userControlsValuesCache.set(label, defaultValue);
+    slidersValuesCache.set(label, defaultValue);
     valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
         const newValue = parseFloat(values[0]);
-        const oldValue = userControlsValuesCache.get(label);
+        const oldValue = slidersValuesCache.get(label);
         if (newValue !== oldValue) {
-            userControlsValuesCache.set(label, newValue);
+            slidersValuesCache.set(label, newValue);
             valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>' ;
             // Regenerate points when slider changes
             clearTimeout(canvas.regenerateTimeout);
@@ -84,15 +84,6 @@ function createUserControl(label, min, max, defaultValue) {
     });
 
     return container;
-}
-
-// Function to ensure UI controls exist
-function ensureUserControls() {
-    const userControls = document.getElementById('userControls');
-    if (userControls.children.length === 0) {
-        userControls.innerHTML = '';
-        userControlsValuesCache.clear();
-    }
 }
 
 function getCircleCoord(theta) {
@@ -206,8 +197,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       targetPointsLength: targets.length,
       // arbitrary index. mathJS uses 1-index.
       currentTargetIndex: 1,
-      // arbitary point to start is 100, 100
-      currentPoint: math.matrix([[100, 100]]),
       // default color for current point (black)
       currentPointColor: 'rgba(0, 0, 0, 1)',
       // optional color for next point (undefined means use currentPointColor)
@@ -216,15 +205,14 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       pointsQueue: [],
       hasKey: hasKey,
       write: writeToDOM,
-      userControl: function(label, min, max, defaultValue) {
-          ensureUserControls();
-          const userControls = document.getElementById('userControls');
-          if (!userControlsValuesCache.has(label)) {
+      createSlider: function(label, min, max, defaultValue) {
+          const sliders = document.getElementById('sliders');
+          if (!slidersValuesCache.has(label)) {
               VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
               const control = createUserControl(label, min, max, defaultValue);
-              userControls.appendChild(control);
+              sliders.appendChild(control);
           }
-          return userControlsValuesCache.get(label) || defaultValue;
+          return slidersValuesCache.get(label) || defaultValue;
       },
       zoom: function(zoomLevel) {
           const zoomInput = document.getElementById('zoom');
@@ -237,7 +225,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
           if (arguments.length === 1 && centerY === undefined) {
               // Handle single argument case: pan([x, y]) or pan(matrix)
               const point = centerX;
-              let x, y;
 
               if (point && typeof point.toArray === 'function') {
                   // It's a MathJS matrix
@@ -296,7 +283,6 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
   }
   let points = [];
   let pointsInViewCount = 0;
-  let nextPoint = null;
   let currentPointsArray = null;
   let showStuff = null;
   let firstTime = true;
@@ -309,18 +295,38 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
     return math.divide(math.matrix([[x, y]]), 2);
   }
 
-  // Helper function to add points to the queue
-  function addPointsToQueue(result) {
-    if (!result) return;
+  // Helper function to convert complex number to [x, y] array
+  function complexToPoint(complex) {
+    return [complex.re, complex.im];
+  }
 
-    // If result is a matrix, convert to array
-    const pointsArray = result.toArray ? result.toArray() : result;
+  function isMathJSComplexNumber(o) {
+      return o && typeof o === 'object' && o.re !== undefined && o.im !== undefined
+  }
+
+  // Helper function to add points to the queue
+  function addPointsToQueue(pointOrPoints) {
+    //if (!pointOrPoints) return;
+
+    // Handle MathJS complex numbers
+    if (isMathJSComplexNumber(pointOrPoints)) {
+      const point = complexToPoint(pointOrPoints);
+      scope.pointsQueue.push(math.matrix([point]));
+      return;
+    }
+
+    // If pointOrPoints is a matrix, convert to array
+    const pointsArray = pointOrPoints.toArray ? pointOrPoints.toArray() : pointOrPoints;
 
     // If it's a single point (1D array), wrap it
     const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
 
     // Add each point as a matrix to the queue
     points.forEach(point => {
+      // Handle complex numbers within arrays
+      if (isMathJSComplexNumber(point)) {
+        point = complexToPoint(point);
+      }
       scope.pointsQueue.push(math.matrix([point]));
     });
   }
@@ -350,6 +356,18 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
     }
   }
 
+  // If currentPoint was set in initialization code, add it to pointsQueue
+  if (scope.currentPoint !== undefined) {
+    // Handle both matrix and array formats
+    if (scope.currentPoint.toArray && typeof scope.currentPoint.toArray === 'function') {
+      // It's a matrix
+      scope.pointsQueue.push(scope.currentPoint);
+    } else if (Array.isArray(scope.currentPoint)) {
+      // It's an array, convert to matrix
+      scope.pointsQueue.push(math.matrix([scope.currentPoint]));
+    }
+  }
+
   return new Promise((resolve, reject) => {
     function generateChunk() {
       if (generationId !== currentGenerationId) {
@@ -361,9 +379,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         writeToDOMCurrentOutput = [];  // this is this iteration's logging
-        showStuff = (VERBOSE & (firstTime | (i % 1000000 == 0)));
+        showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0)));
         // If queue is  empty, give it a random point
-        if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  }
+        if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  } // consider throwing an error here and moving the push of a random point to the above code block where we call scope.pointsQueue.push()
         // Get a current point from queue
         scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
@@ -372,7 +390,7 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         }
         currentPointsArray = scope.currentPoint.toArray();
         // save points to be plotted
-        currentPointsArray.forEach(function (currentPointArray, index) {
+        currentPointsArray.forEach(function (currentPointArray) {
             // Determine the color to use: nextPointColor if set, otherwise currentPointColor
             const pointColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
             points.push({ x: currentPointArray[0], y: currentPointArray[1], color: pointColor });
@@ -572,9 +590,9 @@ async function generateAndDraw() {
   // Only clear controls if this is a fresh generation (not from slider update)
   // and if the code has changed
   if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
-    const userControls = document.getElementById('userControls');
-    userControls.innerHTML = '';
-    userControlsValuesCache.clear();
+    const sliders = document.getElementById('sliders');
+    sliders.innerHTML = '';
+    slidersValuesCache.clear();
     canvas.lastCode = nextVertexAndPointMathJSCodeString;
   }
 
@@ -698,22 +716,7 @@ canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseleave', handleMouseUp);
-
 document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
-document.getElementById('resetBtn').addEventListener('click', () => {
-  const vertices = parseInt(document.getElementById('vertices').value, 10);
-  resetTargetsLocations(vertices); // this evenly distributes the vertices on a circle
-
-  // save the current transformation matrix
-  ctx.save();
-  // use the identity matrix while clearing the canvas
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // restore the transform
-  ctx.restore();
-
-  drawVerticesOnCanvas(ctx);
-});
 
 // Share functionality
 function generateShareableLink() {
@@ -733,7 +736,8 @@ function generateShareableLink() {
   };
 
   // Encode the data as a URL parameter
-  const encodedData = btoa(JSON.stringify(shareData));
+  // Use encodeURIComponent to handle special characters properly
+  const encodedData = encodeURIComponent(btoa(JSON.stringify(shareData)));
 
   // Generate the shareable URL
   const baseUrl = window.location.origin + window.location.pathname;
@@ -800,6 +804,7 @@ function loadSharedCode() {
 
   if (encodedCode) {
     try {
+      // URLSearchParams.get() already URL-decodes, so just do base64 and JSON
       const shareData = JSON.parse(atob(encodedCode));
 
       if (shareData.initCode !== undefined) {

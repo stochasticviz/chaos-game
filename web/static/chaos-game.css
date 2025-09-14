@@ -102,10 +102,6 @@ label[for="nextVertexAndPointMathJSCode"] {
   display: none;
 }
 
-#codeSpacing {
-  display: none;
-}
-
 #codeExplanation {
     display: none;
     margin: 10px 0;
@@ -124,7 +120,7 @@ label[for="nextVertexAndPointMathJSCode"] {
   margin-top: 10px;
 }
 
-#userControls {
+#sliders {
   width: 100%;
   max-width: 1000px;  /* Match canvas width */
   margin-top: 5px;
@@ -132,7 +128,7 @@ label[for="nextVertexAndPointMathJSCode"] {
   box-sizing: border-box;
 }
 
-.userControl {
+.slider {
   margin: 10px 0;
 }
 
@@ -142,7 +138,7 @@ label[for="nextVertexAndPointMathJSCode"] {
   margin-bottom: 5px;
 }
 
-.userControl label {
+.slider label {
   margin-right: 8px;
 }
 
