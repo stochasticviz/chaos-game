@@ -97,7 +97,7 @@ function convertToColorString(color) {
     if (typeof color === 'string') {
         return color; // Already a string, return as-is
     }
-    
+
     // Handle MathJS matrix
     if (color && typeof color.toArray === 'function') {
         const arr = color.toArray();
@@ -108,7 +108,7 @@ function convertToColorString(color) {
             return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
         }
     }
-    
+
     // Fallback to original color if we can't convert
     return color;
 }
@@ -858,11 +858,6 @@ function loadSharedCode() {
 
       if (shareData.centerX !== undefined) {
         document.getElementById('centerX').value = shareData.centerX;
-        // Show view settings if center values are not default
-        if (shareData.centerX !== '0' || shareData.centerY !== '0' || shareData.zoom !== '1') {
-          document.getElementById('customizeView').checked = true;
-          document.getElementById('customizeView').dispatchEvent(new Event('change'));
-        }
       }
 
       if (shareData.centerY !== undefined) {
@@ -872,17 +867,6 @@ function loadSharedCode() {
       if (shareData.zoom !== undefined) {
         document.getElementById('zoom').value = shareData.zoom;
       }
-
-      // If there's shared code, enable the customize checkbox so users can see it
-      if (shareData.mainCode || shareData.initCode) {
-        document.getElementById('customizeMathJSCode').checked = true;
-        // Trigger the change event to show the code areas
-        document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
-      }
-
-      // Clean up the URL by removing the code parameter
-      const newUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
 
     } catch (error) {
       console.error('Error loading shared code:', error);
