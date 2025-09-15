@@ -92,6 +92,27 @@ function getCircleCoord(theta) {
   return { x, y };
 }
 
+// Helper function to convert array/matrix RGB values to CSS color strings
+function convertToColorString(color) {
+    if (typeof color === 'string') {
+        return color; // Already a string, return as-is
+    }
+    
+    // Handle MathJS matrix
+    if (color && typeof color.toArray === 'function') {
+        const arr = color.toArray();
+        // Handle both [[r,g,b]] and [r,g,b] formats
+        const rgbArray = Array.isArray(arr[0]) ? arr[0] : arr;
+        if (rgbArray.length >= 3) {
+            const [r, g, b, a = 1] = rgbArray;
+            return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
+        }
+    }
+    
+    // Fallback to original color if we can't convert
+    return color;
+}
+
 // basic error handling. advanced handling is in the try/catch around "math.evaluate(expression, scope)", below
 function handleMathJSExpressionsError(error) {
     const errorDiv = document.getElementById('errorMessage');
@@ -407,7 +428,8 @@ function generatePoints(debugMode, consumePoints) {
         // save points to be plotted
         currentPointsArray.forEach(function (currentPointArray) {
             // Determine the color to use: nextPointColor if set, otherwise currentPointColor
-            const pointColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
+            const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
+            const pointColor = convertToColorString(rawColor);
             points.push({ x: currentPointArray[0], y: currentPointArray[1], color: pointColor });
             if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
               currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
