@@ -172,8 +172,19 @@ function setVerticesCount(verticesCount) {
 }
 
 let currentGenerationId = 0;
-function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
+function generatePoints(debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
+
+  const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
+
+  // Only clear controls if this is a fresh generation (not from slider update)
+  // and if the code has changed
+  if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
+    const sliders = document.getElementById('sliders');
+    sliders.innerHTML = '';
+    slidersValuesCache.clear();
+    canvas.lastCode = nextVertexAndPointMathJSCodeString;
+  }
 
   const initializationMathJSCodeString = document.getElementById("initializationMathJSCode").value;
   const initializationMathJSCodeLines = initializationMathJSCodeString.split('\n');
@@ -367,6 +378,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       scope.pointsQueue.push(math.matrix([scope.currentPoint]));
     }
   }
+
+  const vertices = parseInt(document.getElementById('vertices').value, 10);
+  const steps = parseInt(document.getElementById('steps').value, 10);
+  const alphaValue = parseFloat(document.getElementById('alpha').value);
 
   return new Promise((resolve, reject) => {
     function generateChunk() {
@@ -587,15 +602,6 @@ async function generateAndDraw() {
   // Clear any previous error message
   document.getElementById('errorMessage').innerHTML = '';
 
-  // Only clear controls if this is a fresh generation (not from slider update)
-  // and if the code has changed
-  if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
-    const sliders = document.getElementById('sliders');
-    sliders.innerHTML = '';
-    slidersValuesCache.clear();
-    canvas.lastCode = nextVertexAndPointMathJSCodeString;
-  }
-
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
@@ -615,7 +621,7 @@ async function generateAndDraw() {
 
     toggleProgressIndicator(true);
     try {
-      await generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, (progress, points, proportionInView) => {
+      await generatePoints(debugMode, (progress, points, proportionInView) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
