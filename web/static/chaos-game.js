@@ -172,8 +172,19 @@ function setVerticesCount(verticesCount) {
 }
 
 let currentGenerationId = 0;
-function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, consumePoints) {
+function generatePoints(debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
+
+  const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
+
+  // Only clear controls if this is a fresh generation (not from slider update)
+  // and if the code has changed
+  if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
+    const sliders = document.getElementById('sliders');
+    sliders.innerHTML = '';
+    slidersValuesCache.clear();
+    canvas.lastCode = nextVertexAndPointMathJSCodeString;
+  }
 
   const initializationMathJSCodeString = document.getElementById("initializationMathJSCode").value;
   const initializationMathJSCodeLines = initializationMathJSCodeString.split('\n');
@@ -197,6 +208,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
       targetPointsLength: targets.length,
       // arbitrary index. mathJS uses 1-index.
       currentTargetIndex: 1,
+      // default color for current point (black)
+      currentPointColor: 'rgba(0, 0, 0, 1)',
+      // optional color for next point (undefined means use currentPointColor)
+      nextPointColor: undefined,
       // Queue for storing multiple points
       pointsQueue: [],
       hasKey: hasKey,
@@ -364,6 +379,10 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
     }
   }
 
+  const vertices = parseInt(document.getElementById('vertices').value, 10);
+  const steps = parseInt(document.getElementById('steps').value, 10);
+  const alphaValue = parseFloat(document.getElementById('alpha').value);
+
   return new Promise((resolve, reject) => {
     function generateChunk() {
       if (generationId !== currentGenerationId) {
@@ -387,7 +406,9 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
         currentPointsArray = scope.currentPoint.toArray();
         // save points to be plotted
         currentPointsArray.forEach(function (currentPointArray) {
-            points.push({ x: currentPointArray[0], y: currentPointArray[1] });
+            // Determine the color to use: nextPointColor if set, otherwise currentPointColor
+            const pointColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
+            points.push({ x: currentPointArray[0], y: currentPointArray[1], color: pointColor });
             if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
               currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
             pointsInViewCount++;
@@ -442,6 +463,12 @@ function generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, co
 
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;
+
+        // Update currentPointColor for next iteration if nextPointColor was set
+        if (scope.nextPointColor !== undefined) {
+          scope.currentPointColor = scope.nextPointColor;
+          scope.nextPointColor = undefined; // Reset nextPointColor
+        }
 
         // Check if current iteration output matches last iteration (only if there's actual output)
         if (writeToDOMCurrentOutput.length > 0 &&
@@ -529,10 +556,25 @@ function drawPointsOnCanvas(ctx, points, alphaValue) {
   ctx.save();
   ctx.scale(zoom, zoom);
   ctx.translate(-centerX, -centerY);
+  ctx.globalAlpha = alphaValue;
 
-  ctx.fillStyle = `rgba(0, 0, 0, ${alphaValue})`;
+  // Group points by color to minimize fillStyle changes
+  const pointsByColor = new Map();
   for (let i = 0; i < points.length; i++) {
-    ctx.fillRect(points[i].x, points[i].y, 1/zoom, 1/zoom);
+    const point = points[i];
+    const color = point.color;
+    if (!pointsByColor.has(color)) {
+      pointsByColor.set(color, []);
+    }
+    pointsByColor.get(color).push(point);
+  }
+
+  // Draw points grouped by color
+  for (const [color, colorPoints] of pointsByColor) {
+    ctx.fillStyle = color;
+    for (let i = 0; i < colorPoints.length; i++) {
+      ctx.fillRect(colorPoints[i].x, colorPoints[i].y, 1/zoom, 1/zoom);
+    }
   }
   ctx.restore();
 }
@@ -560,15 +602,6 @@ async function generateAndDraw() {
   // Clear any previous error message
   document.getElementById('errorMessage').innerHTML = '';
 
-  // Only clear controls if this is a fresh generation (not from slider update)
-  // and if the code has changed
-  if (!canvas.regenerateTimeout && nextVertexAndPointMathJSCodeString !== canvas.lastCode) {
-    const sliders = document.getElementById('sliders');
-    sliders.innerHTML = '';
-    slidersValuesCache.clear();
-    canvas.lastCode = nextVertexAndPointMathJSCodeString;
-  }
-
   const generateBtn = document.getElementById('generateBtn');
   generateBtn.disabled = true;
 
@@ -588,7 +621,7 @@ async function generateAndDraw() {
 
     toggleProgressIndicator(true);
     try {
-      await generatePoints(steps, nextVertexAndPointMathJSCodeString, debugMode, (progress, points, proportionInView) => {
+      await generatePoints(debugMode, (progress, points, proportionInView) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         document.getElementById('pointsInView').textContent = `% of points outside current view: ${(100-proportionInView*100).toFixed(1)}%`;
