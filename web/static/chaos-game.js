@@ -878,26 +878,32 @@ function loadSharedCode() {
       // Restore checkbox states
       if (shareData.customizeMathJSCode !== undefined) {
         document.getElementById('customizeMathJSCode').checked = shareData.customizeMathJSCode;
+        document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
       }
 
       if (shareData.examplesToggle !== undefined) {
         document.getElementById('examples-toggle').checked = shareData.examplesToggle;
+        document.getElementById('examples-toggle').dispatchEvent(new Event('change'));
       }
 
       if (shareData.advancedStuffToggle !== undefined) {
         document.getElementById('advanced-stuff-toggle').checked = shareData.advancedStuffToggle;
+        document.getElementById('advanced-stuff-toggle').dispatchEvent(new Event('change'));
       }
 
       if (shareData.advancedExamplesToggle !== undefined) {
         document.getElementById('advanced-examples-toggle').checked = shareData.advancedExamplesToggle;
+        document.getElementById('advanced-examples-toggle').dispatchEvent(new Event('change'));
       }
 
       if (shareData.debugMode !== undefined) {
         document.getElementById('debugMode').checked = shareData.debugMode;
+        document.getElementById('debugMode').dispatchEvent(new Event('change'));
       }
 
       if (shareData.customizeView !== undefined) {
         document.getElementById('customizeView').checked = shareData.customizeView;
+        document.getElementById('customizeView').dispatchEvent(new Event('change'));
       }
 
       // Restore slider values
