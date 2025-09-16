@@ -70,6 +70,14 @@ function createUserControl(label, min, max, defaultValue) {
     slidersValuesCache.set(label, defaultValue);
     valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
+    // Check for cached value from share link and update if exists
+    if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
+        const sharedValue = window.sharedSliderValues[label];
+        slider.noUiSlider.set(sharedValue);
+        slidersValuesCache.set(label, sharedValue);
+        valueDisplay.innerHTML = '<big>' + sharedValue.toFixed(2) + '</big>';
+    }
+
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
         const newValue = parseFloat(values[0]);
@@ -906,11 +914,9 @@ function loadSharedCode() {
         document.getElementById('customizeView').dispatchEvent(new Event('change'));
       }
 
-      // Restore slider values
+      // Store slider values to be applied after sliders are created
       if (shareData.sliders) {
-        for (const [label, value] of Object.entries(shareData.sliders)) {
-          slidersValuesCache.set(label, value);
-        }
+        window.sharedSliderValues = shareData.sliders;
       }
 
     } catch (error) {
