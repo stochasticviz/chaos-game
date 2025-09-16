@@ -313,14 +313,16 @@ function generatePoints(debugMode, consumePoints) {
           return alphaValue;
       }
   };
-  // vertices() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
-  scope['vertices'] = function(numVertices) {
+  // targets() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
+  scope['targets'] = function(numVertices) {
       if (targets.length !== numVertices) {
           setVerticesCount(numVertices)
           scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
           scope['targetPointsLength'] = targets.length;
       }
   }
+  scope['vertices'] = scope['targets']  // vertices() user function name is deprecated but supported
+
   let points = [];
   let pointsInViewCount = 0;
   let currentPointsArray = null;
@@ -780,7 +782,7 @@ function generateShareableLink() {
   const shareData = {
     initCode: initCode,
     mainCode: mainCode,
-    vertices: document.getElementById('vertices').value,
+    targets: document.getElementById('vertices').value,
     steps: document.getElementById('steps').value,
     alpha: document.getElementById('alpha').value,
     centerX: document.getElementById('centerX').value,
@@ -877,8 +879,8 @@ function loadSharedCode() {
       }
 
       // Restore form field values
-      if (shareData.vertices !== undefined) {
-        document.getElementById('vertices').value = shareData.vertices;
+      if (shareData.targets !== undefined) {
+        document.getElementById('vertices').value = shareData.targets;
       }
 
       if (shareData.steps !== undefined) {

@@ -33,7 +33,7 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
 <body>
 <h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a>!</h1>
 <div id="controls">
-  <label for="vertices">Vertices:</label>
+  <label for="vertices">Targets:</label>
   <input type="number" id="vertices" value="3" min="1"/>
 
   <label for="steps">Points:</label>
@@ -70,7 +70,7 @@ Write your own code to calculate where the next point should be, by setting the 
       <strong>write() function</strong> Write text to the page. Example: <code>write(currentPoint)</code>
     </li>
     <li>
-      <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target vertex" in the advanced examples, below.
+      <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target" in the advanced examples, below.
     </li>
     <li>
       <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
@@ -80,7 +80,7 @@ The following functions are usually used in the optional initialization code:
 
   <ul>
     <li>
-      <strong>vertices(), points(), and opacity() functions</strong> Set the fields seen above, programmatically. Example: <code>vertices(5)</code> will set the Vertices field to 5.
+      <strong>targets(), points(), and opacity() functions</strong> Set the fields seen above, programmatically. Example: <code>targets(5)</code> will set the Targets field to 5.
     </li>
     <li>
       <strong>zoom() and pan() functions</strong> Set the zoom level or center of view fields (see below) programmatically.
@@ -102,19 +102,19 @@ point2 = transpose(multiply(B, transpose(currentPoint)) - transpose(matrix([[.5,
 nextPoint = randomInt() ? point1 : point2</pre>
   </div>
   <div class="codeBlock">
-    Advanced example - Avoid previous target vertex:
+    Advanced example - Avoid previous target:
     <pre class="codeExample">
 # IMPORTANT! Put these two lines in the "Optional initialization code" pane.
-previous_vertex = -1  # start with a non-existing vertex
+previous_target = -1  # start with a non-existing target
 slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
 
 # The rest of this code goes in the main pane
 
-# Get all possible indices except the vertex we used in the last iteration
+# Get all possible indices except the target we used in the last iteration
 _possibleTargetIndices = math.range(1, targetPointsLength+1)
-_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != previous_vertex]
+_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != previous_target]
 
-# Pick a random target vertex
+# Pick a random target
 _nextTargetIndex = math.pickRandom(_possibleTargetIndices)
 # ... and get its coordinates
 _nextTarget = targetPoints[_nextTargetIndex, :]
@@ -122,13 +122,13 @@ _nextTarget = targetPoints[_nextTargetIndex, :]
 # Make next point midway to the target
 nextPoint = (currentPoint + _nextTarget) * slider
 
-# Store current vertex for next iteration
-previous_vertex = _nextTargetIndex</pre>
+# Store current target for next iteration
+previous_target = _nextTargetIndex</pre>
   </div>
     Advanced example - The Corcoran Attractor:
     <div class="codeBlock">
       <pre class="codeExample">
-# try sine_scale of 1/3 and 12 vertices with a 3 million points and 0.1 opacity!
+# try sine_scale of 1/3 and 12 targets with a 3 million points and 0.1 opacity!
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
