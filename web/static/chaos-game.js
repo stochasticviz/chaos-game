@@ -775,7 +775,8 @@ function generateShareableLink() {
     advancedExamplesToggle: document.getElementById('advanced-examples-toggle').checked,
     debugMode: document.getElementById('debugMode').checked,
     customizeView: document.getElementById('customizeView').checked,
-    sliders: Object.fromEntries(slidersValuesCache)
+    sliders: Object.fromEntries(slidersValuesCache),
+    vertexPositions: targets.map(target => ({ x: target.x, y: target.y }))
   };
 
   // Encode the data as a URL parameter
@@ -917,6 +918,11 @@ function loadSharedCode() {
       // Store slider values to be applied after sliders are created
       if (shareData.sliders) {
         window.sharedSliderValues = shareData.sliders;
+      }
+
+      // Restore vertex positions
+      if (shareData.vertexPositions && Array.isArray(shareData.vertexPositions)) {
+        targets = shareData.vertexPositions.map(pos => ({ x: pos.x, y: pos.y }));
       }
 
     } catch (error) {
