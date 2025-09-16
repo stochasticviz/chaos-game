@@ -164,14 +164,17 @@ let writeToDOMLastOutput = [];
 let writeToDOMCurrentOutput = [];
 let writeToDOMRepetitionCount = 1;
 
-function writeToDOM(text) {
+function writeToDOM(...args) {
   if (!writeToDOMDiv) {
     writeToDOMDiv = document.createElement('div');
     writeToDOMDiv.style.cssText = 'background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap;';
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.parentNode.insertBefore(writeToDOMDiv, errorDiv);
   }
-  text = String(text)
+  
+  // Join all arguments with spaces, similar to Python's print()
+  const text = args.map(arg => String(arg)).join(' ');
+  
   const writeToDOMTextNode = document.createTextNode(text + '\n');
   writeToDOMDiv.appendChild(writeToDOMTextNode);
   writeToDOMCurrentOutput.push(text);
