@@ -51,7 +51,7 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
 </div>
 
 <div id="codeExplanation">
-Write your own code to calculate where the next point should be, by setting the <code>nextPoint</code> variable. The default code simply picks one of the targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target target,  <code>targetPoints</code>. Both are matrices. The <code>nextPoint</code> variable must be set to an array of two numbers like <code>[100, 200]</code>, a matrix like <code>[[100, 200]]</code>, or a complex number like <code>complex(100, 200)</code>.<br/>
+Write your own code to calculate where the next point should be, by setting the <code>nextPoint</code> variable. <code>nextPoint</code> must be an array of two numbers <code>[100, 200]</code>, a matrix <code>[[100, 200]]</code>, or a complex number <code>complex(100, 200)</code>. The default code simply picks one of the targets at random and moves the current point halfway there. But you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target, <code>targetPoints</code>. Both are matrices.<br/>
 
 <input type="checkbox" id="examples-toggle">
 <label for="examples-toggle" class="child-checkbox-label">Show examples</label>
@@ -62,12 +62,10 @@ Write your own code to calculate where the next point should be, by setting the 
 <div class="advanced-stuff">
   <ul>
     <li>
-      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then if you have <code>nextPoint = currentPoint + t</code>, this gives your end user 'live' control over the scalar value, t, to add to currentPoint. See also this: <code>slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)</code> in the default code, below.
-     </li>
-
+      <strong>write() function</strong> Write text to the page. Example: <code>write(currentPoint)</code>
     </li>
     <li>
-      <strong>write() function</strong> Write text to the page. Example: <code>write(currentPoint)</code>
+      <strong>nextPointColor</strong> If you set the variable <code>nextPointColor</code> to "red" or "rgb(255, 0, 0)" or [255, 0, 0] the next point will be plotted in red instead of black. Example: <code>nextPointColor = [111, 200, 15]</code>.
     </li>
     <li>
       <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target" in the advanced examples, below.
@@ -79,6 +77,9 @@ Write your own code to calculate where the next point should be, by setting the 
 The following functions are usually used in the optional initialization code:
 
   <ul>
+    <li>
+      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then if you have <code>nextPoint = currentPoint + t</code>, this gives your end user 'live' control over the scalar value, t, to add to currentPoint. See also this: <code>slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)</code> in the default code, below.
+    </li>
     <li>
       <strong>targets(), points(), and opacity() functions</strong> Set the fields seen above, programmatically. Example: <code>targets(5)</code> will set the Targets field to 5.
     </li>
