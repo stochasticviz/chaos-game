@@ -70,6 +70,14 @@ function createUserControl(label, min, max, defaultValue) {
     slidersValuesCache.set(label, defaultValue);
     valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
+    // Check for cached value from share link and update if exists
+    if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
+        const sharedValue = window.sharedSliderValues[label];
+        slider.noUiSlider.set(sharedValue);
+        slidersValuesCache.set(label, sharedValue);
+        valueDisplay.innerHTML = '<big>' + sharedValue.toFixed(2) + '</big>';
+    }
+
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
         const newValue = parseFloat(values[0]);
@@ -760,7 +768,15 @@ function generateShareableLink() {
     alpha: document.getElementById('alpha').value,
     centerX: document.getElementById('centerX').value,
     centerY: document.getElementById('centerY').value,
-    zoom: document.getElementById('zoom').value
+    zoom: document.getElementById('zoom').value,
+    customizeMathJSCode: document.getElementById('customizeMathJSCode').checked,
+    examplesToggle: document.getElementById('examples-toggle').checked,
+    advancedStuffToggle: document.getElementById('advanced-stuff-toggle').checked,
+    advancedExamplesToggle: document.getElementById('advanced-examples-toggle').checked,
+    debugMode: document.getElementById('debugMode').checked,
+    customizeView: document.getElementById('customizeView').checked,
+    sliders: Object.fromEntries(slidersValuesCache),
+    vertexPositions: targets.map(target => ({ x: target.x, y: target.y }))
   };
 
   // Encode the data as a URL parameter
@@ -866,6 +882,47 @@ function loadSharedCode() {
 
       if (shareData.zoom !== undefined) {
         document.getElementById('zoom').value = shareData.zoom;
+      }
+
+      // Restore checkbox states
+      if (shareData.customizeMathJSCode !== undefined) {
+        document.getElementById('customizeMathJSCode').checked = shareData.customizeMathJSCode;
+        document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.examplesToggle !== undefined) {
+        document.getElementById('examples-toggle').checked = shareData.examplesToggle;
+        document.getElementById('examples-toggle').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.advancedStuffToggle !== undefined) {
+        document.getElementById('advanced-stuff-toggle').checked = shareData.advancedStuffToggle;
+        document.getElementById('advanced-stuff-toggle').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.advancedExamplesToggle !== undefined) {
+        document.getElementById('advanced-examples-toggle').checked = shareData.advancedExamplesToggle;
+        document.getElementById('advanced-examples-toggle').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.debugMode !== undefined) {
+        document.getElementById('debugMode').checked = shareData.debugMode;
+        document.getElementById('debugMode').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.customizeView !== undefined) {
+        document.getElementById('customizeView').checked = shareData.customizeView;
+        document.getElementById('customizeView').dispatchEvent(new Event('change'));
+      }
+
+      // Store slider values to be applied after sliders are created
+      if (shareData.sliders) {
+        window.sharedSliderValues = shareData.sliders;
+      }
+
+      // Restore vertex positions
+      if (shareData.vertexPositions && Array.isArray(shareData.vertexPositions)) {
+        targets = shareData.vertexPositions.map(pos => ({ x: pos.x, y: pos.y }));
       }
 
     } catch (error) {
