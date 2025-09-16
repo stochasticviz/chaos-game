@@ -615,6 +615,7 @@ function toggleProgressIndicator(show) {
 }
 
 async function generateAndDraw() {
+  const generationId = currentGenerationId + 1;
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
@@ -633,7 +634,7 @@ async function generateAndDraw() {
   document.getElementById('errorMessage').innerHTML = '';
 
   const generateBtn = document.getElementById('generateBtn');
-  generateBtn.disabled = true;
+  generateBtn.textContent = 'Stop';
 
   try {
       if (targets.length !== vertices) {
@@ -673,7 +674,11 @@ async function generateAndDraw() {
       return;
     }
   } finally {
-    generateBtn.disabled = false;
+    // Only reset button if this generation wasn't superseded by a newer one
+    if (generationId === currentGenerationId) {
+      generateBtn.textContent = 'Generate';
+      generateBtn.disabled = false;
+    }
     // Clear the regenerate timeout flag
     canvas.regenerateTimeout = null;
   }
@@ -752,7 +757,19 @@ canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseleave', handleMouseUp);
-document.getElementById('generateBtn').addEventListener('click', generateAndDraw);
+document.getElementById('generateBtn').addEventListener('click', function() {
+  const generateBtn = document.getElementById('generateBtn');
+  if (generateBtn.textContent === 'Stop') {
+    // Stop generation by incrementing the generation ID
+    currentGenerationId++;
+    // Hide the progress indicator
+    toggleProgressIndicator(false);
+    // Reset button to Generate immediately
+    generateBtn.textContent = 'Generate';
+  } else {
+    generateAndDraw();
+  }
+});
 
 // Share functionality
 function generateShareableLink() {
