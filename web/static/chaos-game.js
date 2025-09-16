@@ -760,7 +760,14 @@ function generateShareableLink() {
     alpha: document.getElementById('alpha').value,
     centerX: document.getElementById('centerX').value,
     centerY: document.getElementById('centerY').value,
-    zoom: document.getElementById('zoom').value
+    zoom: document.getElementById('zoom').value,
+    customizeMathJSCode: document.getElementById('customizeMathJSCode').checked,
+    examplesToggle: document.getElementById('examples-toggle').checked,
+    advancedStuffToggle: document.getElementById('advanced-stuff-toggle').checked,
+    advancedExamplesToggle: document.getElementById('advanced-examples-toggle').checked,
+    debugMode: document.getElementById('debugMode').checked,
+    customizeView: document.getElementById('customizeView').checked,
+    sliders: Object.fromEntries(slidersValuesCache)
   };
 
   // Encode the data as a URL parameter
@@ -866,6 +873,38 @@ function loadSharedCode() {
 
       if (shareData.zoom !== undefined) {
         document.getElementById('zoom').value = shareData.zoom;
+      }
+
+      // Restore checkbox states
+      if (shareData.customizeMathJSCode !== undefined) {
+        document.getElementById('customizeMathJSCode').checked = shareData.customizeMathJSCode;
+      }
+
+      if (shareData.examplesToggle !== undefined) {
+        document.getElementById('examples-toggle').checked = shareData.examplesToggle;
+      }
+
+      if (shareData.advancedStuffToggle !== undefined) {
+        document.getElementById('advanced-stuff-toggle').checked = shareData.advancedStuffToggle;
+      }
+
+      if (shareData.advancedExamplesToggle !== undefined) {
+        document.getElementById('advanced-examples-toggle').checked = shareData.advancedExamplesToggle;
+      }
+
+      if (shareData.debugMode !== undefined) {
+        document.getElementById('debugMode').checked = shareData.debugMode;
+      }
+
+      if (shareData.customizeView !== undefined) {
+        document.getElementById('customizeView').checked = shareData.customizeView;
+      }
+
+      // Restore slider values
+      if (shareData.sliders) {
+        for (const [label, value] of Object.entries(shareData.sliders)) {
+          slidersValuesCache.set(label, value);
+        }
       }
 
     } catch (error) {
