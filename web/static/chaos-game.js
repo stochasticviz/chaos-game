@@ -40,7 +40,7 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 });
 
 // Function to create a user control
-function createUserControl(label, min, max, defaultValue) {
+function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true) {
     const container = document.createElement('div');
     container.className = 'slider';
 
@@ -85,9 +85,14 @@ function createUserControl(label, min, max, defaultValue) {
         if (newValue !== oldValue) {
             slidersValuesCache.set(label, newValue);
             valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>' ;
-            // Regenerate points when slider changes
-            clearTimeout(canvas.regenerateTimeout);
-            canvas.regenerateTimeout = setTimeout(generateAndDraw, 200);
+            if (clearPointsWhenChanged) {
+                // Regenerate points when slider changes
+                clearTimeout(canvas.regenerateTimeout);
+                canvas.regenerateTimeout = setTimeout(() => generateAndDraw(true), 200);
+            } else {
+                clearTimeout(canvas.regenerateTimeout);
+                canvas.regenerateTimeout = setTimeout(() => generateAndDraw(false), 200);
+            }
         }
     });
 
@@ -248,11 +253,11 @@ function generatePoints(debugMode, consumePoints) {
       pointsQueue: [],
       hasKey: hasKey,
       write: writeToDOM,
-      createSlider: function(label, min, max, defaultValue) {
+      createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
           const sliders = document.getElementById('sliders');
           if (!slidersValuesCache.has(label)) {
               VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
-              const control = createUserControl(label, min, max, defaultValue);
+              const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged);
               sliders.appendChild(control);
           }
           return slidersValuesCache.get(label) || defaultValue;
@@ -619,7 +624,7 @@ function toggleProgressIndicator(show) {
   progressIndicator.style.display = show ? 'block' : 'none';
 }
 
-async function generateAndDraw() {
+async function generateAndDraw(clearPoints = true) {
   const generationId = currentGenerationId + 1;
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
@@ -645,13 +650,17 @@ async function generateAndDraw() {
       if (targets.length !== vertices) {
           setVerticesCount(vertices);
       }
-    // save the current transformation matrix
-    ctx.save();
-    // use the identity matrix while clearing the canvas
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // restore the transform
-    ctx.restore();
+
+    // Clear canvas only if requested
+    if (clearPoints) {
+      // save the current transformation matrix
+      ctx.save();
+      // use the identity matrix while clearing the canvas
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // restore the transform
+      ctx.restore();
+    }
 
     await new Promise(resolve => setTimeout(resolve, 5));
 
@@ -772,8 +781,12 @@ document.getElementById('generateBtn').addEventListener('click', function() {
     // Reset button to Generate immediately
     generateBtn.textContent = 'Generate';
   } else {
-    generateAndDraw();
+    generateAndDraw(true);
   }
+});
+
+document.getElementById('generateAddBtn').addEventListener('click', function() {
+  generateAndDraw(false);
 });
 
 // Share functionality

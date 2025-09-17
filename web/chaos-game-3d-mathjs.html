@@ -73,6 +73,7 @@ if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.h
   <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
 
   <button id="generateBtn">Generate</button>
+  <button id="generateAddBtn">Generate (add to existing)</button>
   <button id="shareBtn">Share</button>
 </div>
 <div>
@@ -108,7 +109,7 @@ The following functions are usually used in the optional initialization code:
 
   <ul>
     <li>
-      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then if you have <code>nextPoint = currentPoint + t</code>, this gives your end user 'live' control over the scalar value, t, to add to currentPoint. See also this: <code>slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)</code> in the default code, below.
+      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then ex. <code>nextPoint = currentPoint + t</code> in your code gives your end user 'live' control over the scalar value, <code>t</code>. Optionally you can specifiy a 5th parameter which, when <code>false</code>, prevents the existing points from being cleared when the user slides the slider. Example: <code>slider = createSlider("rotation", 0, 6.28, 0, false)</code>.
     </li>
     <li>
       <strong>targets(), points(), and opacity() functions</strong> Set the fields seen above, programmatically. Example: <code>targets(5)</code> will set the Targets field to 5.
@@ -189,7 +190,7 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
   <br/>
   <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
   <textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
-currentPoint = [[100, 100, 100]]
+currentPoint = [[100, 100, 100]]  # arbitrary starting point
   </textarea>
 
 </div>
@@ -250,7 +251,7 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
   </div>
 </div>
 
-<script type="module" src="static/chaos-game-3d.js?v=2f869cc"></script>
+<script type="module" src="static/chaos-game-3d.js?v=659dc3c7"></script>
 <div><small><a href="https://github.com/herdrick/chaos-game/">source</a>&nbsp;&nbsp;&nbsp;<a href="chaos-game.html">2D version</a></small></div>
 </body>
 </html>
