@@ -735,7 +735,19 @@ function generateShareableLink() {
     alpha: document.getElementById('alpha').value,
     customizeMathJSCode: document.getElementById('customizeMathJSCode').checked,
     debugMode: document.getElementById('debugMode').checked,
-    sliders: Object.fromEntries(slidersValuesCache)
+    sliders: Object.fromEntries(slidersValuesCache),
+    camera: {
+      position: {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z
+      },
+      target: {
+        x: controls.target.x,
+        y: controls.target.y,
+        z: controls.target.z
+      }
+    }
   };
 
   const encodedData = encodeURIComponent(btoa(JSON.stringify(shareData)));
@@ -809,6 +821,25 @@ function loadSharedCode() {
 
       if (shareData.sliders) {
         window.sharedSliderValues = shareData.sliders;
+      }
+
+      if (shareData.camera) {
+        // Restore camera position and target
+        if (shareData.camera.position) {
+          camera.position.set(
+            shareData.camera.position.x,
+            shareData.camera.position.y,
+            shareData.camera.position.z
+          );
+        }
+        if (shareData.camera.target) {
+          controls.target.set(
+            shareData.camera.target.x,
+            shareData.camera.target.y,
+            shareData.camera.target.z
+          );
+        }
+        controls.update();
       }
 
     } catch (error) {
