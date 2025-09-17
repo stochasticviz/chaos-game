@@ -888,6 +888,4 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
 // Initialize everything
 initThreeJS();
 loadSharedCode();
-setVerticesCount(4);
-createTargetVertices(4);
 generateAndDraw();
