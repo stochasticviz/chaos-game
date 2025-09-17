@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Play around with the 3D chaos game</title>
+  <link rel="stylesheet" href="static/chaos-game.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
+  <style>
+    #threejs-container {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      border: 1px solid #ccc;
+      margin: 10px 0;
+    }
+    #controls3d {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      max-width: 200px;
+    }
+    #progress-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+  </style>
+<script>
+if (["herdrick.github.io", "stochasticviz.github.io"].includes(window.location.hostname)) {
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){
+        function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){
+            t.push([e].concat(Array.prototype.slice.call(arguments,0)))
+        }}
+        (p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,
+        p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",
+        (r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);
+        var u=e;
+        for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){
+            var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e
+        },u.people.toString=function(){return u.toString(1)+".people (stub)"},
+        o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId".split(" "),
+        n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])
+    },e.__SV=1)}(document,window.posthog||[]);
+
+    posthog.init('phc_VgjFl2kzM4ipDWGy1kIZMOgSNrZqecVZR8QvYbvIX7K', {
+        api_host:'https://us.i.posthog.com',
+        person_profiles: 'identified_only'
+    });
+}
+</script>
+</head>
+<body>
+<h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a> in 3D!</h1>
+<div id="controls">
+  <label for="vertices">Targets:</label>
+  <input type="number" id="vertices" value="4" min="1"/>
+
+  <label for="steps">Points:</label>
+  <input type="number" id="steps" value="100000" step="50000"/>
+
+  <label for="alpha">Opacity (0.0 - 1.0):</label>
+  <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
+
+  <button id="generateBtn">Generate</button>
+  <button id="shareBtn">Share</button>
+</div>
+<div>
+  <input type="checkbox" id="customizeMathJSCode" />
+  <label for="customizeMathJSCode">Customize the "next point" code</label>
+</div>
+
+<div id="codeExplanation">
+Write your own code to calculate where the next point should be, by setting the <code>nextPoint</code> variable. <code>nextPoint</code> must be an array of three numbers <code>[100, 200, 300]</code> or a matrix <code>[[100, 200, 300]]</code>. The default code simply picks one of the targets at random and moves the current point halfway there, but you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target, <code>targetPoints</code>. Both are matrices.<br/>
+
+<input type="checkbox" id="examples-toggle">
+<label for="examples-toggle" class="child-checkbox-label">Show examples</label>
+<br>
+<input type="checkbox" id="advanced-stuff-toggle">
+<label for="advanced-stuff-toggle" class="child-checkbox-label">Show advanced</label>
+
+<div class="advanced-stuff">
+  <ul>
+    <li>
+      <strong>write() function</strong> Write text to the page. Example: <code>write("currentPoint:", currentPoint)</code>
+    </li>
+    <li>
+      <strong>nextPointColor</strong> If you set the variable <code>nextPointColor</code> to "red" or "rgb(255, 0, 0)" or [255, 0, 0] the next point will be plotted in red instead of white. Example: <code>nextPointColor = [111, 200, 15]</code>.
+    </li>
+    <li>
+      <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target" in the advanced examples, below.
+    </li>
+    <li>
+      <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
+    </li>
+  </ul>
+The following functions are usually used in the optional initialization code:
+
+  <ul>
+    <li>
+      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then if you have <code>nextPoint = currentPoint + t</code>, this gives your end user 'live' control over the scalar value, t, to add to currentPoint. See also this: <code>slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)</code> in the default code, below.
+    </li>
+    <li>
+      <strong>targets(), points(), and opacity() functions</strong> Set the fields seen above, programmatically. Example: <code>targets(5)</code> will set the Targets field to 5.
+    </li>
+  </ul>
+
+  <input type="checkbox" id="advanced-examples-toggle">
+  <label for="advanced-examples-toggle" class="child-checkbox-label">Show advanced examples</label>
+
+  <div class="advanced-examples">
+  <div class="codeBlock">
+    Advanced example - 3D fractal with rotation:
+    <pre class="codeExample">
+# IMPORTANT! Put this line in the "Optional initialization code" pane.
+slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
+rotateSlider = createSlider("rotation factor", 0, 2*math.pi, 0.1)
+
+# The rest of this code goes in the main pane
+# Pick a random target
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+
+# Apply rotation around the Z axis
+rotationMatrix = [[math.cos(rotateSlider), -math.sin(rotateSlider), 0],
+                  [math.sin(rotateSlider), math.cos(rotateSlider), 0],
+                  [0, 0, 1]]
+rotatedTarget = math.multiply(rotationMatrix, math.transpose(_nextTarget))
+nextPoint = currentPoint + (math.transpose(rotatedTarget) - currentPoint) * slider</pre>
+  </div>
+  <div class="codeBlock">
+    Advanced example - Avoid previous target in 3D:
+    <pre class="codeExample">
+# IMPORTANT! Put these two lines in the "Optional initialization code" pane.
+previous_target = -1  # start with a non-existing target
+slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
+
+# The rest of this code goes in the main pane
+
+# Get all possible indices except the target we used in the last iteration
+_possibleTargetIndices = math.range(1, targetPointsLength+1)
+_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != previous_target]
+
+# Pick a random target
+_nextTargetIndex = math.pickRandom(_possibleTargetIndices)
+# ... and get its coordinates
+_nextTarget = targetPoints[_nextTargetIndex, :]
+
+# Make next point move toward the target
+nextPoint = (currentPoint + _nextTarget) * slider
+
+# Store current target for next iteration
+previous_target = _nextTargetIndex</pre>
+  </div>
+  <div class="codeBlock">
+    Advanced example - The Corcoran Attractor in 3D:
+    <pre class="codeExample">
+# try sine_scale of 1/3 and 12 targets with 3 million points and 0.1 opacity!
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+
+# Create user controls for the parameters
+sine_shift = createSlider("Sine shift", 0, 2*math.pi, math.pi*29/25)
+sine_scale = createSlider("Sine scale", -3/2, 4, 1/2)
+sine_offset = createSlider("Sine offset", -1, 7/4, 1/2)
+
+displacement_factors = math.matrix([
+  [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
+   math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset,
+   math.sin(_nextTarget[1,3] + sine_shift) * sine_scale + sine_offset]
+])
+# Apply the factors to the displacement
+displacement_to_target = _nextTarget - currentPoint
+nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
+  </div>
+  </div>
+
+  <br/>
+  <br/>
+  <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
+  <textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
+currentPoint = [[100, 100, 100]]
+  </textarea>
+
+</div>
+
+<div class="examples-docs">
+  <h4>Examples:</h4>
+  <div class="codeBlock">
+    Add 1 to x, y, and z:
+    <pre class="codeExample">
+nextPoint = currentPoint + 1</pre>
+  </div>
+
+  <div class="codeBlock">
+    3D rotation around target:
+    <pre class="codeExample">
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+midpoint = (currentPoint + _nextTarget) / 2
+# Rotation around Z axis
+rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4), 0],
+            [math.sin(math.pi/4), math.cos(math.pi/4), 0],
+            [0, 0, 1]]
+nextPoint = math.multiply(midpoint, rotation)</pre>
+  </div>
+
+</div>
+</div> <!-- codeExplanation -->
+
+<label for="nextVertexAndPointMathJSCode">Code to calculate the next point:</label>
+<textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
+# Pick a random target vertex
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+
+# ... and get its coordinates
+_nextTarget = targetPoints[nextTargetIndex, :]
+
+# Create a slider to let the user control how far to go toward the target
+slider = createSlider("how far to go toward the target", 0.02, 1.4, 0.5)
+
+nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
+</textarea>
+<div id="debugModeDiv" >
+    <input type="checkbox" id="debugMode" />
+    <label for="debugMode" class="child-checkbox-label">Debug mode (slow, shows error messages)</label>
+</div>
+<div id="errorMessage">
+</div>
+
+<div id="sliders"></div>
+<div id="progress-indicator"></div>
+
+<div id="threejs-container">
+  <div id="controls3d">
+    <strong>3D Controls:</strong><br>
+    • Orbit: Left click + drag<br>
+    • Zoom: Mouse wheel<br>
+    • Pan: Right click + drag
+  </div>
+</div>
+
+<script type="module" src="static/chaos-game-3d.js?v=2f869cc"></script>
+<div><small><a href="https://github.com/herdrick/chaos-game/">source</a>&nbsp;&nbsp;&nbsp;<a href="chaos-game.html">2D version</a></small></div>
+</body>
+</html>
