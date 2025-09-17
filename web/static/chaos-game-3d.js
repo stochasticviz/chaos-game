@@ -34,7 +34,10 @@ function initThreeJS() {
   camera.position.set(100, 300, 800);
 
   // Renderer setup
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    preserveDrawingBuffer: true
+  });
   renderer.setSize(container.offsetWidth, container.offsetHeight);
   container.appendChild(renderer.domElement);
 
@@ -176,7 +179,7 @@ document.getElementById('customizeMathJSCode').addEventListener('change', functi
 });
 
 // Function to create a user control (from 2D version)
-function createUserControl(label, min, max, defaultValue) {
+function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true) {
   const container = document.createElement('div');
   container.className = 'slider';
 
@@ -218,8 +221,13 @@ function createUserControl(label, min, max, defaultValue) {
     if (newValue !== oldValue) {
       slidersValuesCache.set(label, newValue);
       valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>';
-      clearTimeout(generateAndDraw.regenerateTimeout);
-      generateAndDraw.regenerateTimeout = setTimeout(generateAndDraw, 200);
+      if (clearPointsWhenChanged) {
+        clearTimeout(generateAndDraw.regenerateTimeout);
+        generateAndDraw.regenerateTimeout = setTimeout(() => generateAndDraw(true), 200);
+      } else {
+        clearTimeout(generateAndDraw.regenerateTimeout);
+        generateAndDraw.regenerateTimeout = setTimeout(() => generateAndDraw(false), 200);
+      }
     }
   });
 
@@ -375,11 +383,11 @@ function generatePoints(debugMode, consumePoints) {
     pointsQueue: [],
     hasKey: hasKey,
     write: writeToDOM,
-    createSlider: function(label, min, max, defaultValue) {
+    createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
       const sliders = document.getElementById('sliders');
       if (!slidersValuesCache.has(label)) {
         VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
-        const control = createUserControl(label, min, max, defaultValue);
+        const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged);
         sliders.appendChild(control);
       }
       return slidersValuesCache.get(label) || defaultValue;
@@ -607,17 +615,10 @@ function generatePoints(debugMode, consumePoints) {
 }
 
 function drawPoints3D(pointsData, alphaValue) {
-  // Remove existing points mesh
-  if (pointsMesh) {
-    scene.remove(pointsMesh);
-    if (pointsGeometry) pointsGeometry.dispose();
-    if (pointsMaterial) pointsMaterial.dispose();
-  }
-
   if (pointsData.length === 0) return;
 
-  // Create geometry
-  pointsGeometry = new THREE.BufferGeometry();
+  // Create geometry for this batch
+  const geometry = new THREE.BufferGeometry();
 
   // Prepare position and color arrays
   const positions = new Float32Array(pointsData.length * 3);
@@ -636,11 +637,11 @@ function drawPoints3D(pointsData, alphaValue) {
     colors[idx + 2] = color.b;
   });
 
-  pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  pointsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-  // Create material
-  pointsMaterial = new THREE.PointsMaterial({
+  // Create material for this batch
+  const material = new THREE.PointsMaterial({
     size: 2,
     vertexColors: true,
     transparent: true,
@@ -648,9 +649,9 @@ function drawPoints3D(pointsData, alphaValue) {
     sizeAttenuation: false
   });
 
-  // Create points mesh
-  pointsMesh = new THREE.Points(pointsGeometry, pointsMaterial);
-  scene.add(pointsMesh);
+  // Create points mesh for this batch
+  const mesh = new THREE.Points(geometry, material);
+  scene.add(mesh);
 }
 
 function toggleProgressIndicator(show) {
@@ -658,7 +659,7 @@ function toggleProgressIndicator(show) {
   progressIndicator.style.display = show ? 'block' : 'none';
 }
 
-async function generateAndDraw() {
+async function generateAndDraw(clearPoints = true) {
   const generationId = currentGenerationId + 1;
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
@@ -685,22 +686,27 @@ async function generateAndDraw() {
       createTargetVertices(vertices);
     }
 
-    // Clear existing points
-    if (pointsMesh) {
-      scene.remove(pointsMesh);
+    // Clear existing points only if requested
+    if (clearPoints) {
+      // Clear the entire scene of points
+      scene.children.filter(child => child instanceof THREE.Points).forEach(points => {
+        scene.remove(points);
+        if (points.geometry) points.geometry.dispose();
+        if (points.material) points.material.dispose();
+      });
+      // Also clear the canvas buffer
+      renderer.clear();
     }
 
     await new Promise(resolve => setTimeout(resolve, 5));
 
     toggleProgressIndicator(true);
-    let allPoints = [];
 
     try {
       await generatePoints(debugMode, (progress, points) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
-        allPoints = allPoints.concat(points);
-        drawPoints3D(allPoints, alphaValue);
+        drawPoints3D(points, alphaValue);
       });
 
       if (document.getElementById('progress-indicator').textContent.includes('100%')) {
@@ -856,8 +862,12 @@ document.getElementById('generateBtn').addEventListener('click', function() {
     toggleProgressIndicator(false);
     generateBtn.textContent = 'Generate';
   } else {
-    generateAndDraw();
+    generateAndDraw(true);
   }
+});
+
+document.getElementById('generateAddBtn').addEventListener('click', function() {
+  generateAndDraw(false);
 });
 
 document.getElementById('shareBtn').addEventListener('click', async () => {
