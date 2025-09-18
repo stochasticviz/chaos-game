@@ -258,6 +258,7 @@ function handleMathJSExpressionsError(error) {
   throw error;
 }
 
+
 function hasKey(obj, key) {
   const type = obj === null ? 'null' : typeof obj;
   const className = (obj && obj.constructor && obj.constructor.name) || type;
@@ -614,7 +615,7 @@ function generatePoints(debugMode, consumePoints) {
   });
 }
 
-function drawPoints3D(pointsData, alphaValue) {
+function drawPoints3D_old(pointsData, alphaValue) {
   if (pointsData.length === 0) return;
 
   // Create geometry for this batch
@@ -660,12 +661,19 @@ function drawPoints3D(pointsData, alphaValue) {
 function drawPoints3D(pointsData, defaultAlpha) {
   if (pointsData.length === 0) return;
 
+  // Helper function to extract alpha from color string
+  function extractAlphaFromColor(colorString) {
+    const rgbaMatch = colorString.match(/rgba?\([\d\s,]+,\s*([\d.]+)\)/);
+    return rgbaMatch ? parseFloat(rgbaMatch[1]) : 1.0;
+  }
+
   // Use a map to group points by their color and alpha
   const pointGroups = new Map();
 
   pointsData.forEach(point => {
-    const color = point.color || '#ffffff';
-    const alpha = point.alpha || defaultAlpha;
+    const color = point.color;
+    // Extract alpha from the color string, or use defaultAlpha
+    const alpha = point.alpha || extractAlphaFromColor(color) || defaultAlpha;
     const key = `${color}-${alpha}`;
 
     if (!pointGroups.has(key)) {
