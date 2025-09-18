@@ -21,6 +21,13 @@ let draggedVertexIndex = -1;
 // Store user control values
 const slidersValuesCache = new Map();
 
+function getRandomVisiblePoint() {
+    const x = (Math.random() - 0.5) * SPHERE_RADIUS;
+    const y = (Math.random() - 0.5) * SPHERE_RADIUS;
+    const z = (Math.random() - 0.5) * SPHERE_RADIUS;
+    return math.matrix([[x, y, z]]);
+}
+
 // Initialize Three.js scene
 function initThreeJS() {
   const container = document.getElementById('threejs-container');
@@ -422,12 +429,6 @@ function generatePoints(debugMode, consumePoints) {
   let firstTime = true;
   let resultSet = null;
 
-  function getRandomVisiblePoint() {
-    const x = (Math.random() - 0.5) * SPHERE_RADIUS;
-    const y = (Math.random() - 0.5) * SPHERE_RADIUS;
-    const z = (Math.random() - 0.5) * SPHERE_RADIUS;
-    return math.matrix([[x, y, z]]);
-  }
 
   function addPointsToQueue(pointOrPoints) {
     if (!pointOrPoints) return;
