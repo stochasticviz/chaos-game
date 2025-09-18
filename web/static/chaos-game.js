@@ -460,7 +460,7 @@ function generatePoints(debugMode, consumePoints) {
         }
         // Update currentPoint from nextPoint for next iteration
         if (scope.nextPoint !== undefined) {
-          scope.currentPoint = scope.nextPoint.toArray ? scope.nextPoint : math.matrix([scope.nextPoint]);
+          scope.currentPoint = scope.nextPoint;
           scope.nextPoint = undefined;
         }
 
