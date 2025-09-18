@@ -595,45 +595,6 @@ function generatePoints(debugMode, consumePoints) {
   });
 }
 
-function drawPoints3D_old(pointsData, alphaValue) {
-  if (pointsData.length === 0) return;
-
-  // Create geometry for this batch
-  const geometry = new THREE.BufferGeometry();
-
-  // Prepare position and color arrays
-  const positions = new Float32Array(pointsData.length * 3);
-  const colors = new Float32Array(pointsData.length * 3);
-
-  pointsData.forEach((point, i) => {
-    const idx = i * 3;
-    positions[idx] = point.x;
-    positions[idx + 1] = point.y;
-    positions[idx + 2] = point.z;
-
-    // Parse color (default to white if parsing fails)
-    const color = new THREE.Color(point.color || 0xffffff);
-    colors[idx] = color.r;
-    colors[idx + 1] = color.g;
-    colors[idx + 2] = color.b;
-  });
-
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-  // Create material for this batch
-  const material = new THREE.PointsMaterial({
-    size: 2,
-    vertexColors: true,
-    transparent: true,
-    opacity: alphaValue,
-    sizeAttenuation: false
-  });
-
-  // Create points mesh for this batch
-  const mesh = new THREE.Points(geometry, material);
-  scene.add(mesh);
-}
 
 // A global or module-level variable to store the default alpha value
 //const defaultAlpha = 0.5;
