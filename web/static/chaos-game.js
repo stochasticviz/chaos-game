@@ -249,8 +249,6 @@ function generatePoints(debugMode, consumePoints) {
       currentPointColor: 'rgba(0, 0, 0, 1)',
       // optional color for next point (undefined means use currentPointColor)
       nextPointColor: undefined,
-      // Queue for storing multiple points
-      pointsQueue: [],
       hasKey: hasKey,
       write: writeToDOM,
       createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
@@ -354,32 +352,6 @@ function generatePoints(debugMode, consumePoints) {
       return o && typeof o === 'object' && o.re !== undefined && o.im !== undefined
   }
 
-  // Helper function to add points to the queue
-  function addPointsToQueue(pointOrPoints) {
-    //if (!pointOrPoints) return;
-
-    // Handle MathJS complex numbers
-    if (isMathJSComplexNumber(pointOrPoints)) {
-      const point = complexToPoint(pointOrPoints);
-      scope.pointsQueue.push(math.matrix([point]));
-      return;
-    }
-
-    // If pointOrPoints is a matrix, convert to array
-    const pointsArray = pointOrPoints.toArray ? pointOrPoints.toArray() : pointOrPoints;
-
-    // If it's a single point (1D array), wrap it
-    const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
-
-    // Add each point as a matrix to the queue
-    points.forEach(point => {
-      // Handle complex numbers within arrays
-      if (isMathJSComplexNumber(point)) {
-        point = complexToPoint(point);
-      }
-      scope.pointsQueue.push(math.matrix([point]));
-    });
-  }
 
   // Execute initialization code once per generation
   if (initializationMathJSCodeString.trim()) {
@@ -406,17 +378,6 @@ function generatePoints(debugMode, consumePoints) {
     }
   }
 
-  // If currentPoint was set in initialization code, add it to pointsQueue
-  if (scope.currentPoint !== undefined) {
-    // Handle both matrix and array formats
-    if (scope.currentPoint.toArray && typeof scope.currentPoint.toArray === 'function') {
-      // It's a matrix
-      scope.pointsQueue.push(scope.currentPoint);
-    } else if (Array.isArray(scope.currentPoint)) {
-      // It's an array, convert to matrix
-      scope.pointsQueue.push(math.matrix([scope.currentPoint]));
-    }
-  }
 
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
@@ -434,10 +395,10 @@ function generatePoints(debugMode, consumePoints) {
       for (let i = currentStep; i < endStep; i++) {
         writeToDOMCurrentOutput = [];  // this is this iteration's logging
         showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0)));
-        // If queue is  empty, give it a random point
-        if (scope.pointsQueue.length === 0) { scope.pointsQueue.push(getRandomVisiblePoint());  } // consider throwing an error here and moving the push of a random point to the above code block where we call scope.pointsQueue.push()
-        // Get a current point from queue
-        scope.currentPoint = scope.pointsQueue.shift();
+        // If currentPoint is undefined, give it a random point
+        if (scope.currentPoint === undefined) {
+          scope.currentPoint = getRandomVisiblePoint();
+        }
         if (showStuff) {
             console.log("i:", i)
             console.log("currentPoint:", scope.currentPoint);
@@ -496,10 +457,12 @@ function generatePoints(debugMode, consumePoints) {
         }
         if (showStuff) {
             console.log("resultSet:", resultSet);
-            console.log("pointsQueue length:", scope.pointsQueue.length);
         }
-         // Add nextPoints from scope (the user sets this value) to queue
-        addPointsToQueue(scope.nextPoint);
+        // Update currentPoint from nextPoint for next iteration
+        if (scope.nextPoint !== undefined) {
+          scope.currentPoint = scope.nextPoint.toArray ? scope.nextPoint : math.matrix([scope.nextPoint]);
+          scope.nextPoint = undefined;
+        }
 
         // Update special occasionally useful vars in scope for next iteration
         scope.currentTargetIndex = scope.nextTargetIndex;

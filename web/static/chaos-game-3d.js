@@ -388,7 +388,6 @@ function generatePoints(debugMode, consumePoints) {
     currentTargetIndex: 1,
     currentPointColor: 'rgba(255, 255, 255, 1)',
     nextPointColor: undefined,
-    pointsQueue: [],
     hasKey: hasKey,
     write: writeToDOM,
     createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
@@ -430,20 +429,6 @@ function generatePoints(debugMode, consumePoints) {
   let resultSet = null;
 
 
-  function addPointsToQueue(pointOrPoints) {
-    if (!pointOrPoints) return;
-
-    const pointsArray = pointOrPoints.toArray ? pointOrPoints.toArray() : pointOrPoints;
-    const points = pointsArray[0] && !Array.isArray(pointsArray[0]) ? [pointsArray] : pointsArray;
-
-    points.forEach(point => {
-      if (point.length === 3) {
-        scope.pointsQueue.push(math.matrix([point]));
-      } else {
-        console.warn('3D chaos game requires 3D points [x,y,z], got:', point);
-      }
-    });
-  }
 
   // Execute initialization code once per generation
   if (initializationMathJSCodeString.trim()) {
@@ -470,13 +455,6 @@ function generatePoints(debugMode, consumePoints) {
     }
   }
 
-  if (scope.currentPoint !== undefined) {
-    if (scope.currentPoint.toArray && typeof scope.currentPoint.toArray === 'function') {
-      scope.pointsQueue.push(scope.currentPoint);
-    } else if (Array.isArray(scope.currentPoint)) {
-      scope.pointsQueue.push(math.matrix([scope.currentPoint]));
-    }
-  }
 
   const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
@@ -494,11 +472,9 @@ function generatePoints(debugMode, consumePoints) {
         writeToDOMCurrentOutput = [];
         showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0)));
 
-        if (scope.pointsQueue.length === 0) {
-          scope.pointsQueue.push(getRandomVisiblePoint());
+        if (scope.currentPoint === undefined) {
+          scope.currentPoint = getRandomVisiblePoint();
         }
-
-        scope.currentPoint = scope.pointsQueue.shift();
         if (showStuff) {
           console.log("i:", i)
           console.log("currentPoint:", scope.currentPoint);
@@ -555,10 +531,13 @@ function generatePoints(debugMode, consumePoints) {
 
         if (showStuff) {
           console.log("resultSet:", resultSet);
-          console.log("pointsQueue length:", scope.pointsQueue.length);
         }
 
-        addPointsToQueue(scope.nextPoint);
+        // Update currentPoint from nextPoint for next iteration
+        if (scope.nextPoint !== undefined) {
+          scope.currentPoint = scope.nextPoint.toArray ? scope.nextPoint : math.matrix([scope.nextPoint]);
+          scope.nextPoint = undefined;
+        }
 
         scope.currentTargetIndex = scope.nextTargetIndex;
 
