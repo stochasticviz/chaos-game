@@ -654,6 +654,66 @@ function drawPoints3D(pointsData, alphaValue) {
   scene.add(mesh);
 }
 
+// A global or module-level variable to store the default alpha value
+//const defaultAlpha = 0.5;
+
+function drawPoints3D(pointsData, defaultAlpha) {
+  if (pointsData.length === 0) return;
+
+  // Use a map to group points by their color and alpha
+  const pointGroups = new Map();
+
+  pointsData.forEach(point => {
+    const color = point.color || '#ffffff';
+    const alpha = point.alpha || defaultAlpha;
+    const key = `${color}-${alpha}`;
+
+    if (!pointGroups.has(key)) {
+      pointGroups.set(key, []);
+    }
+    pointGroups.get(key).push(point);
+  });
+
+  // Iterate over each color group and create a single mesh for it
+  pointGroups.forEach((group, key) => {
+    const [colorHex, alpha] = key.split('-');
+
+    // Create geometry for this color group
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(group.length * 3);
+    const colors = new Float32Array(group.length * 3);
+    const color = new THREE.Color(colorHex);
+
+    group.forEach((point, i) => {
+      const idx = i * 3;
+      positions[idx] = point.x;
+      positions[idx + 1] = point.y;
+      positions[idx + 2] = point.z;
+
+      colors[idx] = color.r;
+      colors[idx + 1] = color.g;
+      colors[idx + 2] = color.b;
+    });
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    // Create material for this color group with the correct alpha
+    const material = new THREE.PointsMaterial({
+      size: 2,
+      vertexColors: true,
+      transparent: true,
+      opacity: parseFloat(alpha),
+      sizeAttenuation: false
+    });
+
+    // Create points mesh and add to scene
+    const mesh = new THREE.Points(geometry, material);
+    scene.add(mesh);
+  });
+}
+
+
 function toggleProgressIndicator(show) {
   const progressIndicator = document.getElementById('progress-indicator');
   progressIndicator.style.display = show ? 'block' : 'none';
