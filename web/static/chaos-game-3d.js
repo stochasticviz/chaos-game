@@ -464,7 +464,7 @@ function generatePoints(debugMode, consumePoints) {
         }
         currentPointsArray = scope.currentPoint.toArray();
         currentPointsArray.forEach(function (currentPointArray) {
-          const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
+          const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
           const pointColor = rawColor;
           if (currentPointArray.length === 3) {
             points.push({
@@ -638,10 +638,10 @@ const colorArrayRaw = colorMatrix.toArray()
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
     //const colors = new Float32Array(group.length * 3);
-    //const color = new THREE.Color(colorHex);
     //const color = new THREE.Color(colorArray);
     const color = new THREE.Color().fromArray(colorArray)
-      console.log('GROUP: length: ', group.length, '  colorArray:', colorArray, " alphaFloat: ", alphaFloat, " color:", color)
+    const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0)
+
     group.forEach((point, i) => {
       const idx = i * 3;
       positions[idx] = point.x;
@@ -658,7 +658,6 @@ const colorArrayRaw = colorMatrix.toArray()
       opacity: alphaFloat,
       sizeAttenuation: false  // TODO: try this with true. it should look better.
     });
-
     // Create points mesh and add to scene
     const mesh = new THREE.Points(geometry, material);
     scene.add(mesh);
