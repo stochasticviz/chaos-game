@@ -589,15 +589,8 @@ function drawPoints3D(pointsData, defaultAlpha) {
   const pointGroups = new Map();
   pointsData.forEach(point => {
     const colorMatrix = point.color;
-    //const colorMatrixSize = colorMatrix.size()
     let alpha = null;
-    //console.log("   alpha null??:", alpha)
     let colorArray = null;
-//console.log("NEW POINT", point);
-//console.log('    point.color:', point.color)
-    // if the color string has an alpha value, it will be ignored by Three.JS -- the alpha is specified in the material.
-////console.log(' math.matrix([[1,2,3,4]]):', math.matrix([[1,2,3,4]]))
-////console.log(' math.matrix([[1,2,3,4]].size()):', math.matrix([[1,2,3,4]]).size())
 const colorArrayRaw = colorMatrix.toArray()
     if (Array.isArray(colorArrayRaw[0])) {
         //console.log('    first element of colorArrayRaw is an array')
@@ -606,7 +599,7 @@ const colorArrayRaw = colorMatrix.toArray()
         alpha = colorArrayRaw[0][3]  // could be undefined
     }
     else {
-        //console.log('    first element of colorArrayRaw is NOT an array')
+        //console.log('    first element of colorArrayRaw is NOT an array, ex. [10, 255, 10, .7]') (or without alpha) then ensure we drop the alpha
         colorArray = colorArrayRaw.slice(0, 3)
         alpha = colorArrayRaw[3]  // could be undefined
     }
@@ -614,13 +607,8 @@ const colorArrayRaw = colorMatrix.toArray()
         alpha = defaultAlpha;
     }
 
-    //console.log("   alpha:", alpha)
-    //console.log("   colorArray:", colorArray)
-
     const key = `${colorArray.join(',')}-${alpha}`;
-    //console.log("   key:", key)
     if (!pointGroups.has(key)) {
-        //console.log("     NEW KEY: ", key)
       pointGroups.set(key, []);
     }
     pointGroups.get(key).push(point);
