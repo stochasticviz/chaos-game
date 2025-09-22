@@ -637,9 +637,6 @@ const colorArrayRaw = colorMatrix.toArray()
     // Create geometry for this color group
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
-    //const colors = new Float32Array(group.length * 3);
-    //const color = new THREE.Color(colorArray);
-    const color = new THREE.Color().fromArray(colorArray)
     const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0)
 
     group.forEach((point, i) => {
