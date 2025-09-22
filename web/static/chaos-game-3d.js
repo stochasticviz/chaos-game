@@ -629,6 +629,10 @@ const colorArrayRaw = colorMatrix.toArray()
   // Iterate over each color group and create a single mesh for it
   pointGroups.forEach((group, key) => {
     const [colorPart, alphaFloat] = key.split('-');
+    if (alphaFloat == 0.0) {
+        // transparent points, don't bother plotting them
+        return
+    }
     const colorArray = colorPart.split(',').map(Number);
     // Create geometry for this color group
     const geometry = new THREE.BufferGeometry();
