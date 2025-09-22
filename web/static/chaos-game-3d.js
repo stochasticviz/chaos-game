@@ -241,23 +241,6 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   return container;
 }
 
-// Helper function to convert array/matrix RGB values to CSS color strings
-function convertToColorString(color) {
-  if (typeof color === 'string') {
-    return color;
-  }
-
-  if (color && typeof color.toArray === 'function') {
-    const arr = color.toArray();
-    const rgbArray = Array.isArray(arr[0]) ? arr[0] : arr;
-    if (rgbArray.length >= 3) {
-      const [r, g, b, a = 1] = rgbArray;
-      return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
-    }
-  }
-
-  return color;
-}
 
 function handleMathJSExpressionsError(error) {
   const errorDiv = document.getElementById('errorMessage');
@@ -386,7 +369,7 @@ function generatePoints(debugMode, consumePoints) {
     targetPoints: math.matrix(targets.map(target => [target.x, target.y, target.z])),
     targetPointsLength: targets.length,
     currentTargetIndex: 1,
-    currentPointColor: 'rgba(255, 255, 255, 1)',
+    currentPointColor: math.matrix([[123, 210, 222, .97]]),
     nextPointColor: undefined,
     hasKey: hasKey,
     write: writeToDOM,
@@ -397,7 +380,7 @@ function generatePoints(debugMode, consumePoints) {
         const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged);
         sliders.appendChild(control);
       }
-      return slidersValuesCache.get(label) || defaultValue;
+      return slidersValuesCache.get(label);
     },
     points: function(numPoints) {
       const stepsInput = document.getElementById('steps');
@@ -480,10 +463,9 @@ function generatePoints(debugMode, consumePoints) {
           console.log("currentPoint:", scope.currentPoint);
         }
         currentPointsArray = scope.currentPoint.toArray();
-
         currentPointsArray.forEach(function (currentPointArray) {
-          const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
-          const pointColor = convertToColorString(rawColor);
+          const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
+          const pointColor = rawColor;
           if (currentPointArray.length === 3) {
             points.push({
               x: currentPointArray[0],
@@ -492,6 +474,9 @@ function generatePoints(debugMode, consumePoints) {
               color: pointColor
             });
           }
+            else {
+                console.log("(currentPointArray.length === 3) is FALSE!", currentPointArray.length);
+}
         });
 
         if (!debugMode) {
@@ -595,68 +580,47 @@ function generatePoints(debugMode, consumePoints) {
   });
 }
 
-function drawPoints3D_old(pointsData, alphaValue) {
-  if (pointsData.length === 0) return;
-
-  // Create geometry for this batch
-  const geometry = new THREE.BufferGeometry();
-
-  // Prepare position and color arrays
-  const positions = new Float32Array(pointsData.length * 3);
-  const colors = new Float32Array(pointsData.length * 3);
-
-  pointsData.forEach((point, i) => {
-    const idx = i * 3;
-    positions[idx] = point.x;
-    positions[idx + 1] = point.y;
-    positions[idx + 2] = point.z;
-
-    // Parse color (default to white if parsing fails)
-    const color = new THREE.Color(point.color || 0xffffff);
-    colors[idx] = color.r;
-    colors[idx + 1] = color.g;
-    colors[idx + 2] = color.b;
-  });
-
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-  // Create material for this batch
-  const material = new THREE.PointsMaterial({
-    size: 2,
-    vertexColors: true,
-    transparent: true,
-    opacity: alphaValue,
-    sizeAttenuation: false
-  });
-
-  // Create points mesh for this batch
-  const mesh = new THREE.Points(geometry, material);
-  scene.add(mesh);
-}
 
 // A global or module-level variable to store the default alpha value
 //const defaultAlpha = 0.5;
 
 function drawPoints3D(pointsData, defaultAlpha) {
-  if (pointsData.length === 0) return;
-
-  // Helper function to extract alpha from color string
-  function extractAlphaFromColor(colorString) {
-    const rgbaMatch = colorString.match(/rgba?\([\d\s,]+,\s*([\d.]+)\)/);
-    return rgbaMatch ? parseFloat(rgbaMatch[1]) : 1.0;
-  }
-
-  // Use a map to group points by their color and alpha
+  // group points by their color and alpha
   const pointGroups = new Map();
-
   pointsData.forEach(point => {
-    const color = point.color;
-    // Extract alpha from the color string, or use defaultAlpha
-    const alpha = point.alpha || extractAlphaFromColor(color) || defaultAlpha;
-    const key = `${color}-${alpha}`;
+    const colorMatrix = point.color;
+    //const colorMatrixSize = colorMatrix.size()
+    let alpha = null;
+    //console.log("   alpha null??:", alpha)
+    let colorArray = null;
+//console.log("NEW POINT", point);
+//console.log('    point.color:', point.color)
+    // if the color string has an alpha value, it will be ignored by Three.JS -- the alpha is specified in the material.
+////console.log(' math.matrix([[1,2,3,4]]):', math.matrix([[1,2,3,4]]))
+////console.log(' math.matrix([[1,2,3,4]].size()):', math.matrix([[1,2,3,4]]).size())
+const colorArrayRaw = colorMatrix.toArray()
+    if (Array.isArray(colorArrayRaw[0])) {
+        //console.log('    first element of colorArrayRaw is an array')
+        // if colorArrayRaw is ex. [[10, 255, 10, .7]] (or without alpha) then make JS array [10, 255, 10]
+        colorArray = colorArrayRaw[0].slice(0, 3)
+        alpha = colorArrayRaw[0][3]  // could be undefined
+    }
+    else {
+        //console.log('    first element of colorArrayRaw is NOT an array')
+        colorArray = colorArrayRaw.slice(0, 3)
+        alpha = colorArrayRaw[3]  // could be undefined
+    }
+    if (alpha === undefined) {
+        alpha = defaultAlpha;
+    }
 
+    //console.log("   alpha:", alpha)
+    //console.log("   colorArray:", colorArray)
+
+    const key = `${colorArray.join(',')}-${alpha}`;
+    //console.log("   key:", key)
     if (!pointGroups.has(key)) {
+        //console.log("     NEW KEY: ", key)
       pointGroups.set(key, []);
     }
     pointGroups.get(key).push(point);
@@ -664,37 +628,36 @@ function drawPoints3D(pointsData, defaultAlpha) {
 
   // Iterate over each color group and create a single mesh for it
   pointGroups.forEach((group, key) => {
-    const [colorHex, alpha] = key.split('-');
-
+    const [colorPart, alphaFloat] = key.split('-');
+    if (alphaFloat == 0.0) {
+        // transparent points, don't bother plotting them
+        return
+    }
+    const colorArray = colorPart.split(',').map(Number);
     // Create geometry for this color group
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
-    const colors = new Float32Array(group.length * 3);
-    const color = new THREE.Color(colorHex);
+    //const colors = new Float32Array(group.length * 3);
+    //const color = new THREE.Color(colorArray);
+    const color = new THREE.Color().fromArray(colorArray)
+    const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0)
 
     group.forEach((point, i) => {
       const idx = i * 3;
       positions[idx] = point.x;
       positions[idx + 1] = point.y;
       positions[idx + 2] = point.z;
-
-      colors[idx] = color.r;
-      colors[idx + 1] = color.g;
-      colors[idx + 2] = color.b;
     });
-
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    // Create material for this color group with the correct alpha
+    // Create material for this color group with alphaFloat
     const material = new THREE.PointsMaterial({
-      size: 2,
-      vertexColors: true,
-      transparent: true,
-      opacity: parseFloat(alpha),
-      sizeAttenuation: false
+      size: 2,  // TODO: this is size of voxel
+      vertexColors: false,
+      transparent: alphaFloat < 1.0,  // TODO: set this false when alphaFloat is 1.0
+      color: color,
+      opacity: alphaFloat,
+      sizeAttenuation: false  // TODO: try this with true. it should look better.
     });
-
     // Create points mesh and add to scene
     const mesh = new THREE.Points(geometry, material);
     scene.add(mesh);
