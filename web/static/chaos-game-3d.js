@@ -521,8 +521,6 @@ function generatePoints(debugMode, consumePoints) {
           scope.nextPoint = undefined;
         }
 
-        scope.currentTargetIndex = scope.nextTargetIndex;
-
         if (scope.nextPointColor !== undefined) {
           scope.currentPointColor = scope.nextPointColor;
           scope.nextPointColor = undefined;
