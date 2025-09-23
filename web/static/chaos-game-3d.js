@@ -368,9 +368,7 @@ function generatePoints(debugMode, consumePoints) {
     math: math,
     targetPoints: math.matrix(targets.map(target => [target.x, target.y, target.z])),
     targetPointsLength: targets.length,
-    currentTargetIndex: 1,
-    currentPointColor: math.matrix([[123, 210, 222, .97]]),
-    nextPointColor: undefined,
+    currentPointColor: math.matrix([255, 255, 255, 1.0]),
     hasKey: hasKey,
     write: writeToDOM,
     createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
@@ -513,7 +511,6 @@ function generatePoints(debugMode, consumePoints) {
             }
           }
         }
-
         if (showStuff) {
           console.log("resultSet:", resultSet);
         }
@@ -591,9 +588,8 @@ function drawPoints3D(pointsData, defaultAlpha) {
     const colorMatrix = point.color;
     let alpha = null;
     let colorArray = null;
-const colorArrayRaw = colorMatrix.toArray()
+    const colorArrayRaw = colorMatrix.toArray()
     if (Array.isArray(colorArrayRaw[0])) {
-        //console.log('    first element of colorArrayRaw is an array')
         // if colorArrayRaw is ex. [[10, 255, 10, .7]] (or without alpha) then make JS array [10, 255, 10]
         colorArray = colorArrayRaw[0].slice(0, 3)
         alpha = colorArrayRaw[0][3]  // could be undefined
