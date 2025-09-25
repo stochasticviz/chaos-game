@@ -368,6 +368,7 @@ function generatePoints(debugMode, consumePoints) {
     math: math,
     targetPoints: math.matrix(targets.map(target => [target.x, target.y, target.z])),
     targetPointsLength: targets.length,
+    currentPoint: getRandomVisiblePoint(),
     currentPointColor: math.matrix([255, 255, 255, 1.0]),
     hasKey: hasKey,
     write: writeToDOM,
@@ -453,9 +454,9 @@ function generatePoints(debugMode, consumePoints) {
         writeToDOMCurrentOutput = [];
         showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0)));
 
-        if (scope.currentPoint === undefined) {
-          scope.currentPoint = getRandomVisiblePoint();
-        }
+        //if (scope.currentPoint === undefined) {
+        //  scope.currentPoint = getRandomVisiblePoint();  // TODO: remove this and instead put this on the scope when we create the scope object. then, if the user sets it to somehting in the init code, great.
+        //}
         if (showStuff) {
           console.log("i:", i)
           console.log("currentPoint:", scope.currentPoint);
