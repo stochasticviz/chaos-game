@@ -394,7 +394,7 @@ function generatePoints(debugMode, consumePoints) {
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         writeToDOMCurrentOutput = [];  // this is this iteration's logging
-        showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0)));
+        showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0) | i == endStep-1));
         // If currentPoint is undefined, give it a random point
         if (scope.currentPoint === undefined) {
           scope.currentPoint = getRandomVisiblePoint();
