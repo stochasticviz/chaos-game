@@ -404,7 +404,6 @@ function generatePoints(debugMode, consumePoints) {
   scope['vertices'] = scope['targets']
 
   let points = [];
-  let currentPointsArray = null;
   let showStuff = null;
   let firstTime = true;
   let resultSet = null;
@@ -448,6 +447,7 @@ function generatePoints(debugMode, consumePoints) {
         return;
       }
 
+      let currentPointArray = null;
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         writeToDOMCurrentOutput = [];
