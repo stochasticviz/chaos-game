@@ -480,8 +480,10 @@ function generatePoints(debugMode, consumePoints) {
           }
             else {
                 console.log("(currentPointArray.length === 3) is FALSE!", currentPointArray.length);
-}
-        });
+                if (showStuff) {
+                    console.log(currentPointArray);
+                }
+            }
 
         if (!debugMode) {
           try {
