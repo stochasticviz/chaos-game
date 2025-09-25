@@ -176,10 +176,10 @@ function writeToDOM(...args) {
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.parentNode.insertBefore(writeToDOMDiv, errorDiv);
   }
-  
+
   // Join all arguments with spaces, similar to Python's print()
   const text = args.map(arg => String(arg)).join(' ');
-  
+
   const writeToDOMTextNode = document.createTextNode(text + '\n');
   writeToDOMDiv.appendChild(writeToDOMTextNode);
   writeToDOMCurrentOutput.push(text);

@@ -461,16 +461,17 @@ function generatePoints(debugMode, consumePoints) {
           console.log("i:", i)
           console.log("currentPoint:", scope.currentPoint);
         }
-        currentPointsArray = scope.currentPoint.toArray();
-        currentPointsArray.forEach(function (currentPointArray) {
-          const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
-          const pointColor = rawColor;
-          if (currentPointArray.length === 3) {
+        currentPointArray = scope.currentPoint.toArray();
+
+        const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
+        const pointColor = rawColor;
+        if (currentPointArray.length === 3) {
+            //
             points.push({
-              x: currentPointArray[0],
-              y: currentPointArray[1],
-              z: currentPointArray[2],
-              color: pointColor
+                x: currentPointArray[0],
+                y: currentPointArray[1],
+                z: currentPointArray[2],
+                color: pointColor
             });
           }
             else {
