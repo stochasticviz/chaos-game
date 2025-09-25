@@ -462,6 +462,10 @@ function generatePoints(debugMode, consumePoints) {
           console.log("currentPoint:", scope.currentPoint);
         }
         currentPointArray = scope.currentPoint.toArray();
+        if (currentPointArray.length === 1) {
+            // assume this is a nested array, like [[100, 200, 44]]
+            currentPointArray = currentPointArray[0];
+        }
 
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
         const pointColor = rawColor;
