@@ -738,6 +738,9 @@ function generateShareableLink() {
     steps: document.getElementById('steps').value,
     alpha: document.getElementById('alpha').value,
     customizeMathJSCode: document.getElementById('customizeMathJSCode').checked,
+    examplesToggle: document.getElementById('examples-toggle').checked,
+    advancedStuffToggle: document.getElementById('advanced-stuff-toggle').checked,
+    advancedExamplesToggle: document.getElementById('advanced-examples-toggle').checked,
     debugMode: document.getElementById('debugMode').checked,
     sliders: Object.fromEntries(slidersValuesCache),
     camera: {
@@ -816,6 +819,21 @@ function loadSharedCode() {
       if (shareData.customizeMathJSCode !== undefined) {
         document.getElementById('customizeMathJSCode').checked = shareData.customizeMathJSCode;
         document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.examplesToggle !== undefined) {
+        document.getElementById('examples-toggle').checked = shareData.examplesToggle;
+        document.getElementById('examples-toggle').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.advancedStuffToggle !== undefined) {
+        document.getElementById('advanced-stuff-toggle').checked = shareData.advancedStuffToggle;
+        document.getElementById('advanced-stuff-toggle').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.advancedExamplesToggle !== undefined) {
+        document.getElementById('advanced-examples-toggle').checked = shareData.advancedExamplesToggle;
+        document.getElementById('advanced-examples-toggle').dispatchEvent(new Event('change'));
       }
 
       if (shareData.debugMode !== undefined) {
