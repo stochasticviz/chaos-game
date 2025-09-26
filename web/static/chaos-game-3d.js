@@ -368,7 +368,7 @@ function generatePoints(debugMode, consumePoints) {
     math: math,
     targetPoints: math.matrix(targets.map(target => [target.x, target.y, target.z])),
     targetPointsLength: targets.length,
-    currentPoint: getRandomVisiblePoint(),
+    currentPoint: getRandomVisiblePoint(),  // the default init code currently overrides this.
     currentPointColor: math.matrix([255, 255, 255, 1.0]),
     hasKey: hasKey,
     write: writeToDOM,
