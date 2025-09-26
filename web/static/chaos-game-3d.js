@@ -1,6 +1,7 @@
 import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
 import * as THREE from '../lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
+import * as polytopes from './polytopes.js';
 
 const math = create(all);
 
@@ -86,55 +87,6 @@ function normalize(point) {
   return new THREE.Vector3(point[0] / norm, point[1] / norm, point[2] / norm);
 }
 
-function tetrahedron() {
-  const points = [
-    [1, 1, 1],
-    [1, -1, -1],
-    [-1, 1, -1],
-    [-1, -1, 1]
-  ];
-  return points.map(normalize);
-}
-
-function octahedron() {
-  const points = [
-    [1, 0, 0], [-1, 0, 0],
-    [0, 1, 0], [0, -1, 0],
-    [0, 0, 1], [0, 0, -1]
-  ];
-  return points.map(normalize);
-}
-
-function cube() {
-  const points = [
-    [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
-    [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1]
-  ];
-  return points.map(normalize);
-}
-
-function icosahedron() {
-  const phi = (1 + Math.sqrt(5)) / 2;
-  const points = [
-    [0, 1, phi], [0, 1, -phi], [0, -1, phi], [0, -1, -phi],
-    [1, phi, 0], [1, -phi, 0], [-1, phi, 0], [-1, -phi, 0],
-    [phi, 0, 1], [phi, 0, -1], [-phi, 0, 1], [-phi, 0, -1]
-  ];
-  return points.map(normalize);
-}
-
-function dodecahedron() {
-  const phi = (1 + Math.sqrt(5)) / 2;
-  const points = [
-    [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
-    [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1],
-    [0, 1/phi, phi], [0, 1/phi, -phi], [0, -1/phi, phi], [0, -1/phi, -phi],
-    [1/phi, phi, 0], [1/phi, -phi, 0], [-1/phi, phi, 0], [-1/phi, -phi, 0],
-    [phi, 0, 1/phi], [phi, 0, -1/phi], [-phi, 0, 1/phi], [-phi, 0, -1/phi]
-  ];
-  return points.map(normalize);
-}
-
 function getEquidistantPointsOnUnitSphereApproximation(n) {
   const points = [];
   const offset = 2 / n;
@@ -157,11 +109,11 @@ function getEquidistantPointsOnUnitSphereApproximation(n) {
 function getEquidistantPointsOnSphere(radius, nPoints) {
   let points = [];
 
-  if (nPoints === 4) points = tetrahedron();
-  else if (nPoints === 6) points = octahedron();
-  else if (nPoints === 8) points = cube();
-  else if (nPoints === 12) points = icosahedron();
-  else if (nPoints === 20) points = dodecahedron();
+  if (nPoints === 4) points = polytopes.tetrahedron();
+  else if (nPoints === 6) points = polytopes.octahedron();
+  else if (nPoints === 8) points = polytopes.cube();
+  else if (nPoints === 12) points = polytopes.icosahedron();
+  else if (nPoints === 20) points = polytopes.dodecahedron();
   else {
     points = getEquidistantPointsOnUnitSphereApproximation(nPoints);
   }
