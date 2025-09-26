@@ -360,7 +360,7 @@ function generatePoints(debugMode, consumePoints) {
   const initializationCompiledExpressions = debugMode ? null : (() => { try { return math.compile(initializationMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
 
   const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
-  const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
+  const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })();
 
   let currentStep = 0;
 
@@ -587,18 +587,18 @@ function drawPoints3D(pointsData, defaultAlpha) {
   const pointGroups = new Map();
   pointsData.forEach(point => {
     const colorMatrix = point.color;
-    let alpha = null;
-    let colorArray = null;
-    const colorArrayRaw = colorMatrix.toArray()
+    const colorArrayRaw = colorMatrix.toArray();
+    let colorArray, alpha;
+
     if (Array.isArray(colorArrayRaw[0])) {
         // if colorArrayRaw is ex. [[10, 255, 10, .7]] (or without alpha) then make JS array [10, 255, 10]
-        colorArray = colorArrayRaw[0].slice(0, 3)
-        alpha = colorArrayRaw[0][3]  // could be undefined
+        colorArray = colorArrayRaw[0].slice(0, 3);
+        alpha = colorArrayRaw[0][3];  // could be undefined
     }
     else {
         //console.log('    first element of colorArrayRaw is NOT an array, ex. [10, 255, 10, .7]') (or without alpha) then ensure we drop the alpha
-        colorArray = colorArrayRaw.slice(0, 3)
-        alpha = colorArrayRaw[3]  // could be undefined
+        colorArray = colorArrayRaw.slice(0, 3);
+        alpha = colorArrayRaw[3];  // could be undefined
     }
     if (alpha === undefined) {
         alpha = defaultAlpha;
@@ -616,13 +616,13 @@ function drawPoints3D(pointsData, defaultAlpha) {
     const [colorPart, alphaFloat] = key.split('-');
     if (alphaFloat == 0.0) {
         // transparent points, don't bother plotting them
-        return
+        return;
     }
     const colorArray = colorPart.split(',').map(Number);
     // Create geometry for this color group
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
-    const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0)
+    const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0);
 
     group.forEach((point, i) => {
       const idx = i * 3;
