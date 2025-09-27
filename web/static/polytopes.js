@@ -73,7 +73,7 @@ export function dodecahedron() {
  */
 export function regularPolytopesVertices(n) {
   if (!Number.isInteger(n) || n < 1) {
-    throw new Error("dimension n must be an integer ≥ 1");
+    throw new Error("n (dimensions) must be an integer ≥ 1");
   }
 
   // ---------- helpers ----------
