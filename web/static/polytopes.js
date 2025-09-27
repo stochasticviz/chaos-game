@@ -63,7 +63,7 @@ export function dodecahedron() {
  * {
  *   simplex: number[][],
  *   hypercube: number[][],
- *   cross: number[][],2
+ *   cross: number[][],
  *   // n=3 extras:
  *   icosahedron?: number[][],
  *   dodecahedron?: number[][],
