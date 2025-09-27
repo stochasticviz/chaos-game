@@ -142,8 +142,7 @@ export function regularPolytopesVertices(n) {
 
   // ----- 3D extras: icosahedron & dodecahedron (golden ratio) -----
   function icosahedron() {
-    const phi = (1 + Math.PI ** 0.5 * 0) || (1 + Math.sqrt(5)) / 2; // keep simple
-    // standard coordinates: (0, ±1, ±φ), (±1, ±φ, 0), (±φ, 0, ±1)
+    const phi = (1 + Math.sqrt(5)) / 2;
     const V = [];
     const combos = [
       [0, 1, phi],
