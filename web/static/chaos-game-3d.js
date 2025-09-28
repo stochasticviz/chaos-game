@@ -81,49 +81,6 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// Generate target points on sphere (from existing 3D version)
-function normalize(point) {
-  const norm = Math.sqrt(point[0] * point[0] + point[1] * point[1] + point[2] * point[2]);
-  return new THREE.Vector3(point[0] / norm, point[1] / norm, point[2] / norm);
-}
-
-function getEquidistantPointsOnUnitSphereApproximation(n) {
-  const points = [];
-  const offset = 2 / n;
-  const increment = Math.PI * (3 - Math.sqrt(5));
-
-  for (let i = 0; i < n; i++) {
-    const y = ((i * offset) - 1) + (offset / 2);
-    const r = Math.sqrt(1 - y * y);
-    const phi = i * increment;
-
-    const x = Math.cos(phi) * r;
-    const z = Math.sin(phi) * r;
-
-    points.push([x, y, z]);
-  }
-
-  return points.map(normalize);
-}
-
-function getEquidistantPointsOnSphere(radius, nPoints) {
-  let points = [];
-
-  if (nPoints === 4) points = polytopes.tetrahedron();
-  else if (nPoints === 6) points = polytopes.octahedron();
-  else if (nPoints === 8) points = polytopes.cube();
-  else if (nPoints === 12) points = polytopes.icosahedron();
-  else if (nPoints === 20) points = polytopes.dodecahedron();
-  else {
-    points = getEquidistantPointsOnUnitSphereApproximation(nPoints);
-  }
-
-  return points.map(p => new THREE.Vector3(
-    p.x * radius,
-    p.y * radius,
-    p.z * radius
-  ));
-}
 
 // MathJS integration functions (adapted from 2D version)
 document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
