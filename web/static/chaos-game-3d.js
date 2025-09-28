@@ -1,7 +1,7 @@
 import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
 import * as THREE from '../lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
-import * as polytopes from './polytopes.js';
+import * as pointsOnNSphere from './points-on-n-sphere.js';
 
 const math = create(all);
 
@@ -209,8 +209,15 @@ function writeToDOM(...args) {
 }
 
 function resetTargetsLocations(verticesCount) {
-  targets = getEquidistantPointsOnSphere(SPHERE_RADIUS, verticesCount);
+  console.log('resetTargetsLocations()');
+  targets = pointsOnNSphere.getEquidistantPointsOnSphere(3, verticesCount).map(p => new THREE.Vector3(
+        p[0] * SPHERE_RADIUS,
+        p[1] * SPHERE_RADIUS,
+        p[2] * SPHERE_RADIUS));
 }
+
+
+
 
 function setVerticesCount(verticesCount) {
   resetTargetsLocations(verticesCount);
@@ -226,8 +233,12 @@ function createTargetVertices(numVertices) {
     scene.remove(vertex);
   });
   targetVertices = [];
+  console.log('createTargetVertices()');
 
-  targets = getEquidistantPointsOnSphere(SPHERE_RADIUS, numVertices);
+  targets = pointsOnNSphere.getEquidistantPointsOnSphere(3, numVertices).map(p => new THREE.Vector3(
+        p[0] * SPHERE_RADIUS,
+        p[1] * SPHERE_RADIUS,
+        p[2] * SPHERE_RADIUS));
 
   targets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
