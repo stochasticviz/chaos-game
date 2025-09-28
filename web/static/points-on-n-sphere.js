@@ -61,7 +61,7 @@ function getEquidistantPointsOnUnitNSphereApproximation(dimensions, nPoints, opt
   // --- helpers
   const norm = (x) => Math.hypot.apply(null, x);
   const normalizeInPlace = (x) => {
-    const n = norm(x) || 1;
+    const n = norm(x);
     for (let i = 0; i < x.length; i++) x[i] /= n;
   };
 
