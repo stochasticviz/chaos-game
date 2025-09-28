@@ -143,7 +143,7 @@ function getEquidistantPointsOnUnitNSphereApproximation(dimensions, nPoints, opt
 export function getEquidistantPointsOnNSphere(dimensions, verticesCount) {
     let vertices = polytopes.regularPolytopeVertices(dimensions, verticesCount);
     if (! vertices)  {
-        console.log("No regular convex polytope found, calculating an approximation...");
+        // console.log("No regular convex polytope found, calculating an approximation...");
         vertices = getEquidistantPointsOnUnitNSphereApproximation(dimensions, verticesCount);
     }
 

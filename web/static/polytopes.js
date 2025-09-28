@@ -28,7 +28,7 @@ export function regularPolytopeVertices(n, V) {
 
   // Regular simplex in R^n via Householder (exactly regular for any n)
   function simplex(n) {
-    console.log("simplex()...");
+    // console.log("simplex()...");
     const m = n + 1;
     const a = new Array(m).fill(1);
     const aNorm = Math.sqrt(m);
@@ -50,7 +50,7 @@ export function regularPolytopeVertices(n, V) {
 
   // n-cube: all ±1 corners
   function hypercube(n) {
-    console.log("hypercube()...");
+    // console.log("hypercube()...");
     const verts = [];
     const total = 1 << n;
     for (let mask = 0; mask < total; mask++) {
@@ -63,7 +63,7 @@ export function regularPolytopeVertices(n, V) {
 
   // n-orthoplex (cross polytope): ±e_i
   function cross(n) {
-    console.log("cross()...");
+    // console.log("cross()...");
     const verts = [];
     for (let i = 0; i < n; i++) {
       const vp = new Array(n).fill(0); vp[i] = 1;
@@ -75,7 +75,7 @@ export function regularPolytopeVertices(n, V) {
 
   // 2D: regular m-gon (any m ≥ 3) on unit circle, centered at origin
   function regular2DPolygon(m) {
-    console.log("regular 2d polygon...");
+    // console.log("regular 2d polygon...");
     const verts = [];
     for (let k = 0; k < m; k++) {
       const theta = (2 * Math.PI * k) / m;
@@ -86,6 +86,7 @@ export function regularPolytopeVertices(n, V) {
 
   // 3D extras
   function icosahedron() {
+    // console.log("       icosahedron!");
     const phi = (1 + Math.sqrt(5)) / 2;
     const V = [];
     const combos = [
@@ -105,6 +106,7 @@ export function regularPolytopeVertices(n, V) {
   }
 
   function dodecahedron() {
+    // console.log("       dodecahedron!");
     const phi = (1 + Math.sqrt(5)) / 2;
     const inv = 1 / phi;
     const V = [];
@@ -134,7 +136,7 @@ export function regularPolytopeVertices(n, V) {
 
   // 4D extra: 24-cell (all permutations of (±1, ±1, 0, 0))
   function cell24() {
-    console.log("      cell24()...");
+    // console.log("      cell24()...");
     const V = [];
     for (let i = 0; i < 4; i++) {
       for (let j = i + 1; j < 4; j++) {
@@ -170,14 +172,14 @@ export function regularPolytopeVertices(n, V) {
 
   // n = 3 extras
   if (n === 3) {
-    console.log("n == 3   possible extra? ...  V:", V);
+    // console.log("n == 3   possible extra? ...  V:", V);
     if (V === 12) return icosahedron();
     if (V === 20) return dodecahedron();
   }
 
   // n = 4 extra
   if (n === 4 && V === 24) {
-      console.log("4D, 24 vertices -- regular polytope");
+      // console.log("     4D, 24 vertices -- regular polytope");
       return cell24();
   }
 
