@@ -234,12 +234,6 @@ function createTargetVertices(numVertices) {
   });
   targetVertices = [];
   console.log('createTargetVertices()');
-
-  targets = pointsOnNSphere.getEquidistantPointsOnSphere(3, numVertices).map(p => new THREE.Vector3(
-        p[0] * SPHERE_RADIUS,
-        p[1] * SPHERE_RADIUS,
-        p[2] * SPHERE_RADIUS));
-
   targets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
