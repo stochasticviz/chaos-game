@@ -210,7 +210,7 @@ function writeToDOM(...args) {
 
 function resetTargetsLocations(verticesCount) {
   console.log('resetTargetsLocations()');
-  targets = pointsOnNSphere.getEquidistantPointsOnSphere(3, verticesCount).map(p => new THREE.Vector3(
+  targets = pointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount).map(p => new THREE.Vector3(
         p[0] * SPHERE_RADIUS,
         p[1] * SPHERE_RADIUS,
         p[2] * SPHERE_RADIUS));
