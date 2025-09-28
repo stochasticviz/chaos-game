@@ -273,7 +273,7 @@ function generatePoints(debugMode, consumePoints) {
   const initializationCompiledExpressions = debugMode ? null : (() => { try { return math.compile(initializationMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
 
   const nextVertexAndPointMathJSCodeLines = nextVertexAndPointMathJSCodeString.split('\n');
-  const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })()
+  const compiledExpressions = debugMode ? null : (() => { try { return math.compile(nextVertexAndPointMathJSCodeString); } catch (error) { handleMathJSExpressionsError(error); } })();
 
   let currentStep = 0;
 
@@ -281,7 +281,7 @@ function generatePoints(debugMode, consumePoints) {
     math: math,
     targetPoints: math.matrix(targets.map(target => [target.x, target.y, target.z])),
     targetPointsLength: targets.length,
-    currentPoint: getRandomVisiblePoint(),
+    currentPoint: getRandomVisiblePoint(),  // the default init code currently overrides this.
     currentPointColor: math.matrix([255, 255, 255, 1.0]),
     hasKey: hasKey,
     write: writeToDOM,
@@ -317,12 +317,8 @@ function generatePoints(debugMode, consumePoints) {
   }
   scope['vertices'] = scope['targets']
 
-  let points = [];
   let showStuff = null;
   let firstTime = true;
-  let resultSet = null;
-
-
 
   // Execute initialization code once per generation
   if (initializationMathJSCodeString.trim()) {
@@ -360,18 +356,17 @@ function generatePoints(debugMode, consumePoints) {
         reject(new Error('Generation cancelled'));
         return;
       }
-
-      let currentPointArray = null;
+      let points = [];
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
+        let currentPointArray = null;
         writeToDOMCurrentOutput = [];
         showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0)));
-
         //if (scope.currentPoint === undefined) {
         //  scope.currentPoint = getRandomVisiblePoint();  // TODO: remove this and instead put this on the scope when we create the scope object. then, if the user sets it to somehting in the init code, great.
         //}
         if (showStuff) {
-          console.log("i:", i)
+          console.log("i:", i);
           console.log("currentPoint:", scope.currentPoint);
         }
         currentPointArray = scope.currentPoint.toArray();
@@ -379,7 +374,6 @@ function generatePoints(debugMode, consumePoints) {
             // assume this is a nested array, like [[100, 200, 44]]
             currentPointArray = currentPointArray[0];
         }
-
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
         const pointColor = rawColor;
         if (currentPointArray.length === 3) {
@@ -398,6 +392,7 @@ function generatePoints(debugMode, consumePoints) {
                 }
             }
 
+        let resultSet = null;
         if (!debugMode) {
           try {
             resultSet = compiledExpressions.evaluate(scope);
@@ -505,18 +500,18 @@ function drawPoints3D(pointsData, defaultAlpha) {
   const pointGroups = new Map();
   pointsData.forEach(point => {
     const colorMatrix = point.color;
-    let alpha = null;
-    let colorArray = null;
-    const colorArrayRaw = colorMatrix.toArray()
+    const colorArrayRaw = colorMatrix.toArray();
+    let colorArray, alpha;
+
     if (Array.isArray(colorArrayRaw[0])) {
         // if colorArrayRaw is ex. [[10, 255, 10, .7]] (or without alpha) then make JS array [10, 255, 10]
-        colorArray = colorArrayRaw[0].slice(0, 3)
-        alpha = colorArrayRaw[0][3]  // could be undefined
+        colorArray = colorArrayRaw[0].slice(0, 3);
+        alpha = colorArrayRaw[0][3];  // could be undefined
     }
     else {
         //console.log('    first element of colorArrayRaw is NOT an array, ex. [10, 255, 10, .7]') (or without alpha) then ensure we drop the alpha
-        colorArray = colorArrayRaw.slice(0, 3)
-        alpha = colorArrayRaw[3]  // could be undefined
+        colorArray = colorArrayRaw.slice(0, 3);
+        alpha = colorArrayRaw[3];  // could be undefined
     }
     if (alpha === undefined) {
         alpha = defaultAlpha;
@@ -534,13 +529,13 @@ function drawPoints3D(pointsData, defaultAlpha) {
     const [colorPart, alphaFloat] = key.split('-');
     if (alphaFloat == 0.0) {
         // transparent points, don't bother plotting them
-        return
+        return;
     }
     const colorArray = colorPart.split(',').map(Number);
     // Create geometry for this color group
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
-    const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0)
+    const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0);
 
     group.forEach((point, i) => {
       const idx = i * 3;
@@ -651,6 +646,9 @@ function generateShareableLink() {
     steps: document.getElementById('steps').value,
     alpha: document.getElementById('alpha').value,
     customizeMathJSCode: document.getElementById('customizeMathJSCode').checked,
+    examplesToggle: document.getElementById('examples-toggle').checked,
+    advancedStuffToggle: document.getElementById('advanced-stuff-toggle').checked,
+    advancedExamplesToggle: document.getElementById('advanced-examples-toggle').checked,
     debugMode: document.getElementById('debugMode').checked,
     sliders: Object.fromEntries(slidersValuesCache),
     camera: {
@@ -729,6 +727,21 @@ function loadSharedCode() {
       if (shareData.customizeMathJSCode !== undefined) {
         document.getElementById('customizeMathJSCode').checked = shareData.customizeMathJSCode;
         document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.examplesToggle !== undefined) {
+        document.getElementById('examples-toggle').checked = shareData.examplesToggle;
+        document.getElementById('examples-toggle').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.advancedStuffToggle !== undefined) {
+        document.getElementById('advanced-stuff-toggle').checked = shareData.advancedStuffToggle;
+        document.getElementById('advanced-stuff-toggle').dispatchEvent(new Event('change'));
+      }
+
+      if (shareData.advancedExamplesToggle !== undefined) {
+        document.getElementById('advanced-examples-toggle').checked = shareData.advancedExamplesToggle;
+        document.getElementById('advanced-examples-toggle').dispatchEvent(new Event('change'));
       }
 
       if (shareData.debugMode !== undefined) {
