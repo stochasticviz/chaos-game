@@ -227,7 +227,7 @@ function setVerticesCount(verticesCount) {
   return verticesCount;
 }
 
-function createTargetVertices(numVertices) {
+function createTargetMeshes() {
   // Remove old vertex spheres
   targetVertices.forEach(vertex => {
     scene.remove(vertex);
@@ -595,7 +595,7 @@ async function generateAndDraw(clearPoints = true) {
   try {
     if (targets.length !== vertices) {
       setVerticesCount(vertices);
-      createTargetVertices(vertices);
+      createTargetMeshes(vertices);
     }
 
     // Clear existing points only if requested
