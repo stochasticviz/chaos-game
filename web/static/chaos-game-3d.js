@@ -233,7 +233,6 @@ function createTargetMeshes() {
     scene.remove(vertex);
   });
   targetVertices = [];
-  console.log('createTargetVertices()');
   targets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
