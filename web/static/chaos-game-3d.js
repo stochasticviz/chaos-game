@@ -209,7 +209,6 @@ function writeToDOM(...args) {
 }
 
 function resetTargetsLocations(verticesCount) {
-  console.log('resetTargetsLocations()');
   unitSphereTargets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount);
   //console.log('    unitSphereTargets:', unitSphereTargets, '  typeof unitSphereTargets:', typeof unitSphereTargets);
 }
@@ -302,7 +301,6 @@ function generatePoints(debugMode, consumePoints) {
   };
 
   scope['targets'] = function(numVertices, force=false) {
-      console.log("scope['targets']() called")
     if (unitSphereTargets.length !== numVertices || force) {
       setVerticesCount(numVertices)
       scope['targetPoints'] = math.multiply(math.matrix(unitSphereTargets), SPHERE_RADIUS);
@@ -380,8 +378,8 @@ function generatePoints(debugMode, consumePoints) {
             });
           }
             else {
-                console.log("(currentPointArray.length === 3) is FALSE!", currentPointArray.length);
                 if (showStuff) {
+                    console.log("(currentPointArray.length === 3) is FALSE!", currentPointArray.length);
                     console.log(currentPointArray);
                 }
             }
@@ -603,6 +601,7 @@ async function generateAndDraw(clearPoints = true) {
     toggleProgressIndicator(true);
 
     try {
+      // TODO: consider putting the progress indicator thing in drawPoints3D() to simplify this call to generatePoints()
       await generatePoints(debugMode, (progress, points) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
