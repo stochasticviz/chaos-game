@@ -1,7 +1,7 @@
 import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
 import * as THREE from '../lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
-import * as pointsOnNSphere from './points-on-n-sphere.js';
+import * as PointsOnNSphere from './points-on-n-sphere.js';
 
 const math = create(all);
 
@@ -9,7 +9,7 @@ const math = create(all);
 let scene, camera, renderer, controls;
 let pointsGeometry, pointsMaterial, pointsMesh;
 let targetVertices = [];
-let targets = [];
+let unitSphereTargets = [];
 
 // MathJS system variables (from 2D version)
 const SPHERE_RADIUS = 500;
@@ -210,14 +210,9 @@ function writeToDOM(...args) {
 
 function resetTargetsLocations(verticesCount) {
   console.log('resetTargetsLocations()');
-  targets = pointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount).map(p => new THREE.Vector3(
-        p[0] * SPHERE_RADIUS,
-        p[1] * SPHERE_RADIUS,
-        p[2] * SPHERE_RADIUS));
+  unitSphereTargets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount);
+  //console.log('    unitSphereTargets:', unitSphereTargets, '  typeof unitSphereTargets:', typeof unitSphereTargets);
 }
-
-
-
 
 function setVerticesCount(verticesCount) {
   resetTargetsLocations(verticesCount);
@@ -233,11 +228,11 @@ function createTargetMeshes() {
     scene.remove(vertex);
   });
   targetVertices = [];
-  targets.forEach(target => {
+  unitSphereTargets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
-    vertexMesh.position.set(target.x, target.y, target.z);
+    vertexMesh.position.set(target[0], target[1], target[2]);
     scene.add(vertexMesh);
     targetVertices.push(vertexMesh);
   });
@@ -279,8 +274,6 @@ function generatePoints(debugMode, consumePoints) {
 
   const scope = {
     math: math,
-    targetPoints: math.matrix(targets.map(target => [target.x, target.y, target.z])),
-    targetPointsLength: targets.length,
     currentPoint: getRandomVisiblePoint(),  // the default init code currently overrides this.
     currentPointColor: math.matrix([255, 255, 255, 1.0]),
     hasKey: hasKey,
@@ -308,14 +301,17 @@ function generatePoints(debugMode, consumePoints) {
     }
   };
 
-  scope['targets'] = function(numVertices) {
-    if (targets.length !== numVertices) {
+  scope['targets'] = function(numVertices, force=false) {
+      console.log("scope['targets']() called")
+    if (unitSphereTargets.length !== numVertices || force) {
       setVerticesCount(numVertices)
-      scope['targetPoints'] = math.matrix(targets.map(target => [target.x, target.y, target.z]));
-      scope['targetPointsLength'] = targets.length;
+      scope['targetPoints'] = math.multiply(math.matrix(unitSphereTargets), SPHERE_RADIUS);
+      scope['targetPointsLength'] = unitSphereTargets.length;
     }
   }
-  scope['vertices'] = scope['targets']
+  const vertices = parseInt(document.getElementById('vertices').value, 10);
+  scope['targets'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
+  scope['vertices'] = scope['targets']  // support deprecated 'vertices' function in MathJS, for now
 
   let showStuff = null;
   let firstTime = true;
@@ -345,8 +341,6 @@ function generatePoints(debugMode, consumePoints) {
     }
   }
 
-
-  const vertices = parseInt(document.getElementById('vertices').value, 10);
   const steps = parseInt(document.getElementById('steps').value, 10);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
@@ -587,7 +581,7 @@ async function generateAndDraw(clearPoints = true) {
   generateBtn.textContent = 'Stop';
 
   try {
-    if (targets.length !== vertices) {
+    if (unitSphereTargets.length !== vertices) {
       setVerticesCount(vertices);
       createTargetMeshes(vertices);
     }
