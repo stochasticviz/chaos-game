@@ -355,7 +355,7 @@ function generatePoints(debugMode, consumePoints) {
       for (let i = currentStep; i < endStep; i++) {
         let currentPointArray = null;
         writeToDOMCurrentOutput = [];
-        showStuff = (VERBOSE && (firstTime | (i % 1000000 == 0)));
+        showStuff = (VERBOSE && (firstTime || (i % 1000000 == 0)));
         //if (scope.currentPoint === undefined) {
         //  scope.currentPoint = getRandomVisiblePoint();  // TODO: remove this and instead put this on the scope when we create the scope object. then, if the user sets it to somehting in the init code, great.
         //}
