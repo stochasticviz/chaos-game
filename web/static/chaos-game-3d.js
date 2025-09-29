@@ -8,7 +8,7 @@ const math = create(all);
 // Three.js scene variables
 let scene, camera, renderer, controls;
 let pointsGeometry, pointsMaterial, pointsMesh;
-let targetVertices = [];
+let targetMeshes = [];
 let unitSphereTargets = [];
 
 // MathJS system variables (from 2D version)
@@ -223,17 +223,17 @@ function setVerticesCount(verticesCount) {
 
 function createTargetMeshes() {
   // Remove old vertex spheres
-  targetVertices.forEach(vertex => {
+  targetMeshes.forEach(vertex => {
     scene.remove(vertex);
   });
-  targetVertices = [];
+  targetMeshes = [];
   unitSphereTargets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
     vertexMesh.position.set(target[0], target[1], target[2]);
     scene.add(vertexMesh);
-    targetVertices.push(vertexMesh);
+    targetMeshes.push(vertexMesh);
   });
 
   // Add lighting for the spheres
