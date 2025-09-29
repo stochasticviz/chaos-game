@@ -1,6 +1,7 @@
 import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
 import * as THREE from '../lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
+import * as pointsOnNSphere from './points-on-n-sphere.js';
 
 const math = create(all);
 
@@ -80,98 +81,6 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// Generate target points on sphere (from existing 3D version)
-function normalize(point) {
-  const norm = Math.sqrt(point[0] * point[0] + point[1] * point[1] + point[2] * point[2]);
-  return new THREE.Vector3(point[0] / norm, point[1] / norm, point[2] / norm);
-}
-
-function tetrahedron() {
-  const points = [
-    [1, 1, 1],
-    [1, -1, -1],
-    [-1, 1, -1],
-    [-1, -1, 1]
-  ];
-  return points.map(normalize);
-}
-
-function octahedron() {
-  const points = [
-    [1, 0, 0], [-1, 0, 0],
-    [0, 1, 0], [0, -1, 0],
-    [0, 0, 1], [0, 0, -1]
-  ];
-  return points.map(normalize);
-}
-
-function cube() {
-  const points = [
-    [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
-    [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1]
-  ];
-  return points.map(normalize);
-}
-
-function icosahedron() {
-  const phi = (1 + Math.sqrt(5)) / 2;
-  const points = [
-    [0, 1, phi], [0, 1, -phi], [0, -1, phi], [0, -1, -phi],
-    [1, phi, 0], [1, -phi, 0], [-1, phi, 0], [-1, -phi, 0],
-    [phi, 0, 1], [phi, 0, -1], [-phi, 0, 1], [-phi, 0, -1]
-  ];
-  return points.map(normalize);
-}
-
-function dodecahedron() {
-  const phi = (1 + Math.sqrt(5)) / 2;
-  const points = [
-    [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
-    [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1],
-    [0, 1/phi, phi], [0, 1/phi, -phi], [0, -1/phi, phi], [0, -1/phi, -phi],
-    [1/phi, phi, 0], [1/phi, -phi, 0], [-1/phi, phi, 0], [-1/phi, -phi, 0],
-    [phi, 0, 1/phi], [phi, 0, -1/phi], [-phi, 0, 1/phi], [-phi, 0, -1/phi]
-  ];
-  return points.map(normalize);
-}
-
-function getEquidistantPointsOnUnitSphereApproximation(n) {
-  const points = [];
-  const offset = 2 / n;
-  const increment = Math.PI * (3 - Math.sqrt(5));
-
-  for (let i = 0; i < n; i++) {
-    const y = ((i * offset) - 1) + (offset / 2);
-    const r = Math.sqrt(1 - y * y);
-    const phi = i * increment;
-
-    const x = Math.cos(phi) * r;
-    const z = Math.sin(phi) * r;
-
-    points.push([x, y, z]);
-  }
-
-  return points.map(normalize);
-}
-
-function getEquidistantPointsOnSphere(radius, nPoints) {
-  let points = [];
-
-  if (nPoints === 4) points = tetrahedron();
-  else if (nPoints === 6) points = octahedron();
-  else if (nPoints === 8) points = cube();
-  else if (nPoints === 12) points = icosahedron();
-  else if (nPoints === 20) points = dodecahedron();
-  else {
-    points = getEquidistantPointsOnUnitSphereApproximation(nPoints);
-  }
-
-  return points.map(p => new THREE.Vector3(
-    p.x * radius,
-    p.y * radius,
-    p.z * radius
-  ));
-}
 
 // MathJS integration functions (adapted from 2D version)
 document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
@@ -300,8 +209,15 @@ function writeToDOM(...args) {
 }
 
 function resetTargetsLocations(verticesCount) {
-  targets = getEquidistantPointsOnSphere(SPHERE_RADIUS, verticesCount);
+  console.log('resetTargetsLocations()');
+  targets = pointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount).map(p => new THREE.Vector3(
+        p[0] * SPHERE_RADIUS,
+        p[1] * SPHERE_RADIUS,
+        p[2] * SPHERE_RADIUS));
 }
+
+
+
 
 function setVerticesCount(verticesCount) {
   resetTargetsLocations(verticesCount);
@@ -311,15 +227,12 @@ function setVerticesCount(verticesCount) {
   return verticesCount;
 }
 
-function createTargetVertices(numVertices) {
+function createTargetMeshes() {
   // Remove old vertex spheres
   targetVertices.forEach(vertex => {
     scene.remove(vertex);
   });
   targetVertices = [];
-
-  targets = getEquidistantPointsOnSphere(SPHERE_RADIUS, numVertices);
-
   targets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
@@ -676,7 +589,7 @@ async function generateAndDraw(clearPoints = true) {
   try {
     if (targets.length !== vertices) {
       setVerticesCount(vertices);
-      createTargetVertices(vertices);
+      createTargetMeshes(vertices);
     }
 
     // Clear existing points only if requested
