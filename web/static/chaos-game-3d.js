@@ -277,7 +277,7 @@ function generatePoints(debugMode, consumePoints) {
   const scope = {
     math: math,
     currentPoint: getRandomVisiblePoint(),  // the default init code currently overrides this.
-    currentPointColor: math.matrix([255, 255, 255, 1.0]),
+    currentPointColor: math.matrix([255, 255, 255]),
     hasKey: hasKey,
     write: writeToDOM,
     createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
@@ -375,10 +375,9 @@ function generatePoints(debugMode, consumePoints) {
             if (currentPointArray.length != 3) console.log("(currentPointArray.length != 3)  currentPointArray:", currentPointArray);
         }
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
-        const pointColor = rawColor;
         points.push({
             position: currentPointArray,
-            color: pointColor
+            color: rawColor
         });
 
 
