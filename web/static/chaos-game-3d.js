@@ -303,7 +303,8 @@ function generatePoints(debugMode, consumePoints) {
   scope['targets'] = function(numVertices, force=false) {
     if (unitSphereTargets.length !== numVertices || force) {
       setVerticesCount(numVertices)
-      scope['targetPoints'] = math.multiply(math.matrix(unitSphereTargets), SPHERE_RADIUS);
+      const regularArrays = unitSphereTargets.map(target => Array.from(target));
+      scope['targetPoints'] = math.multiply(math.matrix(regularArrays), SPHERE_RADIUS);
       scope['targetPointsLength'] = unitSphereTargets.length;
     }
   }
