@@ -215,6 +215,7 @@ function resetTargetsLocations(verticesCount) {
 
 function setVerticesCount(verticesCount) {
   resetTargetsLocations(verticesCount);
+  createTargetMeshes();
   const verticesInput = document.getElementById('vertices');
   verticesInput.value = verticesCount;
   verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -303,7 +304,8 @@ function generatePoints(debugMode, consumePoints) {
   scope['targets'] = function(numVertices, force=false) {
     if (unitSphereTargets.length !== numVertices || force) {
       setVerticesCount(numVertices)
-      scope['targetPoints'] = math.multiply(math.matrix(unitSphereTargets), SPHERE_RADIUS);
+      const regularArrays = unitSphereTargets.map(target => Array.from(target));
+      scope['targetPoints'] = math.multiply(math.matrix(regularArrays), SPHERE_RADIUS);
       scope['targetPointsLength'] = unitSphereTargets.length;
     }
   }
@@ -527,7 +529,7 @@ function drawPoints3D(pointsData, defaultAlpha) {
       const idx = i * 3;
       positions[idx] = point.position[0];
       positions[idx + 1] = point.position[1];
-      positions[idx + 2] = point.position[2];
+      positions[idx + 2] = point.position[2] || 0; // if this is a 2D point, then z=0
     });
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     // Create material for this color group with alphaFloat
@@ -573,10 +575,6 @@ async function generateAndDraw(clearPoints = true) {
   generateBtn.textContent = 'Stop';
 
   try {
-    if (unitSphereTargets.length !== vertices) {
-      setVerticesCount(vertices);
-      createTargetMeshes(vertices);
-    }
 
     // Clear existing points only if requested
     if (clearPoints) {
