@@ -9,12 +9,12 @@ const math = create(all);
 let scene, camera, renderer, controls;
 let pointsGeometry, pointsMaterial, pointsMesh;
 let targetMeshes = [];
-let unitSphereTargets = [];
+let targets = [];
 
 // MathJS system variables (from 2D version)
 const SPHERE_RADIUS = 500;
 const VERTEX_RADIUS = 8;
-const VERBOSE = false;
+const VERBOSE = true;
 const CHUNK_SIZE = 10000;
 let isDragging = false;
 let draggedVertexIndex = -1;

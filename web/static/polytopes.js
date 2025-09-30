@@ -154,7 +154,11 @@ export function regularPolytopeVertices(n, V) {
 
   // n = 2 (any m ≥ 3 is a regular m-gon)
   if (n === 2) {
-    if (V >= 2) return regular2DPolygon(V);
+
+    if (V >= 2) {
+        //console.log("dimensions == 2   making a regular polygon. V:", V);
+        return regular2DPolygon(V);
+    }
     return false;
   }
 
@@ -167,14 +171,14 @@ export function regularPolytopeVertices(n, V) {
 
   // n = 3 extras
   if (n === 3) {
-    // console.log("n == 3   possible extra? ...  V:", V);
+    //console.log("n == 3   possible extra? ...  V:", V);
     if (V === 12) return icosahedron();
     if (V === 20) return dodecahedron();
   }
 
   // n = 4 extra
   if (n === 4 && V === 24) {
-      // console.log("     4D, 24 vertices -- regular polytope");
+      //console.log("     4D, 24 vertices -- regular polytope");
       return cell24();
   }
 
