@@ -527,7 +527,7 @@ function drawPoints3D(pointsData, defaultAlpha) {
       const idx = i * 3;
       positions[idx] = point.position[0];
       positions[idx + 1] = point.position[1];
-      positions[idx + 2] = point.position[2];
+      positions[idx + 2] = point.position[2] || 0; // if this is a 2D point, then z=0
     });
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     // Create material for this color group with alphaFloat
