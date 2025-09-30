@@ -40,6 +40,7 @@ function initThreeJS() {
   // Camera setup
   camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 10000);
   camera.position.set(100, 300, 800);
+  camera.up.set(0, 0, 1); // Set Z as the up direction for mathematical-style visualization
 
   // Renderer setup
   renderer = new THREE.WebGLRenderer({
