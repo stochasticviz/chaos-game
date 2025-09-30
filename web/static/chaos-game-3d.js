@@ -366,23 +366,17 @@ function generatePoints(debugMode, consumePoints) {
             // assume this is a nested array, like [[100, 200, 44]]
             currentPointArray = currentPointArray[0];
         }
+        if (showStuff) {
+            //console.log("pushing currentPointArray:", currentPointArray);
+            if (currentPointArray.length != 3) console.log("(currentPointArray.length != 3)  currentPointArray:", currentPointArray);
+        }
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
         const pointColor = rawColor;
-        if (currentPointArray.length === 3) {
-            //
-            points.push({
-                x: currentPointArray[0],
-                y: currentPointArray[1],
-                z: currentPointArray[2],
-                color: pointColor
-            });
-          }
-            else {
-                if (showStuff) {
-                    console.log("(currentPointArray.length === 3) is FALSE!", currentPointArray.length);
-                    console.log(currentPointArray);
-                }
-            }
+        points.push({
+            position: currentPointArray,
+            color: pointColor
+        });
+
 
         let resultSet = null;
         if (!debugMode) {
@@ -531,9 +525,9 @@ function drawPoints3D(pointsData, defaultAlpha) {
 
     group.forEach((point, i) => {
       const idx = i * 3;
-      positions[idx] = point.x;
-      positions[idx + 1] = point.y;
-      positions[idx + 2] = point.z;
+      positions[idx] = point.position[0];
+      positions[idx + 1] = point.position[1];
+      positions[idx + 2] = point.position[2];
     });
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     // Create material for this color group with alphaFloat
