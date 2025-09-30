@@ -209,8 +209,9 @@ function writeToDOM(...args) {
 }
 
 function resetTargetsLocations(verticesCount) {
-  unitSphereTargets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount);
   //console.log('    unitSphereTargets:', unitSphereTargets, '  typeof unitSphereTargets:', typeof unitSphereTargets);
+  targets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount);
+  targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
 }
 
 function setVerticesCount(verticesCount) {
@@ -228,7 +229,7 @@ function createTargetMeshes() {
     scene.remove(vertex);
   });
   targetMeshes = [];
-  unitSphereTargets.forEach(target => {
+  targets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
@@ -302,11 +303,11 @@ function generatePoints(debugMode, consumePoints) {
   };
 
   scope['targets'] = function(numVertices, force=false) {
-    if (unitSphereTargets.length !== numVertices || force) {
+    if (targets.length !== numVertices || force) {
       setVerticesCount(numVertices)
-      const regularArrays = unitSphereTargets.map(target => Array.from(target));
-      scope['targetPoints'] = math.multiply(math.matrix(regularArrays), SPHERE_RADIUS);
-      scope['targetPointsLength'] = unitSphereTargets.length;
+      const regularArrays = targets.map(target => Array.from(target));
+      scope['targetPoints'] = math.matrix(regularArrays);
+      scope['targetPointsLength'] = targets.length;
     }
   }
   const vertices = parseInt(document.getElementById('vertices').value, 10);
