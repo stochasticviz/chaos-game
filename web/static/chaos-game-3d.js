@@ -215,6 +215,7 @@ function resetTargetsLocations(verticesCount) {
 
 function setVerticesCount(verticesCount) {
   resetTargetsLocations(verticesCount);
+  createTargetMeshes();
   const verticesInput = document.getElementById('vertices');
   verticesInput.value = verticesCount;
   verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -574,10 +575,6 @@ async function generateAndDraw(clearPoints = true) {
   generateBtn.textContent = 'Stop';
 
   try {
-    if (unitSphereTargets.length !== vertices) {
-      setVerticesCount(vertices);
-      createTargetMeshes(vertices);
-    }
 
     // Clear existing points only if requested
     if (clearPoints) {
