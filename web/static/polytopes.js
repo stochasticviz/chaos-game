@@ -151,11 +151,6 @@ export function regularPolytopeVertices(n, V) {
   }
 
   // ---------- decision logic ----------
-  // n = 1   an opt
-  //if (n === 1) {
-  //  if (V === 2) return [[-1], [1]];   // segment
-  //  return false;
-  //}
 
   // n = 2 (any m ≥ 3 is a regular m-gon)
   if (n === 2) {
