@@ -9,7 +9,7 @@ Old version of 3D HTML which was vibeforked (vibeported?) off from a version of 
 import * as THREE from '../../web/lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../../web/lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
 ```
-... and that those modules are found elsewhere in the repo. For development of this I was using:
+... and that those modules are found elsewhere in the repo. For development this was used:
 
 ```
 nvm use 23.7.0
