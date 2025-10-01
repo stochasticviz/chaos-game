@@ -12,6 +12,11 @@ Hosted, live: [chaos-game-3d.html](https://herdrick.github.io/chaos-game/chaos-g
 
 [Source](web/chaos-game-3d.html)
 
+## Archives
+- [archive/sierpinski_triangle/README.md](archive/sierpinski_triangle/README.md)
+- [archive/web/README.md](archive/web/README.md)
+
+
 ## License
 
 This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
