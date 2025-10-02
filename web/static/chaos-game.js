@@ -311,7 +311,7 @@ function generatePoints(debugMode, consumePoints) {
           stepsInput.dispatchEvent(new Event('input', { bubbles: true }));
           return numPoints;
       },
-      opacity: function(alphaValue) {
+      setOpacity: function(alphaValue) {
           const alphaInput = document.getElementById('alpha');
           alphaInput.value = alphaValue;
           // Trigger input event to update UI
