@@ -311,12 +311,18 @@ function generatePoints(debugMode, consumePoints) {
           stepsInput.dispatchEvent(new Event('input', { bubbles: true }));
           return numPoints;
       },
+      getPointsCount: function() {
+          return parseInt(document.getElementById('steps').value, 10);
+      },
       setOpacity: function(alphaValue) {
           const alphaInput = document.getElementById('alpha');
           alphaInput.value = alphaValue;
           // Trigger input event to update UI
           alphaInput.dispatchEvent(new Event('input', { bubbles: true }));
           return alphaValue;
+      },
+      getOpacity: function() {
+          return parseFloat(document.getElementById('alpha').value);
       }
   };
   // setTargetsCount() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
@@ -326,6 +332,9 @@ function generatePoints(debugMode, consumePoints) {
           scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
           scope['targetPointsLength'] = targets.length;
       }
+  }
+  scope['getTargetsCount'] = function() {
+      return targets.length;
   }
 
   let points = [];
