@@ -289,21 +289,27 @@ function generatePoints(debugMode, consumePoints) {
       }
       return slidersValuesCache.get(label);
     },
-    points: function(numPoints) {
+    setPointsCount: function(numPoints) {
       const stepsInput = document.getElementById('steps');
       stepsInput.value = numPoints;
       stepsInput.dispatchEvent(new Event('input', { bubbles: true }));
       return numPoints;
     },
-    opacity: function(alphaValue) {
+    getPointsCount: function() {
+      return parseInt(document.getElementById('steps').value);
+    },
+    setOpacity: function(alphaValue) {
       const alphaInput = document.getElementById('alpha');
       alphaInput.value = alphaValue;
       alphaInput.dispatchEvent(new Event('input', { bubbles: true }));
       return alphaValue;
+    },
+    getOpacity: function() {
+      return parseFloat(document.getElementById('alpha').value);
     }
   };
 
-  scope['targets'] = function(numVertices, force=false) {
+  scope['setTargetsCount'] = function(numVertices, force=false) {
     if (targets.length !== numVertices || force) {
       setVerticesCount(numVertices)
       const regularArrays = targets.map(target => Array.from(target));
@@ -311,9 +317,11 @@ function generatePoints(debugMode, consumePoints) {
       scope['targetPointsLength'] = targets.length;
     }
   }
-  scope['targets'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
-  scope['vertices'] = scope['targets']  // support deprecated 'vertices' function in MathJS, for now
+  scope['getTargetsCount'] = function() {
+    return targets.length;
+  }
   const vertices = parseInt(document.getElementById('vertices').value);
+  scope['setTargetsCount'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
 
   let showStuff = null;
   let firstTime = true;
