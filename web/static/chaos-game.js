@@ -327,7 +327,6 @@ function generatePoints(debugMode, consumePoints) {
           scope['targetPointsLength'] = targets.length;
       }
   }
-  scope['vertices'] = scope['targets']  // vertices() user function name is deprecated but supported
 
   let points = [];
   let pointsInViewCount = 0;
