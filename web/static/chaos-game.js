@@ -304,7 +304,7 @@ function generatePoints(debugMode, consumePoints) {
           centerYInput.dispatchEvent(new Event('input', { bubbles: true }));
           return [centerX, centerY];
       },
-      points: function(numPoints) {
+      setPointsCount: function(numPoints) {
           const stepsInput = document.getElementById('steps');
           stepsInput.value = numPoints;
           // Trigger input event to update UI
@@ -319,8 +319,8 @@ function generatePoints(debugMode, consumePoints) {
           return alphaValue;
       }
   };
-  // targets() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
-  scope['targets'] = function(numVertices) {
+  // setTargetsCount() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
+  scope['setTargetsCount'] = function(numVertices) {
       if (targets.length !== numVertices) {
           setVerticesCount(numVertices)
           scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
