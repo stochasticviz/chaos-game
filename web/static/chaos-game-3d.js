@@ -311,9 +311,9 @@ function generatePoints(debugMode, consumePoints) {
       scope['targetPointsLength'] = targets.length;
     }
   }
-  const vertices = parseInt(document.getElementById('vertices').value, 10);
   scope['targets'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
   scope['vertices'] = scope['targets']  // support deprecated 'vertices' function in MathJS, for now
+  const vertices = parseInt(document.getElementById('vertices').value);
 
   let showStuff = null;
   let firstTime = true;
@@ -343,7 +343,7 @@ function generatePoints(debugMode, consumePoints) {
     }
   }
 
-  const steps = parseInt(document.getElementById('steps').value, 10);
+  const steps = parseInt(document.getElementById('steps').value);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
   return new Promise((resolve, reject) => {
@@ -556,8 +556,8 @@ function toggleProgressIndicator(show) {
 
 async function generateAndDraw(clearPoints = true) {
   const generationId = currentGenerationId + 1;
-  const vertices = parseInt(document.getElementById('vertices').value, 10);
-  const steps = parseInt(document.getElementById('steps').value, 10);
+  const vertices = parseInt(document.getElementById('vertices').value);
+  const steps = parseInt(document.getElementById('steps').value);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const debugMode = document.getElementById('debugMode').checked;
 
