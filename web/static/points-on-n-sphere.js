@@ -1,4 +1,4 @@
-import * as polytopes from './polytopes.js';
+import * as polytopes from './polytopes.js?v=7299d83';
 
 /**
  * getEquidistantPointsOnUnitNSphereApproximation
