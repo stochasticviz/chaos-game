@@ -18,11 +18,11 @@ import * as polytopes from './polytopes.js';
  * @returns {Array<Float64Array>}    Array of length nPoints; each is Float64Array(dimensions)
  */
 function getEquidistantPointsOnUnitNSphereApproximation(dimensions, nPoints, opts = {}) {
-  if (!Number.isInteger(dimensions) || dimensions < 2) {
-    throw new Error("dimensions must be an integer ≥ 2 (points lie on S^{n-1}).");
+  if (!Number.isInteger(dimensions) || dimensions < 0) {
+    throw new Error("dimensions must be an integer ≥ 0 (points lie on S^{n-1}).");
   }
-  if (!Number.isInteger(nPoints) || nPoints < 2) {
-    throw new Error("nPoints must be an integer ≥ 2.");
+  if (!Number.isInteger(nPoints) || nPoints < 1) {
+    throw new Error("vertices count must be an integer ≥ 1.");
   }
 
   const {
