@@ -541,8 +541,8 @@ function drawPoints3D(pointsData, defaultAlpha) {
 
     group.forEach((point, i) => {
       const idx = i * 3;
-      positions[idx] = point.position[0];
-      positions[idx + 1] = point.position[1];
+      positions[idx] = point.position[0] || 0; // if this is a 0D point, then x=0  :)
+      positions[idx + 1] = point.position[1] || 0; // if this is a 1D point, then y=0
       positions[idx + 2] = point.position[2] || 0; // if this is a 2D point, then z=0
     });
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
