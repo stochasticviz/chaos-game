@@ -16,12 +16,6 @@
  *   n = 4:     + 24-cell (24)
  */
 export function regularPolytopeVertices(n, V) {
-  if (!Number.isInteger(n) || n < 1) {
-    throw new Error("dimension must be an integer ≥ 1");
-  }
-  if (!Number.isInteger(V) || V < 1) {
-    throw new Error("verticesCount must be a positive integer");
-  }
 
   // ---------- helpers ----------
   const range = (k) => [...Array(k).keys()];
