@@ -320,6 +320,11 @@ function generatePoints(debugMode, consumePoints) {
   scope['getTargetsCount'] = function() {
     return targets.length;
   }
+  scope['getEquidistantPointsOnSphere'] = function(count, dimensions=3) {
+    const points = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
+    const regularArrays = points.map(point => Array.from(point));
+    return math.matrix(regularArrays);
+  }
   const vertices = parseInt(document.getElementById('vertices').value);
   scope['setTargetsCount'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
 
