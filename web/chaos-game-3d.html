@@ -59,7 +59,10 @@ The following functions are usually used in the optional initialization code:
       <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then ex. <code>nextPoint = currentPoint + t</code> in your code gives your end user 'live' control over the scalar value, <code>t</code>. Optionally you can specifiy a 5th parameter which, when <code>false</code>, prevents the existing points from being cleared when the user slides the slider. Example: <code>slider = createSlider("rotation", 0, 6.28, 0, false)</code>.
     </li>
     <li>
-      <strong>targets(), points(), and opacity() functions</strong> Set the fields seen above, programmatically. Example: <code>targets(5)</code> will set the Targets field to 5.
+      <strong>setTargetsCount(), setPointsCount(), and setOpacity() functions</strong> Set the fields seen above, programmatically. Example: <code>setTargetsCount(5)</code> will set the Targets field to 5.
+    </li>
+    <li>
+      <strong>getTargetsCount(), getPointsCount(), and getOpacity() functions</strong> Get the current values of the fields seen above. Example: <code>n = getTargetsCount()</code>.
     </li>
   </ul>
 

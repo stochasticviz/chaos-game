@@ -289,21 +289,27 @@ function generatePoints(debugMode, consumePoints) {
       }
       return slidersValuesCache.get(label);
     },
-    points: function(numPoints) {
+    setPointsCount: function(numPoints) {
       const stepsInput = document.getElementById('steps');
       stepsInput.value = numPoints;
       stepsInput.dispatchEvent(new Event('input', { bubbles: true }));
       return numPoints;
     },
-    opacity: function(alphaValue) {
+    getPointsCount: function() {
+      return parseInt(document.getElementById('steps').value);
+    },
+    setOpacity: function(alphaValue) {
       const alphaInput = document.getElementById('alpha');
       alphaInput.value = alphaValue;
       alphaInput.dispatchEvent(new Event('input', { bubbles: true }));
       return alphaValue;
+    },
+    getOpacity: function() {
+      return parseFloat(document.getElementById('alpha').value);
     }
   };
 
-  scope['targets'] = function(numVertices, force=false) {
+  scope['setTargetsCount'] = function(numVertices, force=false) {
     if (targets.length !== numVertices || force) {
       setVerticesCount(numVertices)
       const regularArrays = targets.map(target => Array.from(target));
@@ -311,9 +317,11 @@ function generatePoints(debugMode, consumePoints) {
       scope['targetPointsLength'] = targets.length;
     }
   }
-  const vertices = parseInt(document.getElementById('vertices').value, 10);
-  scope['targets'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
-  scope['vertices'] = scope['targets']  // support deprecated 'vertices' function in MathJS, for now
+  scope['getTargetsCount'] = function() {
+    return targets.length;
+  }
+  const vertices = parseInt(document.getElementById('vertices').value);
+  scope['setTargetsCount'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
 
   let showStuff = null;
   let firstTime = true;
@@ -343,7 +351,7 @@ function generatePoints(debugMode, consumePoints) {
     }
   }
 
-  const steps = parseInt(document.getElementById('steps').value, 10);
+  const steps = parseInt(document.getElementById('steps').value);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
   return new Promise((resolve, reject) => {
@@ -556,8 +564,8 @@ function toggleProgressIndicator(show) {
 
 async function generateAndDraw(clearPoints = true) {
   const generationId = currentGenerationId + 1;
-  const vertices = parseInt(document.getElementById('vertices').value, 10);
-  const steps = parseInt(document.getElementById('steps').value, 10);
+  const vertices = parseInt(document.getElementById('vertices').value);
+  const steps = parseInt(document.getElementById('steps').value);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
   const debugMode = document.getElementById('debugMode').checked;
 

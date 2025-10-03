@@ -304,30 +304,38 @@ function generatePoints(debugMode, consumePoints) {
           centerYInput.dispatchEvent(new Event('input', { bubbles: true }));
           return [centerX, centerY];
       },
-      points: function(numPoints) {
+      setPointsCount: function(numPoints) {
           const stepsInput = document.getElementById('steps');
           stepsInput.value = numPoints;
           // Trigger input event to update UI
           stepsInput.dispatchEvent(new Event('input', { bubbles: true }));
           return numPoints;
       },
-      opacity: function(alphaValue) {
+      getPointsCount: function() {
+          return parseInt(document.getElementById('steps').value, 10);
+      },
+      setOpacity: function(alphaValue) {
           const alphaInput = document.getElementById('alpha');
           alphaInput.value = alphaValue;
           // Trigger input event to update UI
           alphaInput.dispatchEvent(new Event('input', { bubbles: true }));
           return alphaValue;
+      },
+      getOpacity: function() {
+          return parseFloat(document.getElementById('alpha').value);
       }
   };
-  // targets() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
-  scope['targets'] = function(numVertices) {
+  // setTargetsCount() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
+  scope['setTargetsCount'] = function(numVertices) {
       if (targets.length !== numVertices) {
           setVerticesCount(numVertices)
           scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
           scope['targetPointsLength'] = targets.length;
       }
   }
-  scope['vertices'] = scope['targets']  // vertices() user function name is deprecated but supported
+  scope['getTargetsCount'] = function() {
+      return targets.length;
+  }
 
   let points = [];
   let pointsInViewCount = 0;
