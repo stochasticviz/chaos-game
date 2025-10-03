@@ -6,36 +6,6 @@
   <link rel="stylesheet" href="static/chaos-game.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.css">
   <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
-  <style>
-    #threejs-container {
-      position: relative;
-      width: 100%;
-      height: 600px;
-      border: 1px solid #ccc;
-      margin: 10px 0;
-    }
-    #controls3d {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      max-width: 200px;
-    }
-    #progress-indicator {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      z-index: 1000;
-    }
-  </style>
 </head>
 <body>
 <h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a> in 3D!</h1>
@@ -197,7 +167,7 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
   </div>
 
 </div>
-</div> <!-- codeExplanation -->
+</div>
 
 <label for="nextVertexAndPointMathJSCode">Code to calculate the next point:</label>
 <textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
@@ -230,7 +200,6 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
     • Pan: Right click + drag
   </div>
 </div>
-
 <script type="module" src="static/chaos-game-3d.js?v=5d5b3d2c"></script>
 <div><small><a href="https://github.com/herdrick/chaos-game/">source</a>&nbsp;&nbsp;&nbsp;<a href="chaos-game.html">2D version</a></small></div>
 </body>
