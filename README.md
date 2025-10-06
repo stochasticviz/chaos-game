@@ -12,6 +12,11 @@ Hosted, live: [chaos-game.html](https://herdrick.github.io/chaos-game/chaos-game
 
 [Source](web/chaos-game.html)
 
+## Running locally
+
+```bash
+python3 -m http.server 8080
+```
 
 ## Archives
 - [archive/sierpinski_triangle/README.md](archive/sierpinski_triangle/README.md)
