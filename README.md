@@ -12,7 +12,7 @@ Hosted, live: [chaos-game.html](https://herdrick.github.io/chaos-game/chaos-game
 
 [Source](web/chaos-game.html)
 
-## Running locally
+## To run locally
 
 ```bash
 python3 -m http.server 8080
