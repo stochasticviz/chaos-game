@@ -549,7 +549,7 @@ function drawPoints3D(pointsData, defaultAlpha) {
     // Create material for this color group with alphaFloat
     const material = new THREE.PointsMaterial({
       size: 2,  // TODO: this is size of voxel
-      vertexColors: false,
+      vertexColors: false,  // each material object is for one color and alpha combination
       transparent: alphaFloat < 1.0,  // TODO: set this false when alphaFloat is 1.0
       color: color,
       opacity: alphaFloat,
