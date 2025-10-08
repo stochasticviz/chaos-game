@@ -626,7 +626,7 @@ async function generateAndDraw(clearPoints = true) {
     }
   } finally {
     if (generationId === currentGenerationId) {
-      generateBtn.textContent = 'Generate';
+      generateBtn.textContent = 'New point cloud';
       generateBtn.disabled = false;
     }
     generateAndDraw.regenerateTimeout = null;
@@ -783,7 +783,7 @@ document.getElementById('generateBtn').addEventListener('click', function() {
   if (generateBtn.textContent === 'Stop') {
     currentGenerationId++;
     toggleProgressIndicator(false);
-    generateBtn.textContent = 'Generate';
+    generateBtn.textContent = 'New point cloud';
   } else {
     generateAndDraw(true);
   }

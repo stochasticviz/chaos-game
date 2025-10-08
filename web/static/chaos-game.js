@@ -661,7 +661,7 @@ async function generateAndDraw(clearPoints = true) {
   } finally {
     // Only reset button if this generation wasn't superseded by a newer one
     if (generationId === currentGenerationId) {
-      generateBtn.textContent = 'Generate';
+      generateBtn.textContent = 'New point cloud';
       generateBtn.disabled = false;
     }
     // Clear the regenerate timeout flag
@@ -750,7 +750,7 @@ document.getElementById('generateBtn').addEventListener('click', function() {
     // Hide the progress indicator
     toggleProgressIndicator(false);
     // Reset button to Generate immediately
-    generateBtn.textContent = 'Generate';
+    generateBtn.textContent = 'New point cloud';
   } else {
     generateAndDraw(true);
   }
