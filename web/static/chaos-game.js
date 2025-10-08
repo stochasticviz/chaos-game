@@ -615,8 +615,8 @@ async function generateAndDraw(clearPoints = true) {
   document.getElementById('errorMessage').innerHTML = '';
 
   // Hide generate buttons and show stop button
-  document.getElementById('generateBtn').style.display = 'none';
-  document.getElementById('generateAddBtn').style.display = 'none';
+  document.getElementById('generateBtn').style.visibility = 'hidden';
+  document.getElementById('generateAddBtn').style.visibility = 'hidden';
   document.getElementById('stopBtn').style.display = 'inline-block';
 
   try {
@@ -663,8 +663,8 @@ async function generateAndDraw(clearPoints = true) {
   } finally {
     // Only reset buttons if this generation wasn't superseded by a newer one
     if (generationId === currentGenerationId) {
-      document.getElementById('generateBtn').style.display = 'inline-block';
-      document.getElementById('generateAddBtn').style.display = 'inline-block';
+      document.getElementById('generateBtn').style.visibility = 'visible';
+      document.getElementById('generateAddBtn').style.visibility = 'visible';
       document.getElementById('stopBtn').style.display = 'none';
     }
     // Clear the regenerate timeout flag
@@ -759,8 +759,8 @@ document.getElementById('stopBtn').addEventListener('click', function() {
   // Hide the progress indicator
   toggleProgressIndicator(false);
   // Show generate buttons, hide stop button
-  document.getElementById('generateBtn').style.display = 'inline-block';
-  document.getElementById('generateAddBtn').style.display = 'inline-block';
+  document.getElementById('generateBtn').style.visibility = 'visible';
+  document.getElementById('generateAddBtn').style.visibility = 'visible';
   document.getElementById('stopBtn').style.display = 'none';
 });
 

@@ -2,6 +2,29 @@ body {
   font-family: sans-serif;
 }
 
+.button-grid {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  vertical-align: top;
+}
+
+#generateBtn {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+#generateAddBtn {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+#stopBtn {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+}
+
 h1 {
   font-size: 1.2em;
   font-weight: normal;
