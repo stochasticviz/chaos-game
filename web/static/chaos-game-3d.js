@@ -585,8 +585,10 @@ async function generateAndDraw(clearPoints = true) {
   // Clear any previous error message
   document.getElementById('errorMessage').innerHTML = '';
 
-  const generateBtn = document.getElementById('generateBtn');
-  generateBtn.textContent = 'Stop';
+  // Hide generate buttons and show stop button
+  document.getElementById('generateBtn').style.display = 'none';
+  document.getElementById('generateAddBtn').style.display = 'none';
+  document.getElementById('stopBtn').style.display = 'inline-block';
 
   try {
 
@@ -626,8 +628,9 @@ async function generateAndDraw(clearPoints = true) {
     }
   } finally {
     if (generationId === currentGenerationId) {
-      generateBtn.textContent = 'New point cloud';
-      generateBtn.disabled = false;
+      document.getElementById('generateBtn').style.display = 'inline-block';
+      document.getElementById('generateAddBtn').style.display = 'inline-block';
+      document.getElementById('stopBtn').style.display = 'none';
     }
     generateAndDraw.regenerateTimeout = null;
   }
@@ -779,18 +782,22 @@ function loadSharedCode() {
 
 // Event listeners
 document.getElementById('generateBtn').addEventListener('click', function() {
-  const generateBtn = document.getElementById('generateBtn');
-  if (generateBtn.textContent === 'Stop') {
-    currentGenerationId++;
-    toggleProgressIndicator(false);
-    generateBtn.textContent = 'New point cloud';
-  } else {
-    generateAndDraw(true);
-  }
+  generateAndDraw(true);
 });
 
 document.getElementById('generateAddBtn').addEventListener('click', function() {
   generateAndDraw(false);
+});
+
+document.getElementById('stopBtn').addEventListener('click', function() {
+  // Stop generation by incrementing the generation ID
+  currentGenerationId++;
+  // Hide the progress indicator
+  toggleProgressIndicator(false);
+  // Show generate buttons, hide stop button
+  document.getElementById('generateBtn').style.display = 'inline-block';
+  document.getElementById('generateAddBtn').style.display = 'inline-block';
+  document.getElementById('stopBtn').style.display = 'none';
 });
 
 document.getElementById('shareBtn').addEventListener('click', async () => {
