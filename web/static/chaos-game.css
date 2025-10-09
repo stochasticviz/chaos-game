@@ -87,11 +87,7 @@ pre.codeExample {
 }
 
 /* Advanced examples section styling */
-.advanced-examples {
-  display: none;
-}
-
-#advanced-examples-toggle:checked ~ .advanced-examples {
+#advanced-stuff-toggle:checked ~ .advanced-stuff .advanced-examples {
   display: block;
 }
 
