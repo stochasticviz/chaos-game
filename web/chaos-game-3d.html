@@ -51,9 +51,6 @@ Write your own code to calculate where the next point should be, by setting the 
     <li>
       <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target" in the advanced examples, below.
     </li>
-    <li>
-      <strong>Optional initialization code</strong> When the "Show advanced" checkbox is checked, another code window is visible. This is for code that you want to run only once, before the first point is created.
-    </li>
   </ul>
 The following functions are usually used in the optional initialization code:
 
@@ -139,13 +136,6 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
   </div>
   </div>
 
-  <br/>
-  <br/>
-  <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
-  <textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
-currentPoint = [[100, 100, 100]]  # arbitrary starting point
-  </textarea>
-
 </div>
 
 <div class="examples-docs">
@@ -170,6 +160,14 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
   </div>
 
 </div>
+
+<br/>
+<br/>
+<label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
+<textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
+currentPoint = [[100, 100, 100]]  # arbitrary starting point
+</textarea>
+
 </div>
 
 <label for="nextVertexAndPointMathJSCode">Code to calculate the next point:</label>

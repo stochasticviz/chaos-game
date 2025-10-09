@@ -77,8 +77,12 @@ pre.codeExample {
   display: block;
 }
 
-/* Show the initialization code textarea when advanced docs are visible */
-#advanced-stuff-toggle:checked ~ .advanced-stuff #initializationMathJSCode {
+/* Show the initialization code textarea when code customization is enabled */
+#codeExplanation #initializationMathJSCode {
+  display: block;
+}
+
+#codeExplanation label[for="initializationMathJSCode"] {
   display: block;
 }
 
