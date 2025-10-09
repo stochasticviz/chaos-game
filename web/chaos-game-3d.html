@@ -31,7 +31,31 @@
 
 <div id="codeExplanation">
 Write your own code to calculate where the next point should be, by setting the <code>nextPoint</code> variable. <code>nextPoint</code> must be an array of three numbers <code>[100, 200, 300]</code> or a matrix <code>[[100, 200, 300]]</code>. The default code simply picks one of the targets at random and moves the current point halfway there, but you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target, <code>targetPoints</code>. Both are matrices.<br/>
+<details class="examples-docs">
+<summary>Show examples</summary>
+<div>
+  <h4>Examples:</h4>
+  <div class="codeBlock">
+    Add 1 to x, y, and z:
+    <pre class="codeExample">
+nextPoint = currentPoint + 1</pre>
+  </div>
 
+  <div class="codeBlock">
+    3D rotation around target:
+    <pre class="codeExample">
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
+midpoint = (currentPoint + _nextTarget) / 2
+# Rotation around Z axis
+rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4), 0],
+            [math.sin(math.pi/4), math.cos(math.pi/4), 0],
+            [0, 0, 1]]
+nextPoint = math.multiply(midpoint, rotation)</pre>
+  </div>
+
+</div>
+</details>
 <details class="advanced-stuff">
 <summary>Show advanced</summary>
 <div>
@@ -129,33 +153,6 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
 
 </div>
 </details>
-
-<details class="examples-docs">
-<summary>Show examples</summary>
-<div>
-  <h4>Examples:</h4>
-  <div class="codeBlock">
-    Add 1 to x, y, and z:
-    <pre class="codeExample">
-nextPoint = currentPoint + 1</pre>
-  </div>
-
-  <div class="codeBlock">
-    3D rotation around target:
-    <pre class="codeExample">
-nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
-midpoint = (currentPoint + _nextTarget) / 2
-# Rotation around Z axis
-rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4), 0],
-            [math.sin(math.pi/4), math.cos(math.pi/4), 0],
-            [0, 0, 1]]
-nextPoint = math.multiply(midpoint, rotation)</pre>
-  </div>
-
-</div>
-</details>
-
 <br/>
 <br/>
 <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
