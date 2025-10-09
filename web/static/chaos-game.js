@@ -779,12 +779,6 @@ function generateShareableLink() {
     centerX: document.getElementById('centerX').value,
     centerY: document.getElementById('centerY').value,
     zoom: document.getElementById('zoom').value,
-    customizeMathJSCode: document.getElementById('customizeMathJSCode').checked,
-    examplesToggle: document.getElementById('examples-toggle').checked,
-    advancedStuffToggle: document.getElementById('advanced-stuff-toggle').checked,
-    advancedExamplesToggle: document.getElementById('advanced-examples-toggle').checked,
-    debugMode: document.getElementById('debugMode').checked,
-    customizeView: document.getElementById('customizeView').checked,
     sliders: Object.fromEntries(slidersValuesCache),
     vertexPositions: targets.map(target => ({ x: target.x, y: target.y }))
   };
@@ -892,37 +886,6 @@ function loadSharedCode() {
 
       if (shareData.zoom !== undefined) {
         document.getElementById('zoom').value = shareData.zoom;
-      }
-
-      // Restore checkbox states
-      if (shareData.customizeMathJSCode !== undefined) {
-        document.getElementById('customizeMathJSCode').checked = shareData.customizeMathJSCode;
-        document.getElementById('customizeMathJSCode').dispatchEvent(new Event('change'));
-      }
-
-      if (shareData.examplesToggle !== undefined) {
-        document.getElementById('examples-toggle').checked = shareData.examplesToggle;
-        document.getElementById('examples-toggle').dispatchEvent(new Event('change'));
-      }
-
-      if (shareData.advancedStuffToggle !== undefined) {
-        document.getElementById('advanced-stuff-toggle').checked = shareData.advancedStuffToggle;
-        document.getElementById('advanced-stuff-toggle').dispatchEvent(new Event('change'));
-      }
-
-      if (shareData.advancedExamplesToggle !== undefined) {
-        document.getElementById('advanced-examples-toggle').checked = shareData.advancedExamplesToggle;
-        document.getElementById('advanced-examples-toggle').dispatchEvent(new Event('change'));
-      }
-
-      if (shareData.debugMode !== undefined) {
-        document.getElementById('debugMode').checked = shareData.debugMode;
-        document.getElementById('debugMode').dispatchEvent(new Event('change'));
-      }
-
-      if (shareData.customizeView !== undefined) {
-        document.getElementById('customizeView').checked = shareData.customizeView;
-        document.getElementById('customizeView').dispatchEvent(new Event('change'));
       }
 
       // Store slider values to be applied after sliders are created
