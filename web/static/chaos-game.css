@@ -69,35 +69,12 @@ pre.codeExample {
   white-space: pre;
 }
 
-.advanced-stuff {
-  display: none;
+details.advanced-stuff > div {
+  margin-top: 0.5em;
 }
 
-#advanced-stuff-toggle:checked ~ .advanced-stuff {
-  display: block;
-}
-
-/* Show the initialization code textarea when code customization is enabled */
-#codeExplanation #initializationMathJSCode {
-  display: block;
-}
-
-#codeExplanation label[for="initializationMathJSCode"] {
-  display: block;
-}
-
-/* Advanced examples section styling */
-#advanced-stuff-toggle:checked ~ .advanced-stuff .advanced-examples {
-  display: block;
-}
-
-/* Examples section styling */
-.examples-docs {
-  display: none;
-}
-
-#examples-toggle:checked ~ .examples-docs {
-  display: block;
+details.examples-docs > div {
+  margin-top: 0.5em;
 }
 
 .child-checkbox-label {
@@ -106,7 +83,6 @@ pre.codeExample {
 }
 
 .mathJSCode {
-  display: none;
   width: 100%;
   max-width: 1000px;  /* Match canvas width */
   margin-top: 10px;
@@ -120,18 +96,17 @@ pre.codeExample {
   resize: vertical;
 }
 
-/* Hide the labels for the code inputs by default */
-label[for="nextVertexAndPointMathJSCode"] {
-  display: none;
+label[for="nextVertexAndPointMathJSCode"],
+label[for="initializationMathJSCode"] {
+  display: block;
 }
 
 #codeExplanation {
-    display: none;
     margin: 10px 0;
 }
 
 #debugModeDiv {
-    display: none;
+    display: block;
 }
 
 #errorMessage {

@@ -26,18 +26,15 @@
   </div>
   <button id="shareBtn">Share</button>
 </div>
-<div>
-  <input type="checkbox" id="customizeMathJSCode" />
-  <label for="customizeMathJSCode">Customize the "next point" code</label>
-</div>
+<details id="customizeMathJSCode">
+  <summary>Customize the "next point" code</summary>
 
 <div id="codeExplanation">
 Write your own code to calculate where the next point should be, by setting the <code>nextPoint</code> variable. <code>nextPoint</code> must be an array of three numbers <code>[100, 200, 300]</code> or a matrix <code>[[100, 200, 300]]</code>. The default code simply picks one of the targets at random and moves the current point halfway there, but you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target, <code>targetPoints</code>. Both are matrices.<br/>
 
-<input type="checkbox" id="advanced-stuff-toggle">
-<label for="advanced-stuff-toggle" class="child-checkbox-label">Show advanced</label>
-
-<div class="advanced-stuff">
+<details class="advanced-stuff">
+<summary>Show advanced</summary>
+<div>
   <ul>
     <li>
       <strong>write() function</strong> Write text to the page. Example: <code>write("currentPoint:", currentPoint)</code>
@@ -131,11 +128,11 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
   </div>
 
 </div>
+</details>
 
-<input type="checkbox" id="examples-toggle">
-<label for="examples-toggle" class="child-checkbox-label">Show examples</label>
-
-<div class="examples-docs">
+<details class="examples-docs">
+<summary>Show examples</summary>
+<div>
   <h4>Examples:</h4>
   <div class="codeBlock">
     Add 1 to x, y, and z:
@@ -157,6 +154,7 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
   </div>
 
 </div>
+</details>
 
 <br/>
 <br/>
@@ -166,6 +164,7 @@ currentPoint = [[100, 100, 100]]  # arbitrary starting point
 </textarea>
 
 </div>
+</details>
 
 <label for="nextVertexAndPointMathJSCode">Code to calculate the next point:</label>
 <textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
