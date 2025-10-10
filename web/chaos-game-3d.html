@@ -154,15 +154,10 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
 </div>
 </details>
 <br/>
-<br/>
 <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
 <textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
 currentPoint = [[100, 100, 100]]  # arbitrary starting point
 </textarea>
-
-</div>
-</details>
-
 <label for="nextVertexAndPointMathJSCode">Code to calculate the next point:</label>
 <textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
 # Pick a random target vertex
@@ -176,10 +171,11 @@ slider = createSlider("how far to go toward the target", 0.02, 1.4, 0.5)
 
 nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 </textarea>
-<div id="debugModeDiv" >
+<div id="debugModeDiv">
     <input type="checkbox" id="debugMode" />
     <label for="debugMode" class="child-checkbox-label">Debug mode (slow, shows error messages)</label>
 </div>
+</details>
 <div id="errorMessage">
 </div>
 
