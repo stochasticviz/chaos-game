@@ -22,18 +22,6 @@ ctx.translate(canvas.width / 2, canvas.height / 2);
 // Flip Y axis so positive is up
 ctx.scale(1, -1);
 
-
-document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
-    const mainCodeLabel = document.querySelector('label[for="nextVertexAndPointMathJSCode"]');
-    const mainCodeInput = document.getElementById('nextVertexAndPointMathJSCode');
-    const explanation = document.getElementById('codeExplanation');
-    const debugModeDiv = document.getElementById('debugModeDiv');
-    mainCodeLabel.style.display = e.target.checked ? 'block' : 'none';
-    mainCodeInput.style.display = e.target.checked ? 'block' : 'none';
-    explanation.style.display = e.target.checked ? 'block' : 'none';
-    debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
-});
-
 document.getElementById('customizeView').addEventListener('change', function(e) {
     const viewSettings = document.getElementById('viewSettings');
     viewSettings.style.display = e.target.checked ? 'block' : 'none';

@@ -82,19 +82,6 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-
-// MathJS integration functions (adapted from 2D version)
-document.getElementById('customizeMathJSCode').addEventListener('change', function(e) {
-  const mainCodeLabel = document.querySelector('label[for="nextVertexAndPointMathJSCode"]');
-  const mainCodeInput = document.getElementById('nextVertexAndPointMathJSCode');
-  const explanation = document.getElementById('codeExplanation');
-  const debugModeDiv = document.getElementById('debugModeDiv');
-  mainCodeLabel.style.display = e.target.checked ? 'block' : 'none';
-  mainCodeInput.style.display = e.target.checked ? 'block' : 'none';
-  explanation.style.display = e.target.checked ? 'block' : 'none';
-  debugModeDiv.style.display = e.target.checked ? 'block' : 'none';
-});
-
 // Function to create a user control (from 2D version)
 function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true) {
   const container = document.createElement('div');
