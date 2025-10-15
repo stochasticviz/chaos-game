@@ -55,7 +55,7 @@ function initThreeJS() {
   controls.enableDamping = true;
   controls.rotateSpeed = 0.7;
   controls.zoomSpeed = 0.8;
-  controls.panSpeed = 0.2;
+  controls.panSpeed = 1.0;
   controls.minDistance = 50;
   controls.maxDistance = 4000;
 
