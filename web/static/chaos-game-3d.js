@@ -60,6 +60,8 @@ function initThreeJS() {
   controls.minDistance = 5;
   controls.maxDistance = 4000;
 
+  controls.target.set(0, 0, 0);
+
   // Store initial camera position and target for reset functionality
   initialCameraPosition = camera.position.clone();
   initialCameraTarget = controls.target.clone();
