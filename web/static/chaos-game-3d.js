@@ -10,6 +10,7 @@ let scene, camera, renderer, controls;
 let pointsGeometry, pointsMaterial, pointsMesh;
 let targetMeshes = [];
 let targets = [];
+let initialCameraPosition, initialCameraTarget;
 
 // MathJS system variables (from 2D version)
 const SPHERE_RADIUS = 500;
@@ -56,8 +57,12 @@ function initThreeJS() {
   controls.rotateSpeed = 0.7;
   controls.zoomSpeed = 0.8;
   controls.panSpeed = 1.0;
-  controls.minDistance = 50;
+  controls.minDistance = 5;
   controls.maxDistance = 4000;
+
+  // Store initial camera position and target for reset functionality
+  initialCameraPosition = camera.position.clone();
+  initialCameraTarget = controls.target.clone();
 
   // Add coordinate axes helper
   const axesHelper = new THREE.AxesHelper(SPHERE_RADIUS + 50);
@@ -780,6 +785,12 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
       shareBtn.textContent = originalText;
     }, 2000);
   }
+});
+
+document.getElementById('resetCameraBtn').addEventListener('click', () => {
+  camera.position.copy(initialCameraPosition);
+  controls.target.copy(initialCameraTarget);
+  controls.update();
 });
 
 // Initialize everything

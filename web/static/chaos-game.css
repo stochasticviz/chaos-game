@@ -192,6 +192,25 @@ label[for="initializationMathJSCode"] {
   margin: 10px 0;
 }
 
+#resetCameraBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 100;
+  transition: background 0.2s;
+}
+
+#resetCameraBtn:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: #4285F4;
+}
+
 #controls3d {
   position: absolute;
   top: 10px;
