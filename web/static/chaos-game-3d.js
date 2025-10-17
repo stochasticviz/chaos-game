@@ -46,7 +46,7 @@ function initThreeJS() {
   // Renderer setup
   renderer = new THREE.WebGLRenderer({
     antialias: true,
-    preserveDrawingBuffer: true
+    preserveDrawingBuffer: false
   });
   renderer.setSize(container.offsetWidth, container.offsetHeight);
   container.appendChild(renderer.domElement);
