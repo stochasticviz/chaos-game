@@ -357,6 +357,9 @@ function generatePoints(debugMode, consumePoints) {
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
   performance.mark('start-main-loop');
+  let totalExpressionTime = 0;
+  let totalDrawTime = 0;
+
   return new Promise((resolve, reject) => {
     function generateChunk() {
       if (generationId !== currentGenerationId) {
@@ -365,6 +368,7 @@ function generatePoints(debugMode, consumePoints) {
       }
       let points = [];
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
+      const chunkExpressionStart = performance.now();
       for (let i = currentStep; i < endStep; i++) {
         let currentPointArray = null;
         writeToDOMCurrentOutput = [];
@@ -476,8 +480,16 @@ function generatePoints(debugMode, consumePoints) {
         firstTime = false;
       }
 
+      const chunkExpressionEnd = performance.now();
+      totalExpressionTime += (chunkExpressionEnd - chunkExpressionStart);
+
       currentStep = endStep;
+
+      const chunkDrawStart = performance.now();
       consumePoints(currentStep / steps, points);
+      const chunkDrawEnd = performance.now();
+      totalDrawTime += (chunkDrawEnd - chunkDrawStart);
+
       points = [];
 
       if (currentStep < steps) {
@@ -491,10 +503,18 @@ function generatePoints(debugMode, consumePoints) {
         performance.measure('main-loop', 'start-main-loop', 'end-main-loop');
         performance.measure('total-generatePoints', 'start-generatePoints', 'end-generatePoints');
 
-        console.table(performance.getEntriesByType('measure').map(m => ({
+        const measures = performance.getEntriesByType('measure').map(m => ({
           name: m.name,
           duration: `${m.duration.toFixed(2)}ms`
-        })));
+        }));
+
+        // Add breakdown timings
+        measures.push(
+          { name: 'expression-evaluation', duration: `${totalExpressionTime.toFixed(2)}ms` },
+          { name: 'drawing-rendering', duration: `${totalDrawTime.toFixed(2)}ms` }
+        );
+
+        console.table(measures);
 
         // Clear marks and measures for next run
         performance.clearMarks();
