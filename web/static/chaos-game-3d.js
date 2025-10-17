@@ -491,7 +491,7 @@ function generatePoints(debugMode, consumePoints) {
 // A global or module-level variable to store the default alpha value
 //const defaultAlpha = 0.5;
 
-const clamp255i = x => (x <= 0 ? 0 : (x >= 255 ? 255 : x|0)); // integer clamp
+const clamp255i = x => (x <= 0 ? 0 : (x >= 255 ? 255 : x|0)); // clamp. "x|0" is Bitwise-OR with 0, JS idiom for truncating a number to a 32-bit signed integer
 
 // pack (r,g,b,aByte) into a single signed 32-bit int: a in top 8 bits
 const packRGBA = (r, g, b, aByte) => ((aByte & 255) << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
