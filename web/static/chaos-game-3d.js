@@ -513,9 +513,9 @@ function drawPoints3D(pointsData, defaultAlpha) {
     let r, g, b, a;
     if (Array.isArray(raw[0])) {
       const row = raw[0];
-      r = clamp255i(row[0] ?? 0);
-      g = clamp255i(row[1] ?? 0);
-      b = clamp255i(row[2] ?? 0);
+      r = clamp255i(row[0] ?? 0); // if this is a 0D point, then x=0  :)
+      g = clamp255i(row[1] ?? 0); // if this is a 1D point, then y=0
+      b = clamp255i(row[2] ?? 0); // if this is a 2D point, then z=0
       a = row[3];
     } else {
       r = clamp255i(raw[0] ?? 0);
