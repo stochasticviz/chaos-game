@@ -248,6 +248,7 @@ function createTargetMeshes() {
 
 let currentGenerationId = 0;
 function generatePoints(debugMode, consumePoints) {
+  performance.mark('start-generatePoints');
   const generationId = ++currentGenerationId;
 
   const nextVertexAndPointMathJSCodeString = document.getElementById("nextVertexAndPointMathJSCode").value;
@@ -325,6 +326,7 @@ function generatePoints(debugMode, consumePoints) {
   let showStuff = null;
   let firstTime = true;
 
+  performance.mark('start-initialization');
   // Execute initialization code once per generation
   if (initializationMathJSCodeString.trim()) {
     if (!debugMode) {
@@ -349,10 +351,12 @@ function generatePoints(debugMode, consumePoints) {
       }
     }
   }
+  performance.mark('end-initialization');
 
   const steps = parseInt(document.getElementById('steps').value);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
 
+  performance.mark('start-main-loop');
   return new Promise((resolve, reject) => {
     function generateChunk() {
       if (generationId !== currentGenerationId) {
@@ -479,6 +483,23 @@ function generatePoints(debugMode, consumePoints) {
       if (currentStep < steps) {
         setTimeout(generateChunk, 0);
       } else {
+        performance.mark('end-main-loop');
+        performance.mark('end-generatePoints');
+
+        // Measure and log performance
+        performance.measure('initialization', 'start-initialization', 'end-initialization');
+        performance.measure('main-loop', 'start-main-loop', 'end-main-loop');
+        performance.measure('total-generatePoints', 'start-generatePoints', 'end-generatePoints');
+
+        console.table(performance.getEntriesByType('measure').map(m => ({
+          name: m.name,
+          duration: `${m.duration.toFixed(2)}ms`
+        })));
+
+        // Clear marks and measures for next run
+        performance.clearMarks();
+        performance.clearMeasures();
+
         resolve(points);
       }
     }
