@@ -491,69 +491,81 @@ function generatePoints(debugMode, consumePoints) {
 // A global or module-level variable to store the default alpha value
 //const defaultAlpha = 0.5;
 
+const clamp255i = x => (x <= 0 ? 0 : (x >= 255 ? 255 : x|0)); // integer clamp
+
+// pack (r,g,b,aByte) into a single signed 32-bit int: a in top 8 bits
+const packRGBA = (r, g, b, aByte) => ((aByte & 255) << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
+
+// unpack back out
+const unpackRGBA = k => ({
+  aByte: (k >>> 24) & 255,
+  r:     (k >>> 16) & 255,
+  g:     (k >>> 8)  & 255,
+  b:     (k)        & 255
+});
+
 function drawPoints3D(pointsData, defaultAlpha) {
-  // group points by their color and alpha
-  const pointGroups = new Map();
-  pointsData.forEach(point => {
-    const colorMatrix = point.color;
-    const colorArrayRaw = colorMatrix.toArray();
-    let colorArray, alpha;
+  const groups = new Map();
 
-    if (Array.isArray(colorArrayRaw[0])) {
-        // if colorArrayRaw is ex. [[10, 255, 10, .7]] (or without alpha) then make JS array [10, 255, 10]
-        colorArray = colorArrayRaw[0].slice(0, 3);
-        alpha = colorArrayRaw[0][3];  // could be undefined
-    }
-    else {
-        //console.log('    first element of colorArrayRaw is NOT an array, ex. [10, 255, 10, .7]') (or without alpha) then ensure we drop the alpha
-        colorArray = colorArrayRaw.slice(0, 3);
-        alpha = colorArrayRaw[3];  // could be undefined
-    }
-    if (alpha === undefined) {
-        alpha = defaultAlpha;
-    }
+  for (let i = 0; i < pointsData.length; i++) {
+    const raw = pointsData[i].color.toArray();
 
-    const key = `${colorArray.join(',')}-${alpha}`;
-    if (!pointGroups.has(key)) {
-      pointGroups.set(key, []);
+    let r, g, b, a;
+    if (Array.isArray(raw[0])) {
+      const row = raw[0];
+      r = clamp255i(row[0] ?? 0);
+      g = clamp255i(row[1] ?? 0);
+      b = clamp255i(row[2] ?? 0);
+      a = row[3];
+    } else {
+      r = clamp255i(raw[0] ?? 0);
+      g = clamp255i(raw[1] ?? 0);
+      b = clamp255i(raw[2] ?? 0);
+      a = raw[3];
     }
-    pointGroups.get(key).push(point);
-  });
+    const alpha = (a === undefined ? defaultAlpha : a);
+    const aByte = (alpha <= 0 ? 0 : (alpha >= 1 ? 255 : (alpha * 255 + 0.5) | 0));
 
-  // Iterate over each color group and create a single mesh for it
-  pointGroups.forEach((group, key) => {
-    const [colorPart, alphaFloat] = key.split('-');
-    if (alphaFloat == 0.0) {
-        // transparent points, don't bother plotting them
-        return;
+    const key = packRGBA(r, g, b, aByte);
+    let bucket = groups.get(key);
+    if (bucket === undefined) {
+      bucket = [];
+      groups.set(key, bucket);
     }
-    const colorArray = colorPart.split(',').map(Number);
-    // Create geometry for this color group
+    bucket.push(pointsData[i]);
+  }
+
+  // Build one mesh per group key
+  for (const [key, group] of groups) {
+    const { r, g, b, aByte } = unpackRGBA(key);
+    const alphaFloat = aByte / 255;
+    if (alphaFloat === 0) continue;
+
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
-    const color = new THREE.Color().setRGB(colorArray[0]/255.0, colorArray[1]/255.0, colorArray[2]/255.0);
-
-    group.forEach((point, i) => {
+    for (let i = 0; i < group.length; i++) {
+      const p = group[i].position;
       const idx = i * 3;
-      positions[idx] = point.position[0] || 0; // if this is a 0D point, then x=0  :)
-      positions[idx + 1] = point.position[1] || 0; // if this is a 1D point, then y=0
-      positions[idx + 2] = point.position[2] || 0; // if this is a 2D point, then z=0
-    });
+      positions[idx]     = p[0] || 0;
+      positions[idx + 1] = p[1] || 0;
+      positions[idx + 2] = p[2] || 0;
+    }
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    // Create material for this color group with alphaFloat
+
     const material = new THREE.PointsMaterial({
-      size: 2,  // TODO: this is size of voxel
-      vertexColors: false,  // each material object is for one color and alpha combination
-      transparent: alphaFloat < 1.0,  // TODO: set this false when alphaFloat is 1.0
-      color: color,
+      size: 2,
+      vertexColors: false,
+      transparent: aByte < 255,
+      color: new THREE.Color(r/255, g/255, b/255),
       opacity: alphaFloat,
-      sizeAttenuation: false  // TODO: try this with true. it should look better.
+      sizeAttenuation: false
     });
-    // Create points mesh and add to scene
+
     const mesh = new THREE.Points(geometry, material);
     scene.add(mesh);
-  });
+  }
 }
+
 
 
 function toggleProgressIndicator(show) {
