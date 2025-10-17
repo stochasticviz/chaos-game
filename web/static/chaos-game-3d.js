@@ -359,6 +359,10 @@ function generatePoints(debugMode, consumePoints) {
   performance.mark('start-main-loop');
   let totalExpressionTime = 0;
   let totalDrawTime = 0;
+  let totalMatrixConversionTime = 0;
+  let totalPointCreationTime = 0;
+  let totalColorHandlingTime = 0;
+  let totalWriteOverheadTime = 0;
 
   return new Promise((resolve, reject) => {
     function generateChunk() {
@@ -371,7 +375,11 @@ function generatePoints(debugMode, consumePoints) {
       const chunkExpressionStart = performance.now();
       for (let i = currentStep; i < endStep; i++) {
         let currentPointArray = null;
+
+        const writeStart = performance.now();
         writeToDOMCurrentOutput = [];
+        totalWriteOverheadTime += (performance.now() - writeStart);
+
         showStuff = (VERBOSE && (firstTime || (i % 1000000 == 0)));
         //if (scope.currentPoint === undefined) {
         //  scope.currentPoint = getRandomVisiblePoint();  // TODO: remove this and instead put this on the scope when we create the scope object. then, if the user sets it to somehting in the init code, great.
@@ -380,20 +388,30 @@ function generatePoints(debugMode, consumePoints) {
           console.log("i:", i);
           console.log("currentPoint:", scope.currentPoint);
         }
+
+        const matrixStart = performance.now();
         currentPointArray = scope.currentPoint.toArray();
         if (currentPointArray.length === 1) {
             // assume this is a nested array, like [[100, 200, 44]]
             currentPointArray = currentPointArray[0];
         }
+        totalMatrixConversionTime += (performance.now() - matrixStart);
+
         if (showStuff) {
             //console.log("pushing currentPointArray:", currentPointArray);
             if (currentPointArray.length != 3) console.log("(currentPointArray.length != 3)  currentPointArray:", currentPointArray);
         }
+
+        const colorStart = performance.now();
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
+        totalColorHandlingTime += (performance.now() - colorStart);
+
+        const pointCreationStart = performance.now();
         points.push({
             position: currentPointArray,
             color: rawColor
         });
+        totalPointCreationTime += (performance.now() - pointCreationStart);
 
 
         let resultSet = null;
@@ -511,7 +529,11 @@ function generatePoints(debugMode, consumePoints) {
         // Add breakdown timings
         measures.push(
           { name: 'expression-evaluation', duration: `${totalExpressionTime.toFixed(2)}ms` },
-          { name: 'drawing-rendering', duration: `${totalDrawTime.toFixed(2)}ms` }
+          { name: 'drawing-rendering', duration: `${totalDrawTime.toFixed(2)}ms` },
+          { name: 'matrix-conversions', duration: `${totalMatrixConversionTime.toFixed(2)}ms` },
+          { name: 'point-object-creation', duration: `${totalPointCreationTime.toFixed(2)}ms` },
+          { name: 'color-handling', duration: `${totalColorHandlingTime.toFixed(2)}ms` },
+          { name: 'write-overhead', duration: `${totalWriteOverheadTime.toFixed(2)}ms` }
         );
 
         console.table(measures);
