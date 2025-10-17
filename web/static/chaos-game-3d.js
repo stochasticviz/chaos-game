@@ -531,34 +531,39 @@ function generatePoints(debugMode, consumePoints) {
 // A global or module-level variable to store the default alpha value
 //const defaultAlpha = 0.5;
 
+// super fast branchy clamp (no function calls to Math.min/Math.max)
+const clamp255 = x => (x <= 0 ? 0 : (x >= 255 ? 255 : x));
+
 function drawPoints3D(pointsData, defaultAlpha) {
-  // group points by their color and alpha
   const pointGroups = new Map();
-  pointsData.forEach(point => {
-    const colorMatrix = point.color;
-    const colorArrayRaw = colorMatrix.toArray();
-    let colorArray, alpha;
 
+  for (let i = 0; i < pointsData.length; i++) {
+    const colorArrayRaw = pointsData[i].color.toArray();
+
+    // Extract possible [r,g,b,(a)] from either [[...]] or [...]
+    let r, g, b, a;
     if (Array.isArray(colorArrayRaw[0])) {
-        // if colorArrayRaw is ex. [[10, 255, 10, .7]] (or without alpha) then make JS array [10, 255, 10]
-        colorArray = colorArrayRaw[0].slice(0, 3);
-        alpha = colorArrayRaw[0][3];  // could be undefined
+      const row = colorArrayRaw[0];
+      r = clamp255(row[0] ?? 0);
+      g = clamp255(row[1] ?? 0);
+      b = clamp255(row[2] ?? 0);
+      a = row[3];
+    } else {
+      r = clamp255(colorArrayRaw[0] ?? 0);
+      g = clamp255(colorArrayRaw[1] ?? 0);
+      b = clamp255(colorArrayRaw[2] ?? 0);
+      a = colorArrayRaw[3];
     }
-    else {
-        //console.log('    first element of colorArrayRaw is NOT an array, ex. [10, 255, 10, .7]') (or without alpha) then ensure we drop the alpha
-        colorArray = colorArrayRaw.slice(0, 3);
-        alpha = colorArrayRaw[3];  // could be undefined
-    }
-    if (alpha === undefined) {
-        alpha = defaultAlpha;
-    }
+    const alpha = (a === undefined ? defaultAlpha : a);
 
-    const key = `${colorArray.join(',')}-${alpha}`;
-    if (!pointGroups.has(key)) {
-      pointGroups.set(key, []);
+    const key = `${r},${g},${b}-${alpha}`;
+    let bucket = pointGroups.get(key);
+    if (bucket === undefined) {
+      bucket = [];
+      pointGroups.set(key, bucket);
     }
-    pointGroups.get(key).push(point);
-  });
+    bucket.push(pointsData[i]);
+  }
 
   // Iterate over each color group and create a single mesh for it
   pointGroups.forEach((group, key) => {
@@ -593,8 +598,8 @@ function drawPoints3D(pointsData, defaultAlpha) {
     const mesh = new THREE.Points(geometry, material);
     scene.add(mesh);
   });
-}
 
+}
 
 function toggleProgressIndicator(show) {
   const progressIndicator = document.getElementById('progress-indicator');
