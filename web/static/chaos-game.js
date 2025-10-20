@@ -51,13 +51,13 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
         start: defaultValue,
         connect: true,
         range: {'min': min, 'max': max},
-        step: 0.01  // this is coupled to the .toFixed(2) calls, below
+        step: 0.01
     });
 
     // Store the initial value
     slidersValuesCache.set(label, defaultValue);
 
-    // Check for cached value from share link and update if exists
+    // Check for value from Share link and update if exists
     if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
         defaultValue = window.sharedSliderValues[label];
         slider.noUiSlider.set(defaultValue);

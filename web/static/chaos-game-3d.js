@@ -119,6 +119,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
   slidersValuesCache.set(label, defaultValue);
 
+  // Check for value from Share link and update if exists
   if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
     defaultValue = window.sharedSliderValues[label];
     slider.noUiSlider.set(defaultValue);
