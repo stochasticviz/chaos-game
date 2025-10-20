@@ -2,6 +2,7 @@ import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
 import * as THREE from '../lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
 import * as PointsOnNSphere from './points-on-n-sphere.js?v=7299d83';
+// we can't import noUiSlider in this way. ChatGPT: "noUiSlider’s distribution has been stuck in UMD-only for years — it never added a proper ESM export"
 
 const math = create(all);
 
@@ -504,6 +505,7 @@ const unpackRGBA = k => ({
   b:     (k)        & 255
 });
 
+/* This function gained, in commit ffc3d34, a important opt for the end user -- clamped colors to 0 thru 255, ints only. This greatly reduced mesh count for some MathJS code. But also ChatGPT did a lot of general opt which appears to have done nothing in the usual case, see "... No noticeable speedup in this https://tinyurl.com/43b4wn2j" in that commit's msg. So be aware that simplifying this function should always be on the table. Details: https://github.com/herdrick/chaos-game/issues/83 */
 function drawPoints3D(pointsData, defaultAlpha) {
   const groups = new Map();
 
