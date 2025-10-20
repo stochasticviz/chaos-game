@@ -118,14 +118,14 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   });
 
   slidersValuesCache.set(label, defaultValue);
-  valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
   if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
-    const sharedValue = window.sharedSliderValues[label];
-    slider.noUiSlider.set(sharedValue);
-    slidersValuesCache.set(label, sharedValue);
-    valueDisplay.innerHTML = '<big>' + sharedValue.toFixed(2) + '</big>';
+    defaultValue = window.sharedSliderValues[label];
+    slider.noUiSlider.set(defaultValue);
+    slidersValuesCache.set(label, defaultValue);
   }
+
+  valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
   slider.noUiSlider.on('update', function(values) {
     const newValue = parseFloat(values[0]);

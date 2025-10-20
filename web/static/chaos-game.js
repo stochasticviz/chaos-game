@@ -56,15 +56,15 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
     // Store the initial value
     slidersValuesCache.set(label, defaultValue);
-    valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
     // Check for cached value from share link and update if exists
     if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
-        const sharedValue = window.sharedSliderValues[label];
-        slider.noUiSlider.set(sharedValue);
-        slidersValuesCache.set(label, sharedValue);
-        valueDisplay.innerHTML = '<big>' + sharedValue.toFixed(2) + '</big>';
+        defaultValue = window.sharedSliderValues[label];
+        slider.noUiSlider.set(defaultValue);
+        slidersValuesCache.set(label, defaultValue);
     }
+
+    valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
