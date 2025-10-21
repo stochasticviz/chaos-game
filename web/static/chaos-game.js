@@ -71,6 +71,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
         if (newValue !== oldValue) {
             slidersValuesCache.set(label, newValue);
             valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>' ;
+            // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
             if (clearPointsWhenChanged) {
                 // Regenerate points when slider changes
                 clearTimeout(canvas.regenerateTimeout);
@@ -244,7 +245,7 @@ function generatePoints(debugMode, consumePoints) {
               const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged);
               sliders.appendChild(control);
           }
-          return slidersValuesCache.get(label) || defaultValue;
+          return slidersValuesCache.get(label); // this is the only place where the value of a slider becomes available to the MathJS code
       },
       zoom: function(zoomLevel) {
           const zoomInput = document.getElementById('zoom');

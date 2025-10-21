@@ -124,7 +124,6 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   }
 
   slidersValuesCache.set(label, defaultValue);
-
   valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
   slider.noUiSlider.on('update', function(values) {
@@ -133,6 +132,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
     if (newValue !== oldValue) {
       slidersValuesCache.set(label, newValue);
       valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>';
+      // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
       if (clearPointsWhenChanged) {
         clearTimeout(generateAndDraw.regenerateTimeout);
         generateAndDraw.regenerateTimeout = setTimeout(() => generateAndDraw(true), 200);
@@ -282,7 +282,7 @@ function generatePoints(debugMode, consumePoints) {
         const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged);
         sliders.appendChild(control);
       }
-      return slidersValuesCache.get(label);
+      return slidersValuesCache.get(label); // this is the only place where the value of a slider becomes available to the MathJS code
     },
     setPointsCount: function(numPoints) {
       const stepsInput = document.getElementById('steps');
