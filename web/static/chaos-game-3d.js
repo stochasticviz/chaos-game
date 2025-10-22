@@ -247,6 +247,25 @@ function createTargetMeshes() {
   }
 }
 
+function highlightErrorCharacter(expression, error) {
+  let highlightedExpression = expression;
+  const charMatch = error.message.match(/\(char (\d+)\)/);
+  if (charMatch) {
+    const charPos = parseInt(charMatch[1]) - 1;
+    if (charPos === expression.length) {
+      highlightedExpression = expression +
+        '<span class="error-highlight"> </span>';
+    } else {
+      highlightedExpression = expression.slice(0, charPos) +
+        '<span class="error-highlight">' +
+        expression[charPos] +
+        '</span>' +
+        expression.slice(charPos + 1);
+    }
+  }
+  return highlightedExpression;
+}
+
 let currentGenerationId = 0;
 function generatePoints(debugMode, consumePoints) {
   const generationId = ++currentGenerationId;
@@ -339,21 +358,7 @@ function generatePoints(debugMode, consumePoints) {
             math.evaluate(expression, scope);
           } catch (error) {
             const errorDiv = document.getElementById('errorMessage');
-            let highlightedExpression = expression;
-            const charMatch = error.message.match(/\(char (\d+)\)/);
-            if (charMatch) {
-              const charPos = parseInt(charMatch[1]) - 1;
-              if (charPos === expression.length) {
-                highlightedExpression = expression +
-                  '<span class="error-highlight"> </span>';
-              } else {
-                highlightedExpression = expression.slice(0, charPos) +
-                  '<span class="error-highlight">' +
-                  expression[charPos] +
-                  '</span>' +
-                  expression.slice(charPos + 1);
-              }
-            }
+            const highlightedExpression = highlightErrorCharacter(expression, error);
             errorDiv.innerHTML = `
               <span>Error in initialization code at line ${index+1}:</span>
               <pre class="error-message">${highlightedExpression}</pre>
@@ -415,21 +420,7 @@ function generatePoints(debugMode, consumePoints) {
               math.evaluate(expression, scope);
             } catch (error) {
               const errorDiv = document.getElementById('errorMessage');
-              let highlightedExpression = expression;
-              const charMatch = error.message.match(/\(char (\d+)\)/);
-              if (charMatch) {
-                const charPos = parseInt(charMatch[1]) - 1;
-                if (charPos === expression.length) {
-                  highlightedExpression = expression +
-                    '<span class="error-highlight"> </span>';
-                } else {
-                  highlightedExpression = expression.slice(0, charPos) +
-                    '<span class="error-highlight">' +
-                    expression[charPos] +
-                    '</span>' +
-                    expression.slice(charPos + 1);
-                }
-              }
+              const highlightedExpression = highlightErrorCharacter(expression, error);
               errorDiv.innerHTML = `
                 <span>Error at line ${index+1}:</span>
                 <pre class="error-message">${highlightedExpression}</pre>
