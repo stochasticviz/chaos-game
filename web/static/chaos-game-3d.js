@@ -548,9 +548,9 @@ function drawPoints3D(pointsData, defaultAlpha) {
     for (let i = 0; i < group.length; i++) {
       const p = group[i].position;
       const idx = i * 3;
-      positions[idx]     = p[0] || 0;
-      positions[idx + 1] = p[1] || 0;
-      positions[idx + 2] = p[2] || 0;
+      positions[idx]     = p[0];
+      positions[idx + 1] = p[1];
+      positions[idx + 2] = p[2];
     }
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
