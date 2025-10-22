@@ -422,7 +422,7 @@ function generatePoints(debugMode, consumePoints) {
               const errorDiv = document.getElementById('errorMessage');
               const highlightedExpression = highlightErrorCharacter(expression, error);
               errorDiv.innerHTML = `
-                <span>Error at line ${index+1}:</span>
+                <span>Error in the 'Code to calculate the next point' at line ${index+1}:</span>
                 <pre class="error-message">${highlightedExpression}</pre>
                 <span>${error.name}: ${error.message}</span>
                 <pre class="error-stack">${error.stack}</pre>`;
