@@ -123,22 +123,29 @@ previous_target = _nextTargetIndex</pre>
     Advanced example - The Corcoran Attractor:
     <div class="codeBlock">
       <pre class="codeExample">
-# try sine_scale of 1/3 and 12 targets with a 3 million points and 0.1 opacity!
-nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
+# put these in the initialization code pane
+setTargetsCount(12)
+setPointsCount(3000000)
+setOpacity(0.1)
+
 
 # Create user controls for the parameters
 sine_shift = createSlider("Sine shift", 0, 2*math.pi, math.pi*29/25)
-sine_scale = createSlider("Sine scale", -3/2, 4, 1/2)
+sine_scale = createSlider("Sine scale", -3/2, 4, 1/3)
 sine_offset = createSlider("Sine offset", -1, 7/4, 1/2)
+
+nextTargetIndex = math.randomInt(1, targetPointsLength+1)
+_nextTarget = targetPoints[nextTargetIndex, :]
 
 displacement_factors = math.matrix([
   [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
    math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset]
 ])
+
 # Apply the factors to the displacement
 displacement_to_target = _nextTarget - currentPoint
-nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)</pre>
+nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)
+</pre>
     </div>
   </div>
 </div>
