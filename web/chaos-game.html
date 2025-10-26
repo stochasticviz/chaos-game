@@ -126,20 +126,20 @@ previous_target = _nextTargetIndex</pre>
 # put these in the initialization code pane
 setTargetsCount(12)
 setPointsCount(3000000)
-setOpacity(0.1)
+setOpacity(0.5)
 
 
 # Create user controls for the parameters
-sine_shift = createSlider("Sine shift", 0, 2*math.pi, math.pi*29/25)
-sine_scale = createSlider("Sine scale", -3/2, 4, 1/3)
-sine_offset = createSlider("Sine offset", -1, 7/4, 1/2)
+phase_offset = createSlider("Phase offset", 0, 2*math.pi, math.pi*29/25)
+amplitude = createSlider("Amplitude", -3/2, 4, 1/3)
+bias = createSlider("Bias", -1, 7/4, 1/2)
 
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 _nextTarget = targetPoints[nextTargetIndex, :]
 
 displacement_factors = math.matrix([
-  [math.sin(_nextTarget[1,2] + sine_shift) * sine_scale + sine_offset,
-   math.sin(_nextTarget[1,1] + sine_shift) * sine_scale + sine_offset]
+  [math.sin(_nextTarget[1,2] + phase_offset) * amplitude + bias,
+   math.sin(_nextTarget[1,1] + phase_offset) * amplitude + bias]
 ])
 
 # Apply the factors to the displacement
