@@ -127,11 +127,9 @@ label[for="initializationMathJSCode"] {
 }
 
 #reset-sliders-container {
-  width: 100%;
-  max-width: 1000px;
-  text-align: right;
-  padding: 5px;
-  box-sizing: border-box;
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: bottom;
 }
 
 #resetSlidersBtn {
