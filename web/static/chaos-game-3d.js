@@ -149,12 +149,6 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 }
 
 function addResetButtonToLastSlider() {
-// Remove existing reset button if any
-const existingResetBtn = document.getElementById('resetSlidersBtn');
-if (existingResetBtn) {
-existingResetBtn.remove();
-}
-
 // Add reset button to the last slider container (to the right of slider bar)
 const sliders = document.getElementById('sliders');
 const sliderElements = sliders.querySelectorAll('.slider');
