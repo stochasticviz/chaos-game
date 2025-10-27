@@ -119,8 +119,9 @@ label[for="initializationMathJSCode"] {
 }
 
 #sliders {
-  width: 100%;
-  max-width: 1000px;  /* Match canvas width */
+  display: inline-block;
+  vertical-align: bottom;
+  max-width: calc(1000px - 100px);  /* Leave space for reset button */
   margin-top: 5px;
   padding: 5px;
   box-sizing: border-box;
