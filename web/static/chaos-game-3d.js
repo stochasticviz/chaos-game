@@ -148,6 +148,36 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   return container;
 }
 
+function addResetButtonToLastSlider() {
+    // Remove existing reset button if any
+    const existingResetBtn = document.getElementById('resetSlidersBtn');
+    if (existingResetBtn) {
+        existingResetBtn.remove();
+    }
+    
+    // Add reset button to the last slider container (to the right of slider bar)
+    const sliders = document.getElementById('sliders');
+    const sliderElements = sliders.querySelectorAll('.slider');
+    if (sliderElements.length > 0) {
+        const lastSlider = sliderElements[sliderElements.length - 1];
+        const sliderDiv = lastSlider.children[1]; // The noUiSlider div
+        
+        // Make slider div inline-block so button can sit next to it
+        sliderDiv.style.display = 'inline-block';
+        sliderDiv.style.width = 'calc(100% - 100px)'; // Leave room for button
+        sliderDiv.style.verticalAlign = 'middle';
+        
+        // Add button
+        const resetBtn = document.createElement('button');
+        resetBtn.id = 'resetSlidersBtn';
+        resetBtn.textContent = 'Reset ⟲';
+        resetBtn.style.display = 'inline-block';
+        resetBtn.style.marginLeft = '10px';
+        resetBtn.style.verticalAlign = 'middle';
+        lastSlider.appendChild(resetBtn);
+    }
+}
+
 function resetAllSliders() {
     for (const [label, defaultValue] of sliderDefaults.entries()) {
         const sliderElements = document.querySelectorAll('.slider');
@@ -390,6 +420,9 @@ function generatePoints(debugMode, consumePoints) {
       }
     }
   }
+
+  // Add reset button to the last slider after all sliders are created
+  addResetButtonToLastSlider();
 
   const steps = parseInt(document.getElementById('steps').value);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
@@ -793,8 +826,11 @@ document.getElementById('generateAddBtn').addEventListener('click', function() {
   generateAndDraw(false);
 });
 
-document.getElementById('resetSlidersBtn').addEventListener('click', function() {
-  resetAllSliders();
+// Use event delegation for dynamically created reset button
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.id === 'resetSlidersBtn') {
+    resetAllSliders();
+  }
 });
 
 document.getElementById('stopBtn').addEventListener('click', function() {
