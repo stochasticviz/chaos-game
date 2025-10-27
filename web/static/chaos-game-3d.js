@@ -149,33 +149,28 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 }
 
 function addResetButtonToLastSlider() {
-    // Remove existing reset button if any
-    const existingResetBtn = document.getElementById('resetSlidersBtn');
-    if (existingResetBtn) {
-        existingResetBtn.remove();
-    }
-    
-    // Add reset button to the last slider container (to the right of slider bar)
-    const sliders = document.getElementById('sliders');
-    const sliderElements = sliders.querySelectorAll('.slider');
-    if (sliderElements.length > 0) {
-        const lastSlider = sliderElements[sliderElements.length - 1];
-        const sliderDiv = lastSlider.children[1]; // The noUiSlider div
-        
-        // Make slider div inline-block so button can sit next to it
-        sliderDiv.style.display = 'inline-block';
-        sliderDiv.style.width = 'calc(100% - 100px)'; // Leave room for button
-        sliderDiv.style.verticalAlign = 'middle';
-        
-        // Add button
-        const resetBtn = document.createElement('button');
+// Remove existing reset button if any
+const existingResetBtn = document.getElementById('resetSlidersBtn');
+if (existingResetBtn) {
+existingResetBtn.remove();
+}
+
+// Add reset button to the last slider container (to the right of slider bar)
+const sliders = document.getElementById('sliders');
+const sliderElements = sliders.querySelectorAll('.slider');
+if (sliderElements.length > 0) {
+const lastSlider = sliderElements[sliderElements.length - 1];
+
+        // Add class to slider for inline layout
+lastSlider.classList.add('with-reset-button');
+
+// Add button
+const resetBtn = document.createElement('button');
         resetBtn.id = 'resetSlidersBtn';
-        resetBtn.textContent = 'Reset ⟲';
-        resetBtn.style.display = 'inline-block';
-        resetBtn.style.marginLeft = '10px';
-        resetBtn.style.verticalAlign = 'middle';
-        lastSlider.appendChild(resetBtn);
-    }
+resetBtn.className = 'reset-button-inline';
+resetBtn.textContent = 'Reset ⟲';
+lastSlider.appendChild(resetBtn);
+}
 }
 
 function resetAllSliders() {

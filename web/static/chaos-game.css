@@ -153,6 +153,30 @@ label[for="initializationMathJSCode"] {
   margin: 10px 0;
 }
 
+.slider.with-reset-button .noUi-target {
+  display: inline-block;
+  width: calc(100% - 100px);
+  vertical-align: middle;
+}
+
+.reset-button-inline {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.reset-button-inline:hover {
+  background: #f5f5f5;
+  border-color: #4285F4;
+}
+
 .label-container {
   display: flex;
   align-items: baseline;
