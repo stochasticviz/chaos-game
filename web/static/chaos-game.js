@@ -102,7 +102,7 @@ lastSlider.classList.add('with-reset-button');
 const resetBtn = document.createElement('button');
         resetBtn.id = 'resetSlidersBtn';
 resetBtn.className = 'reset-button-inline';
-resetBtn.textContent = 'Reset ⟲';
+resetBtn.textContent = 'Reset sliders ⟲';
 lastSlider.appendChild(resetBtn);
 }
 }
