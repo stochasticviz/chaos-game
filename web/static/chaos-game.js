@@ -13,7 +13,7 @@ let draggedVertexIndex = -1;
 
 // Store user control values
 const slidersValuesCache = new Map();
-const sliderDefaults = new Map();
+const sliderDefaults = new Map();  // this holds the original (lexical) default numeric values of each slider -- not any values which may be from a share link
 
 // Canvas setup with transformed context
 const canvas = document.getElementById('myCanvas');
