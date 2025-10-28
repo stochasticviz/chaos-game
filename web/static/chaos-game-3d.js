@@ -23,6 +23,7 @@ let draggedVertexIndex = -1;
 
 // Store user control values
 const slidersValuesCache = new Map();
+const sliderDefaults = new Map();  // this holds the original (lexical) default numeric values of each slider -- not any values which may be from a share link
 
 function getRandomVisiblePoint() {
     const x = (Math.random() - 0.5) * SPHERE_RADIUS;
@@ -110,6 +111,8 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   const slider = document.createElement('div');
   container.appendChild(slider);
 
+  sliderDefaults.set(label, defaultValue);
+
   noUiSlider.create(slider, {
     start: defaultValue,
     connect: true,
@@ -119,11 +122,10 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
   // Check for value from Share link and update if exists
   if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
-    defaultValue = window.sharedSliderValues[label];
-    slider.noUiSlider.set(defaultValue);
+    slider.noUiSlider.set(window.sharedSliderValues[label]);
   }
 
-  slidersValuesCache.set(label, defaultValue);
+  slidersValuesCache.set(label, slider.noUiSlider.get());
   valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
   slider.noUiSlider.on('update', function(values) {
@@ -146,6 +148,43 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   return container;
 }
 
+function addResetButtonToLastSlider() {
+// Add reset button to the last slider container (to the right of slider bar)
+const sliders = document.getElementById('sliders');
+const sliderElements = sliders.querySelectorAll('.slider');
+if (sliderElements.length > 0) {
+const lastSlider = sliderElements[sliderElements.length - 1];
+
+        // Add class to slider for inline layout
+lastSlider.classList.add('with-reset-button');
+
+// Add button
+const resetBtn = document.createElement('button');
+        resetBtn.id = 'resetSlidersBtn';
+resetBtn.className = 'reset-button-inline';
+resetBtn.textContent = 'Reset sliders ⟲';
+lastSlider.appendChild(resetBtn);
+}
+}
+
+function resetAllSliders() {
+    for (const [label, defaultValue] of sliderDefaults.entries()) {
+        const sliderElements = document.querySelectorAll('.slider');
+        for (const sliderContainer of sliderElements) {
+            const labelElem = sliderContainer.querySelector('label');
+            if (labelElem && labelElem.textContent.startsWith(label + ':')) {
+                const divs = sliderContainer.querySelectorAll('div');
+                for (const div of divs) {
+                    if (div.noUiSlider) {
+                        div.noUiSlider.set(defaultValue);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
 
 function handleMathJSExpressionsError(error) {
   const errorDiv = document.getElementById('errorMessage');
@@ -370,6 +409,9 @@ function generatePoints(debugMode, consumePoints) {
       }
     }
   }
+
+  // Add reset button to the last slider after all sliders are created
+  addResetButtonToLastSlider();
 
   const steps = parseInt(document.getElementById('steps').value);
   const alphaValue = parseFloat(document.getElementById('alpha').value);
@@ -771,6 +813,13 @@ document.getElementById('generateBtn').addEventListener('click', function() {
 
 document.getElementById('generateAddBtn').addEventListener('click', function() {
   generateAndDraw(false);
+});
+
+// Use event delegation for dynamically created reset button
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.id === 'resetSlidersBtn') {
+    resetAllSliders();
+  }
 });
 
 document.getElementById('stopBtn').addEventListener('click', function() {
