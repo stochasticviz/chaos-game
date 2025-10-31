@@ -134,6 +134,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
     if (newValue !== oldValue) {
       slidersValuesCache.set(label, newValue);
       valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>';
+      updateResetButtonVisibility();
       // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
       if (clearPointsWhenChanged) {
         clearTimeout(generateAndDraw.regenerateTimeout);
@@ -164,6 +165,18 @@ function resetAllSliders() {
                 break;
             }
         }
+    }
+}
+
+function updateResetButtonVisibility() {
+    const allAtDefaults = Array.from(sliderDefaults.entries()).every(([label, defaultValue]) => {
+        const currentValue = slidersValuesCache.get(label);
+        return currentValue === undefined || Math.abs(currentValue - defaultValue) < 0.001;
+    });
+    
+    const resetBtn = document.getElementById('resetSlidersBtn');
+    if (resetBtn) {
+        resetBtn.style.display = allAtDefaults ? 'none' : 'inline-block';
     }
 }
 
@@ -795,6 +808,7 @@ document.getElementById('generateAddBtn').addEventListener('click', function() {
 
 document.getElementById('resetSlidersBtn').addEventListener('click', function() {
   resetAllSliders();
+  updateResetButtonVisibility();
 });
 
 document.getElementById('stopBtn').addEventListener('click', function() {
@@ -843,3 +857,4 @@ document.getElementById('resetCameraBtn').addEventListener('click', () => {
 initThreeJS();
 loadSharedCode();
 generateAndDraw();
+updateResetButtonVisibility();

@@ -126,27 +126,8 @@ label[for="initializationMathJSCode"] {
   box-sizing: border-box;
 }
 
-#reset-sliders-container {
-  width: 100%;
-  max-width: 1000px;
-  text-align: right;
-  padding: 5px;
-  box-sizing: border-box;
-}
-
-#resetSlidersBtn {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-#resetSlidersBtn:hover {
-  background: #f5f5f5;
-  border-color: #4285F4;
+#shareBtn, #resetSlidersBtn {
+  vertical-align: top;
 }
 
 .slider {

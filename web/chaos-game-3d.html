@@ -24,7 +24,10 @@
     <button id="generateAddBtn">Add points</button>
     <button id="stopBtn" style="display: none;">Stop</button>
   </div>
-  <button id="shareBtn">Share</button>
+  <span>
+    <button id="shareBtn">Share</button>
+    <button id="resetSlidersBtn" style="display: none;">Reset sliders ⟲</button>
+  </span>
 </div>
 <details id="customizeMathJSCode">
   <summary>Customize the "next point" code</summary>
@@ -167,9 +170,6 @@ nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
 </div>
 
 <div id="sliders"></div>
-<div id="reset-sliders-container">
-  <button id="resetSlidersBtn">Reset ⟲</button>
-</div>
 <div id="progress-indicator"></div>
 
 <div id="threejs-container">
