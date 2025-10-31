@@ -49,8 +49,8 @@ nextPoint = currentPoint + 1</pre>
     With rotation:
     <pre class="codeExample">
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
-midpoint = (currentPoint + _nextTarget) / 2
+nextTarget = targetPoints[nextTargetIndex, :]
+midpoint = (currentPoint + nextTarget) / 2
 rotation = [[math.cos(math.pi/4), -math.sin(math.pi/4)], [math.sin(math.pi/4), math.cos(math.pi/4)]]
 nextPoint = math.multiply(midpoint, rotation)</pre>
   </div>
@@ -109,19 +109,19 @@ slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
 # The rest of this code goes in the main pane
 
 # Get all possible indices except the target we used in the last iteration
-_possibleTargetIndices = math.range(1, targetPointsLength+1)
-_possibleTargetIndices = _possibleTargetIndices[_possibleTargetIndices != previous_target]
+possibleTargetIndices = math.range(1, targetPointsLength+1)
+possibleTargetIndices = possibleTargetIndices[possibleTargetIndices != previous_target]
 
 # Pick a random target
-_nextTargetIndex = math.pickRandom(_possibleTargetIndices)
+nextTargetIndex = math.pickRandom(possibleTargetIndices)
 # ... and get its coordinates
-_nextTarget = targetPoints[_nextTargetIndex, :]
+nextTarget = targetPoints[nextTargetIndex, :]
 
 # Make next point midway to the target
-nextPoint = (currentPoint + _nextTarget) * slider
+nextPoint = (currentPoint + nextTarget) * slider
 
 # Store current target for next iteration
-previous_target = _nextTargetIndex</pre>
+previous_target = nextTargetIndex</pre>
   </div>
     Advanced example - The Corcoran Attractor:
     <div class="codeBlock">
@@ -138,15 +138,15 @@ amplitude = createSlider("Amplitude", -3/2, 4, 1/3)
 bias = createSlider("Bias", -1, 7/4, 1/2)
 
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
-_nextTarget = targetPoints[nextTargetIndex, :]
+nextTarget = targetPoints[nextTargetIndex, :]
 
 displacement_factors = math.matrix([
-  [math.sin(_nextTarget[1,2] + phase_offset) * amplitude + bias,
-   math.sin(_nextTarget[1,1] + phase_offset) * amplitude + bias]
+  [math.sin(nextTarget[1,2] + phase_offset) * amplitude + bias,
+   math.sin(nextTarget[1,1] + phase_offset) * amplitude + bias]
 ])
 
 # Apply the factors to the displacement
-displacement_to_target = _nextTarget - currentPoint
+displacement_to_target = nextTarget - currentPoint
 nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)
 </pre>
     </div>
@@ -168,9 +168,9 @@ currentPoint = [[100, 100]]  # arbitrary starting point
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 
 # ... and get its coordinates
-_nextTarget = targetPoints[nextTargetIndex, :]
+nextTarget = targetPoints[nextTargetIndex, :]
 
-nextPoint = currentPoint + (_nextTarget - currentPoint) * slider
+nextPoint = currentPoint + (nextTarget - currentPoint) * slider
 </textarea>
 <div id="debugModeDiv">
     <input type="checkbox" id="debugMode" />
