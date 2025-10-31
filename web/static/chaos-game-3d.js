@@ -23,6 +23,7 @@ let draggedVertexIndex = -1;
 
 // Store user control values
 const slidersValuesCache = new Map();
+const sliderDefaults = new Map();
 
 function getRandomVisiblePoint() {
     const x = (Math.random() - 0.5) * SPHERE_RADIUS;
@@ -110,6 +111,8 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   const slider = document.createElement('div');
   container.appendChild(slider);
 
+  sliderDefaults.set(label, defaultValue);
+
   noUiSlider.create(slider, {
     start: defaultValue,
     connect: true,
@@ -119,11 +122,10 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
   // Check for value from Share link and update if exists
   if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
-    defaultValue = window.sharedSliderValues[label];
-    slider.noUiSlider.set(defaultValue);
+    slider.noUiSlider.set(window.sharedSliderValues[label]);
   }
 
-  slidersValuesCache.set(label, defaultValue);
+  slidersValuesCache.set(label, slider.noUiSlider.get());
   valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
 
   slider.noUiSlider.on('update', function(values) {
@@ -132,6 +134,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
     if (newValue !== oldValue) {
       slidersValuesCache.set(label, newValue);
       valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>';
+      updateResetButtonVisibility();
       // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
       if (clearPointsWhenChanged) {
         clearTimeout(generateAndDraw.regenerateTimeout);
@@ -146,6 +149,36 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   return container;
 }
 
+function resetAllSliders() {
+    for (const [label, defaultValue] of sliderDefaults.entries()) {
+        const sliderElements = document.querySelectorAll('.slider');
+        for (const sliderContainer of sliderElements) {
+            const labelElem = sliderContainer.querySelector('label');
+            if (labelElem && labelElem.textContent.startsWith(label + ':')) {
+                const divs = sliderContainer.querySelectorAll('div');
+                for (const div of divs) {
+                    if (div.noUiSlider) {
+                        div.noUiSlider.set(defaultValue);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
+function updateResetButtonVisibility() {
+    const allAtDefaults = Array.from(sliderDefaults.entries()).every(([label, defaultValue]) => {
+        const currentValue = slidersValuesCache.get(label);
+        return currentValue === undefined || Math.abs(currentValue - defaultValue) < 0.001;
+    });
+    
+    const resetBtn = document.getElementById('resetSlidersBtn');
+    if (resetBtn) {
+        resetBtn.style.display = allAtDefaults ? 'none' : 'inline-block';
+    }
+}
 
 function handleMathJSExpressionsError(error) {
   const errorDiv = document.getElementById('errorMessage');
@@ -773,6 +806,11 @@ document.getElementById('generateAddBtn').addEventListener('click', function() {
   generateAndDraw(false);
 });
 
+document.getElementById('resetSlidersBtn').addEventListener('click', function() {
+  resetAllSliders();
+  updateResetButtonVisibility();
+});
+
 document.getElementById('stopBtn').addEventListener('click', function() {
   // Stop generation by incrementing the generation ID
   currentGenerationId++;
@@ -819,3 +857,4 @@ document.getElementById('resetCameraBtn').addEventListener('click', () => {
 initThreeJS();
 loadSharedCode();
 generateAndDraw();
+updateResetButtonVisibility();

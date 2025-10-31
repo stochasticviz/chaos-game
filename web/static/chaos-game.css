@@ -126,6 +126,10 @@ label[for="initializationMathJSCode"] {
   box-sizing: border-box;
 }
 
+#shareBtn, #resetSlidersBtn {
+  vertical-align: top;
+}
+
 .slider {
   margin: 10px 0;
 }
