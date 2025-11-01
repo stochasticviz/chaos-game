@@ -11,22 +11,22 @@
 <h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a>!</h1>
 <div id="controls">
   <label for="vertices">Targets:</label>
-  <input type="number" id="vertices" value="3" min="1"/>
+  <input type="number" id="vertices" value="3" min="1" aria-label="Number of target vertices" title="Number of target vertices"/>
 
   <label for="steps">Points:</label>
-  <input type="number" id="steps" value="100000" step="50000"/>
+  <input type="number" id="steps" value="100000" step="50000" aria-label="Number of points to generate" title="Number of points to generate"/>
 
   <label for="alpha">Opacity (0.0 - 1.0):</label>
-  <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
+  <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" aria-label="Point opacity from 0 to 1" title="Point opacity from 0 to 1"/>
 
   <div class="button-grid">
-    <button id="generateBtn">New point cloud</button>
-    <button id="generateAddBtn">Add points</button>
-    <button id="stopBtn" style="display: none;">Stop</button>
+    <button id="generateBtn" aria-label="Generate new point cloud" title="Generate new point cloud">New point cloud</button>
+    <button id="generateAddBtn" aria-label="Add more points to existing cloud" title="Add more points to existing cloud">Add points</button>
+    <button id="stopBtn" style="display: none;" aria-label="Stop generation" title="Stop generation">Stop</button>
   </div>
   <div>
-    <button id="shareBtn">Share</button>
-    <button id="resetSlidersBtn" style="display: none;">Reset sliders ⟲</button>
+    <button id="shareBtn" aria-label="Share current configuration" title="Share current configuration">Share</button>
+    <button id="resetSlidersBtn" style="display: none;" aria-label="Reset sliders to default values" title="Reset sliders to default values">Reset sliders ⟲</button>
   </div>
 </div>
 <details id="customizeMathJSCode">
@@ -185,18 +185,18 @@ nextPoint = currentPoint + (nextTarget - currentPoint) * slider
 </div>
 <div id="viewSettings">
     <label for="centerX">Center X:</label>
-    <input type="number" id="centerX" value="0" />
+    <input type="number" id="centerX" value="0" aria-label="X coordinate of view center" title="X coordinate of view center"/>
 
     <label for="centerY">Center Y:</label>
-    <input type="number" id="centerY" value="0" />
+    <input type="number" id="centerY" value="0" aria-label="Y coordinate of view center" title="Y coordinate of view center"/>
 
     <label for="zoom">Zoom:</label>
-    <input type="number" id="zoom" value="1" step="0.1"/>
+    <input type="number" id="zoom" value="1" step="0.1" aria-label="Zoom level" title="Zoom level"/>
     <span id="pointsInView"></span>
 </div>
 <div id="sliders"></div>
 <div id="progress-indicator"></div>
-<canvas id="myCanvas" width="1000" height="1000"></canvas>
+<canvas id="myCanvas" width="1000" height="1000" aria-label="Chaos game visualization canvas" title="Chaos game visualization"></canvas>
 <script type="module" src="static/chaos-game.js?v=a82c764f0033"></script>
 <div><small><a href="https://github.com/herdrick/chaos-game/">source</a>&nbsp;&nbsp;&nbsp;<a href="chaos-game-3d.html">3D version</a></small></div>
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "9ded2ae934bc48fcb280531fe7b8e22f"}'></script>

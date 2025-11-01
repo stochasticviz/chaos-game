@@ -11,22 +11,22 @@
 <h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a> in 3D!</h1>
 <div id="controls">
   <label for="vertices">Targets:</label>
-  <input type="number" id="vertices" value="4" min="1"/>
+  <input type="number" id="vertices" value="4" min="1" aria-label="Number of target vertices" title="Number of target vertices"/>
 
   <label for="steps">Points:</label>
-  <input type="number" id="steps" value="100000" step="50000"/>
+  <input type="number" id="steps" value="100000" step="50000" aria-label="Number of points to generate" title="Number of points to generate"/>
 
   <label for="alpha">Opacity (0.0 - 1.0):</label>
-  <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" />
+  <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" aria-label="Point opacity from 0 to 1" title="Point opacity from 0 to 1"/>
 
   <div class="button-grid">
-    <button id="generateBtn">New point cloud</button>
-    <button id="generateAddBtn">Add points</button>
-    <button id="stopBtn" style="display: none;">Stop</button>
+    <button id="generateBtn" aria-label="Generate new point cloud" title="Generate new point cloud">New point cloud</button>
+    <button id="generateAddBtn" aria-label="Add more points to existing cloud" title="Add more points to existing cloud">Add points</button>
+    <button id="stopBtn" style="display: none;" aria-label="Stop generation" title="Stop generation">Stop</button>
   </div>
   <span>
-    <button id="shareBtn">Share</button>
-    <button id="resetSlidersBtn" style="display: none;">Reset sliders ⟲</button>
+    <button id="shareBtn" aria-label="Share current configuration" title="Share current configuration">Share</button>
+    <button id="resetSlidersBtn" style="display: none;" aria-label="Reset sliders to default values" title="Reset sliders to default values">Reset sliders ⟲</button>
   </span>
 </div>
 <details id="customizeMathJSCode">
@@ -173,7 +173,7 @@ nextPoint = currentPoint + (nextTarget - currentPoint) * slider
 <div id="progress-indicator"></div>
 
 <div id="threejs-container">
-  <button id="resetCameraBtn" title="Reset camera view">⟲</button>
+  <button id="resetCameraBtn" aria-label="Reset camera view" title="Reset camera view">⟲</button>
   <div id="controls3d">
     <strong>3D Controls:</strong><br>
     • Orbit: Left click + drag<br>
