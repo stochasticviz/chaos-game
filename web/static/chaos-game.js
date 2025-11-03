@@ -29,7 +29,8 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 });
 
 // Function to create a user control
-function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true) {
+function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
+console.log(options);
     const container = document.createElement('div');
     container.className = 'slider';
 
@@ -50,11 +51,14 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
     sliderDefaults.set(label, defaultValue);
 
+    const decimals = (options.step && options.step >= 1) ? 0 : 2;
+
     noUiSlider.create(slider, {
         start: defaultValue,
         connect: true,
         range: {'min': min, 'max': max},
-        step: 0.01
+        step: 0.01,
+        ...options
     });
 
     // Check for value from Share link and update if exists
@@ -64,7 +68,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
     slidersValuesCache.set(label, slider.noUiSlider.get());
 
-    valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
+    valueDisplay.innerHTML = '<big>' + parseFloat(defaultValue).toFixed(decimals) + '</big>';
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
@@ -72,7 +76,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
         const oldValue = slidersValuesCache.get(label);
         if (newValue !== oldValue) {
             slidersValuesCache.set(label, newValue);
-            valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>' ;
+            valueDisplay.innerHTML = '<big>' + newValue.toFixed(decimals) + '</big>' ;
             updateResetButtonVisibility();
             // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
             if (clearPointsWhenChanged) {
@@ -113,7 +117,7 @@ function updateResetButtonVisibility() {
         const currentValue = slidersValuesCache.get(label);
         return currentValue === undefined || Math.abs(currentValue - defaultValue) < 0.001;
     });
-    
+
     const resetBtn = document.getElementById('resetSlidersBtn');
     if (resetBtn) {
         resetBtn.style.display = allAtDefaults ? 'none' : 'inline-block';
@@ -272,11 +276,13 @@ function generatePoints(debugMode, consumePoints) {
       nextPointColor: undefined,
       hasKey: hasKey,
       write: writeToDOM,
-      createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
+      createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
+          console.log("createSlider() clearPointsWhenChanged:", clearPointsWhenChanged);
+          console.log("createSlider() options:", options);
           const sliders = document.getElementById('sliders');
           if (!slidersValuesCache.has(label)) {
               VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
-              const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged);
+              const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, options);
               sliders.appendChild(control);
           }
           return slidersValuesCache.get(label); // this is the only place where the value of a slider becomes available to the MathJS code
