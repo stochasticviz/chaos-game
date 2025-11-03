@@ -30,6 +30,7 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 
 // Function to create a user control
 function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
+console.log(clearPointsWhenChanged);
 console.log(options);
     const container = document.createElement('div');
     container.className = 'slider';
@@ -57,7 +58,7 @@ console.log(options);
         start: defaultValue,
         connect: true,
         range: {'min': min, 'max': max},
-        step: 0.01,
+        step: 0.1,
         ...options
     });
 
@@ -276,13 +277,23 @@ function generatePoints(debugMode, consumePoints) {
       nextPointColor: undefined,
       hasKey: hasKey,
       write: writeToDOM,
-      createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
-          console.log("createSlider() clearPointsWhenChanged:", clearPointsWhenChanged);
-          console.log("createSlider() options:", options);
+      createSlider: function(label, min, max, defaultValue, options = {}) {
+          // Backward compatibility: if options is a boolean, convert it
+          if (typeof options === 'boolean') {
+              options = {clearPointsWhenChanged: options};
+          }
+
+          const clearPointsWhenChanged = options.clearPointsWhenChanged !== undefined
+              ? options.clearPointsWhenChanged
+              : true;
+
+          // Extract clearPointsWhenChanged from options for noUISlider
+          const {clearPointsWhenChanged: _, ...sliderOptions} = options;
+
           const sliders = document.getElementById('sliders');
           if (!slidersValuesCache.has(label)) {
               VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
-              const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, options);
+              const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, sliderOptions);
               sliders.appendChild(control);
           }
           return slidersValuesCache.get(label); // this is the only place where the value of a slider becomes available to the MathJS code
