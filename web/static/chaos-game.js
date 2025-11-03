@@ -52,7 +52,7 @@ console.log(options);
 
     sliderDefaults.set(label, defaultValue);
 
-    const decimals = (options.step && options.step >= 1) ? 0 : 2;
+    const sliderDisplayPrecision = (options.step && options.step >= 1) ? 0 : 2;
 
     noUiSlider.create(slider, {
         start: defaultValue,
@@ -69,7 +69,7 @@ console.log(options);
 
     slidersValuesCache.set(label, slider.noUiSlider.get());
 
-    valueDisplay.innerHTML = '<big>' + parseFloat(defaultValue).toFixed(decimals) + '</big>';
+    valueDisplay.innerHTML = '<big>' + parseFloat(defaultValue).toFixed(sliderDisplayPrecision) + '</big>';
 
     // Update value when slider changes
     slider.noUiSlider.on('update', function(values) {
@@ -77,7 +77,7 @@ console.log(options);
         const oldValue = slidersValuesCache.get(label);
         if (newValue !== oldValue) {
             slidersValuesCache.set(label, newValue);
-            valueDisplay.innerHTML = '<big>' + newValue.toFixed(decimals) + '</big>' ;
+            valueDisplay.innerHTML = '<big>' + newValue.toFixed(sliderDisplayPrecision) + '</big>' ;
             updateResetButtonVisibility();
             // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
             if (clearPointsWhenChanged) {
