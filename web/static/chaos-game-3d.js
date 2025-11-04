@@ -120,7 +120,7 @@ console.log(options);
     start: defaultValue,
     connect: true,
     range: {'min': min, 'max': max},
-    step: 0.1,
+    step: 0.01,
     ...options
   });
 
