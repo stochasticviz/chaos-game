@@ -120,7 +120,7 @@ console.log(options);
     start: defaultValue,
     connect: true,
     range: {'min': min, 'max': max},
-    step: 0.01,
+    step: 0.01,  // i wanted to try 0.1 but anything less granular than that which was used when a Share link is created can cause a hard to fix problem: the value can be out of phase with multiples of the new step.
     ...options
   });
 
