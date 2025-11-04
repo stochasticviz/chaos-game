@@ -50,7 +50,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
     sliderDefaults.set(label, defaultValue);
 
-    const sliderDisplayPrecision = (options.step && options.step >= 1) ? 0 : 2;
+    const sliderDisplayPrecision = options.step ? Math.max(0, Math.ceil(-Math.log10(Math.abs(options.step)))) : 2;
 
     noUiSlider.create(slider, {
         start: defaultValue,

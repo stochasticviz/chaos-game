@@ -93,7 +93,6 @@ function animate() {
 
 // Function to create a user control (from 2D version)
 function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
-console.log(options);
   const container = document.createElement('div');
   container.className = 'slider';
 
@@ -114,7 +113,7 @@ console.log(options);
 
   sliderDefaults.set(label, defaultValue);
 
-  const decimals = (options.step && options.step >= 1) ? 0 : 2;
+  const sliderDisplayPrecision = options.step ? Math.max(0, Math.ceil(-Math.log10(Math.abs(options.step)))) : 2;
 
   noUiSlider.create(slider, {
     start: defaultValue,
@@ -130,14 +129,14 @@ console.log(options);
   }
 
   slidersValuesCache.set(label, slider.noUiSlider.get());
-  valueDisplay.innerHTML = '<big>' + parseFloat(defaultValue).toFixed(decimals) + '</big>';
+  valueDisplay.innerHTML = '<big>' + parseFloat(defaultValue).toFixed(sliderDisplayPrecision) + '</big>';
 
   slider.noUiSlider.on('update', function(values) {
     const newValue = parseFloat(values[0]);
     const oldValue = slidersValuesCache.get(label);
     if (newValue !== oldValue) {
       slidersValuesCache.set(label, newValue);
-      valueDisplay.innerHTML = '<big>' + newValue.toFixed(decimals) + '</big>';
+      valueDisplay.innerHTML = '<big>' + newValue.toFixed(sliderDisplayPrecision) + '</big>';
       updateResetButtonVisibility();
       // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
       if (clearPointsWhenChanged) {
