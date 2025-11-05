@@ -569,14 +569,14 @@ function drawPoints3D(pointsData, defaultAlpha) {
     let r, g, b, a;
     if (Array.isArray(raw[0])) {
       const row = raw[0];
-      r = clamp255i(row[0] ?? 0); // if this is a 0D point, then x=0  :)
-      g = clamp255i(row[1] ?? 0); // if this is a 1D point, then y=0
-      b = clamp255i(row[2] ?? 0); // if this is a 2D point, then z=0
+      r = clamp255i(row[0]);
+      g = clamp255i(row[1]);
+      b = clamp255i(row[2]);
       a = row[3];
     } else {
-      r = clamp255i(raw[0] ?? 0);
-      g = clamp255i(raw[1] ?? 0);
-      b = clamp255i(raw[2] ?? 0);
+      r = clamp255i(raw[0]);
+      g = clamp255i(raw[1]);
+      b = clamp255i(raw[2]);
       a = raw[3];
     }
     const alpha = (a === undefined ? defaultAlpha : a);
@@ -602,9 +602,9 @@ function drawPoints3D(pointsData, defaultAlpha) {
     for (let i = 0; i < group.length; i++) {
       const p = group[i].position;
       const idx = i * 3;
-      positions[idx]     = p[0];
-      positions[idx + 1] = p[1];
-      positions[idx + 2] = p[2];
+      positions[idx]     = p[0] ?? 0; // if this is a 0D point, then x=0  :)
+      positions[idx + 1] = p[1] ?? 0; // if this is a 1D point, then y=0
+      positions[idx + 2] = p[2] ?? 0; // if this is a 2D point, then z=0
     }
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
