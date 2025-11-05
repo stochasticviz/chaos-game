@@ -120,7 +120,7 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
     connect: true,
     range: {'min': min, 'max': max},
     step: 0.01,  // i wanted to try 0.1 but anything less granular than the value which was used when a Share link is created can cause a hard to fix problem: the value can be out of phase with multiples of the new step. We have legacy links out there that were created with step 0.01.
-    ...options
+    ...options  // this can contain 'step' in which case it overrides the above value of 0.01 (or whatever the user wrongly specifies)
   });
 
   // Check for value from Share link and update if exists
