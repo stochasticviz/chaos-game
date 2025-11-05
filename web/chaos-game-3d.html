@@ -102,13 +102,9 @@ slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
 possibleTargetIndices = math.range(1, targetPointsLength+1)
 possibleTargetIndices = possibleTargetIndices[possibleTargetIndices != previous_target]
 
-# Pick a random target
 nextTargetIndex = math.pickRandom(possibleTargetIndices)
-# ... and get its coordinates
 nextTarget = targetPoints[nextTargetIndex, :]
-
-# Make next point move toward the target
-nextPoint = (currentPoint + nextTarget) * slider
+nextPoint = currentPoint + (nextTarget - currentPoint) * slider
 
 # Store current target for next iteration
 previous_target = nextTargetIndex</pre>
@@ -147,19 +143,26 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
 <label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
 <textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
 # Create a slider to let the user control how far to go toward the target
-slider = createSlider("how far to go toward the target", 0.02, 1.4, 0.5)
+slider = createSlider("how far to go toward the target", 0, 1.4, 0.5)
 
 currentPoint = [[100, 100, 100]]  # arbitrary starting point
 </textarea>
 <label for="nextVertexAndPointMathJSCode">Code to calculate the next point (runs each iteration):</label>
 <textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
-# Pick a random target vertex
+# pick a random target vertex
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 
-# ... and get its coordinates
+# ... and retrieve its coordinates
 nextTarget = targetPoints[nextTargetIndex, :]
 
-nextPoint = currentPoint + (nextTarget - currentPoint) * slider
+# calculate the vector from currentPoint to nextTarget
+delta = nextTarget - currentPoint
+
+# scale that vector
+scaledDelta = delta * slider
+
+# next point is scaledDelta away from currentPoint
+nextPoint = currentPoint + scaledDelta
 </textarea>
 <div id="debugModeDiv">
     <input type="checkbox" id="debugMode" />
