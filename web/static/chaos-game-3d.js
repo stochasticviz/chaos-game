@@ -92,7 +92,7 @@ function animate() {
 }
 
 // Function to create a user control (from 2D version)
-function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true) {
+function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
   const container = document.createElement('div');
   container.className = 'slider';
 
@@ -117,8 +117,11 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
     start: defaultValue,
     connect: true,
     range: {'min': min, 'max': max},
-    step: 0.01
+    step: 0.01,  // i wanted to try 0.1 but anything less granular than the value which was used when a Share link is created can cause a hard to fix problem: the value can be out of phase with multiples of the new step. We have legacy links out there that were created with step 0.01.
+    ...options  // this can contain 'step' in which case it overrides the above value of 0.01 (or whatever the user wrongly specifies)
   });
+
+  const sliderDisplayPrecision = slider.noUiSlider.options.step ? Math.max(0, Math.ceil(-Math.log10(Math.abs(slider.noUiSlider.options.step)))) : 2;
 
   // Check for value from Share link and update if exists
   if (window.sharedSliderValues && window.sharedSliderValues[label] !== undefined) {
@@ -126,14 +129,14 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
   }
 
   slidersValuesCache.set(label, slider.noUiSlider.get());
-  valueDisplay.innerHTML = '<big>' + defaultValue.toFixed(2) + '</big>';
+  valueDisplay.innerHTML = '<big>' + parseFloat(defaultValue).toFixed(sliderDisplayPrecision) + '</big>';
 
   slider.noUiSlider.on('update', function(values) {
     const newValue = parseFloat(values[0]);
     const oldValue = slidersValuesCache.get(label);
     if (newValue !== oldValue) {
       slidersValuesCache.set(label, newValue);
-      valueDisplay.innerHTML = '<big>' + newValue.toFixed(2) + '</big>';
+      valueDisplay.innerHTML = '<big>' + newValue.toFixed(sliderDisplayPrecision) + '</big>';
       updateResetButtonVisibility();
       // now we start a new generation of drawing. this is how we get 'live' control from a slide -- the slider is live, but the old generation is not.
       if (clearPointsWhenChanged) {
@@ -173,7 +176,7 @@ function updateResetButtonVisibility() {
         const currentValue = slidersValuesCache.get(label);
         return currentValue === undefined || Math.abs(currentValue - defaultValue) < 0.001;
     });
-    
+
     const resetBtn = document.getElementById('resetSlidersBtn');
     if (resetBtn) {
         resetBtn.style.display = allAtDefaults ? 'none' : 'inline-block';
@@ -327,11 +330,23 @@ function generatePoints(debugMode, consumePoints) {
     currentPointColor: math.matrix([255, 255, 255]),
     hasKey: hasKey,
     write: writeToDOM,
-    createSlider: function(label, min, max, defaultValue, clearPointsWhenChanged = true) {
+    createSlider: function(label, min, max, defaultValue, options = {}) {
+      // Backward compatibility: if options is a boolean, convert it
+      if (typeof options === 'boolean') {
+        options = {clearPointsWhenChanged: options};
+      }
+
+      const clearPointsWhenChanged = options.clearPointsWhenChanged !== undefined
+        ? options.clearPointsWhenChanged
+        : true;
+
+      // Extract clearPointsWhenChanged from options for noUISlider
+      const {clearPointsWhenChanged: _, ...sliderOptions} = options;
+
       const sliders = document.getElementById('sliders');
       if (!slidersValuesCache.has(label)) {
         VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
-        const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged);
+        const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, sliderOptions);
         sliders.appendChild(control);
       }
       return slidersValuesCache.get(label); // this is the only place where the value of a slider becomes available to the MathJS code

@@ -75,7 +75,7 @@ The following functions are usually used in the optional initialization code:
 
   <ul>
     <li>
-      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then ex. <code>nextPoint = currentPoint + t</code> in your code gives your end user 'live' control over the scalar value, <code>t</code>. Optionally you can specifiy a 5th parameter which, when <code>false</code>, prevents the existing points from being cleared when the user slides the slider. Example: <code>slider = createSlider("rotation", 0, 6.28, 0, false)</code>.
+      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then ex. <code>nextPoint = currentPoint + t</code> in your code gives your end user 'live' control over the scalar value, <code>t</code>. Optionally you can specifiy a 5th parameter which, when <code>false</code>, prevents the existing points from being cleared when the user slides the slider. Example: <code>slider = createSlider("rotation", 0, 6.28, 0, false)</code>. You can also pass arguments to <a href="https://refreshless.com/nouislider/">noUiSlider.create()</a> by using a Javascript object as the 5th parameter, like <code>{step: 0.01}</code> to set a custom step increment.
     </li>
     <li>
       <strong>setTargetsCount(), setPointsCount(), and setOpacity() functions</strong> Set the fields seen above, programmatically. Example: <code>setTargetsCount(5)</code> will set the Targets field to 5.
