@@ -382,7 +382,7 @@ function generatePoints(debugMode, consumePoints) {
   scope['getTargetsCount'] = function() {
     return targets.length;
   }
-  scope['getEquidistantPointsOnSphere'] = function(count, dimensions=3) {
+  scope['getEquidistantPointsOnSphere'] = function(count, dimensions) {
     const points = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
     const regularArrays = points.map(point => Array.from(point));
     return math.matrix(regularArrays);

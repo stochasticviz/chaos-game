@@ -83,19 +83,28 @@ export function regularPolytopeVertices(n, V) {
     // console.log("       icosahedron!");
     const phi = (1 + Math.sqrt(5)) / 2;
     const V = [];
-    const combos = [
-      [0, 1, phi],
-      [1, phi, 0],
-      [phi, 0, 1],
-    ];
-    for (const [a, b, c] of combos) {
-      for (const sa of [1, -1]) {
-        for (const sb of [1, -1]) {
-          V.push([sa * a, sb * b,  c]);
-          V.push([sa * a, sb * b, -c]);
-        }
+
+    // (0, ±1, ±φ)
+    for (const s1 of [1, -1]) {
+      for (const sPhi of [1, -1]) {
+        V.push([0, s1 * 1, sPhi * phi]);
       }
     }
+
+    // (±1, ±φ, 0)
+    for (const s1 of [1, -1]) {
+      for (const sPhi of [1, -1]) {
+        V.push([s1 * 1, sPhi * phi, 0]);
+      }
+    }
+
+    // (±φ, 0, ±1)
+    for (const sPhi of [1, -1]) {
+      for (const s1 of [1, -1]) {
+        V.push([sPhi * phi, 0, s1 * 1]);
+      }
+    }
+
     return V;
   }
 
