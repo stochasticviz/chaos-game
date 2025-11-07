@@ -361,16 +361,15 @@ function generatePoints(debugMode, consumePoints) {
           return parseFloat(document.getElementById('alpha').value);
       }
   };
-  // setTargetsCount() is a closure over scope['targetPoints'] and scope['targetPointsLength'] so it needs to be created after those are set.
   scope['setTargetsCount'] = function(numVertices) {
-      if (targets.length !== numVertices) {
-          setVerticesCount(numVertices)
-          scope['targetPoints'] = math.matrix(targets.map( (pointObj) => { return [pointObj.x, pointObj.y] }));
-          scope['targetPointsLength'] = targets.length;
-      }
+      const verticesInput = document.getElementById('vertices');
+      verticesInput.value = numVertices;
+      // Trigger input event to update UI
+      verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
+      return numVertices;
   }
   scope['getTargetsCount'] = function() {
-      return targets.length;
+      return parseInt(document.getElementById('vertices').value, 10);
   }
 
   function highlightErrorCharacter(expression, error) {
@@ -416,7 +415,7 @@ function generatePoints(debugMode, consumePoints) {
   }
 
   // Update scope with current target points before initialization
-  const regularArrays = targets.map(target => Array.from(target));
+  const regularArrays = targets.map(target => [target.x, target.y]);
   scope['targetPoints'] = math.matrix(regularArrays);
   scope['targetPointsLength'] = targets.length;
 
