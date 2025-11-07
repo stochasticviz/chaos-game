@@ -247,7 +247,7 @@ function resetTargetsLocations(verticesCount) {
 }
 
 function initializeTargets() {
-  resetTargetsLocations(parseFloat(document.getElementById('vertices').value));
+  resetTargetsLocations(parseInt(document.getElementById('vertices').value));
   createTargetMeshes();
 }
 
