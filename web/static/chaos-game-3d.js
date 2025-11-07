@@ -246,13 +246,9 @@ function resetTargetsLocations(verticesCount) {
   targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
 }
 
-function setVerticesCount(verticesCount) {
-  resetTargetsLocations(verticesCount);
+function initializeTargets() {
+  resetTargetsLocations(parseFloat(document.getElementById('vertices').value));
   createTargetMeshes();
-  const verticesInput = document.getElementById('vertices');
-  verticesInput.value = verticesCount;
-  verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
-  return verticesCount;
 }
 
 function createTargetMeshes() {
@@ -371,24 +367,27 @@ function generatePoints(debugMode, consumePoints) {
     }
   };
 
-  scope['setTargetsCount'] = function(numVertices, force=false) {
-    if (targets.length !== numVertices || force) {
-      setVerticesCount(numVertices)
-      const regularArrays = targets.map(target => Array.from(target));
-      scope['targetPoints'] = math.matrix(regularArrays);
-      scope['targetPointsLength'] = targets.length;
-    }
+  scope['setTargetsCount'] = function(numVertices) {
+      const verticesInput = document.getElementById('vertices');
+      verticesInput.value = numVertices;
+      // Trigger input event to update UI
+      verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
+      return numVertices;
   }
   scope['getTargetsCount'] = function() {
-    return targets.length;
+      return parseInt(document.getElementById('vertices').value, 10);
   }
   scope['getEquidistantPointsOnSphere'] = function(count, dimensions) {
     const points = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
     const regularArrays = points.map(point => Array.from(point));
     return math.matrix(regularArrays);
   }
-  const vertices = parseInt(document.getElementById('vertices').value);
-  scope['setTargetsCount'](vertices, true) // set scope.targetPoints and scope.targetPointsLength initially
+
+  // Update scope with current target points before initialization MathJS executes
+  initializeTargets()
+  const regularArrays = targets.map(target => Array.from(target));
+  scope['targetPoints'] = math.matrix(regularArrays);
+  scope['targetPointsLength'] = targets.length;
 
   let showStuff = null;
   let firstTime = true;

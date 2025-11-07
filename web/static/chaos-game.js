@@ -415,6 +415,10 @@ function generatePoints(debugMode, consumePoints) {
       return o && typeof o === 'object' && o.re !== undefined && o.im !== undefined
   }
 
+  // Update scope with current target points before initialization
+  const regularArrays = targets.map(target => Array.from(target));
+  scope['targetPoints'] = math.matrix(regularArrays);
+  scope['targetPointsLength'] = targets.length;
 
   // Execute initialization code once per generation
   if (initializationMathJSCodeString.trim()) {
