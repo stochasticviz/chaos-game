@@ -6,7 +6,6 @@ import * as PointsOnNSphere from './points-on-n-sphere.js?v=7299d83';
 
 const math = create(all);
 
-window.chaosGameComplete = false; // for testing
 // Three.js scene variables
 let scene, camera, renderer, controls;
 let pointsGeometry, pointsMaterial, pointsMesh;
@@ -545,8 +544,6 @@ function generatePoints(debugMode, consumePoints) {
         setTimeout(generateChunk, 0);
       } else {
         resolve(points);
-        console.log("setting window.chaosGameComplete = true. The points generation must be done now.");
-        window.chaosGameComplete = true; // for testing
       }
     }
 
