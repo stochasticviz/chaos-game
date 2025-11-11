@@ -6,12 +6,14 @@ import * as PointsOnNSphere from './points-on-n-sphere.js?v=7299d83';
 
 const math = create(all);
 
+window.chaosGameComplete = false; // for testing
 // Three.js scene variables
 let scene, camera, renderer, controls;
 let pointsGeometry, pointsMaterial, pointsMesh;
 let targetMeshes = [];
 let targets = [];
 let initialCameraPosition, initialCameraTarget;
+let axesHelper = null;
 
 // MathJS system variables (from 2D version)
 const SPHERE_RADIUS = 500;
@@ -69,7 +71,7 @@ function initThreeJS() {
   initialCameraTarget = controls.target.clone();
 
   // Add coordinate axes helper
-  const axesHelper = new THREE.AxesHelper(SPHERE_RADIUS + 50);
+  axesHelper = new THREE.AxesHelper(SPHERE_RADIUS + 50);
   scene.add(axesHelper);
 
   // Handle window resize
@@ -83,6 +85,13 @@ function onWindowResize() {
   camera.aspect = container.offsetWidth / container.offsetHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(container.offsetWidth, container.offsetHeight);
+}
+
+function toggleScaffolding(visible) {
+  axesHelper.visible = visible;
+  targetMeshes.forEach(mesh => {
+    mesh.visible = visible;
+  });
 }
 
 function animate() {
@@ -257,11 +266,13 @@ function createTargetMeshes() {
     scene.remove(vertex);
   });
   targetMeshes = [];
+  const showScaffolding = document.getElementById('scaffolding-toggle').checked;
   targets.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
     vertexMesh.position.set(target[0], target[1], target[2]);
+    vertexMesh.visible = showScaffolding;
     scene.add(vertexMesh);
     targetMeshes.push(vertexMesh);
   });
@@ -534,6 +545,8 @@ function generatePoints(debugMode, consumePoints) {
         setTimeout(generateChunk, 0);
       } else {
         resolve(points);
+        console.log("setting window.chaosGameComplete = true. The points generation must be done now.");
+        window.chaosGameComplete = true; // for testing
       }
     }
 
@@ -865,6 +878,10 @@ document.getElementById('resetCameraBtn').addEventListener('click', () => {
   camera.position.copy(initialCameraPosition);
   controls.target.copy(initialCameraTarget);
   controls.update();
+});
+
+document.getElementById('scaffolding-toggle').addEventListener('change', (event) => {
+  toggleScaffolding(event.target.checked);
 });
 
 // Initialize everything
