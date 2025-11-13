@@ -117,9 +117,9 @@ setPointsCount(300000)
 setOpacity(0.5)
 
 # Create user controls for the parameters
-phase_offset = createSlider("Phase offset", 0, 2*math.pi, 5/2)
-amplitude = createSlider("Amplitude", -3/2, 4, 1/2)
-bias = createSlider("Bias", -1, 7/4, 1/2)
+phase_offset = createSlider("Phase offset", 0, 2*math.pi, 5/2, {display: "inline"})
+amplitude = createSlider("Amplitude", -3/2, 4, 1/2, {display: "inline"})
+bias = createSlider("Bias", -1, 7/4, 1/2, {display: "inline"})
 
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 nextTarget = targetPoints[nextTargetIndex, :]

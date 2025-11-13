@@ -124,6 +124,8 @@ label[for="initializationMathJSCode"] {
   margin-top: 5px;
   padding: 5px;
   box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 #shareBtn, #resetSlidersBtn {
@@ -132,6 +134,7 @@ label[for="initializationMathJSCode"] {
 
 .slider {
   margin: 10px 0;
+  width: 100%;
 }
 
 .label-container {
@@ -236,4 +239,15 @@ label[for="initializationMathJSCode"] {
   border-radius: 5px;
   font-weight: bold;
   z-index: 1000;
+}
+
+.slider.slider-inline {
+  flex-grow: 1;
+  flex-basis: 0;
+  width: auto; /* override the 100% width */
+  margin-right: 15px;
+}
+
+.slider.slider-inline:last-of-type {
+    margin-right: 0;
 }
