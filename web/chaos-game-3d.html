@@ -8,7 +8,9 @@
   <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
 </head>
 <body>
-<h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a> in 3D!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <div class="button-grid">
+<div class="header-container">
+  <h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a> in 3D!</h1>
+  <div class="button-grid">
     <button id="generateBtn" aria-label="Generate new point cloud" title="Generate new point cloud">New point cloud</button>
     <button id="generateAddBtn" aria-label="Add more points to existing cloud" title="Add more points to existing cloud">Add points</button>
     <button id="stopBtn" style="display: none;" aria-label="Stop generation" title="Stop generation">Stop</button>
@@ -16,7 +18,8 @@
   <span>
     <button id="shareBtn" aria-label="Share current configuration" title="Share current configuration">Share</button>
     <button id="resetSlidersBtn" style="display: none;" aria-label="Reset sliders to default values" title="Reset sliders to default values">Reset sliders ⟲</button>
-  </span></h1>
+  </span>
+</div>
 
 <div id="sliders"></div>
 <div id="controls"></div>

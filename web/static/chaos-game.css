@@ -2,6 +2,12 @@ body {
   font-family: sans-serif;
 }
 
+.header-container {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
 .button-grid {
   display: inline-grid;
   grid-template-columns: 1fr 1fr;
