@@ -103,6 +103,9 @@ function animate() {
 function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
   const container = document.createElement('div');
   container.className = 'slider';
+  if (options.display === 'inline') {
+    container.classList.add('slider-inline');
+  }
 
   const labelContainer = document.createElement('div');
   labelContainer.className = 'label-container';
@@ -121,12 +124,14 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
   sliderDefaults.set(label, defaultValue);
 
+  const { display, ...sliderOptions } = options;
+
   noUiSlider.create(slider, {
     start: defaultValue,
     connect: true,
     range: {'min': min, 'max': max},
     step: 0.01,  // i wanted to try 0.1 but anything less granular than the value which was used when a Share link is created can cause a hard to fix problem: the value can be out of phase with multiples of the new step. We have legacy links out there that were created with step 0.01.
-    ...options  // this can contain 'step' in which case it overrides the above value of 0.01 (or whatever the user wrongly specifies)
+    ...sliderOptions  // this can contain 'step' in which case it overrides the above value of 0.01 (or whatever the user wrongly specifies)
   });
 
   const sliderDisplayPrecision = slider.noUiSlider.options.step ? Math.max(0, Math.ceil(-Math.log10(Math.abs(slider.noUiSlider.options.step)))) : 2;
@@ -254,8 +259,8 @@ function resetTargetsLocations(verticesCount) {
   targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
 }
 
-function initializeTargets() {
-  resetTargetsLocations(parseInt(document.getElementById('vertices').value));
+function initializeTargets(verticesCount) {
+  resetTargetsLocations(verticesCount);
   createTargetMeshes();
 }
 
@@ -346,58 +351,21 @@ function generatePoints(debugMode, consumePoints) {
         ? options.clearPointsWhenChanged
         : true;
 
-      // Extract clearPointsWhenChanged from options for noUISlider
-      const {clearPointsWhenChanged: _, ...sliderOptions} = options;
-
       const sliders = document.getElementById('sliders');
       if (!slidersValuesCache.has(label)) {
         VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
-        const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, sliderOptions);
+        const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, options);
         sliders.appendChild(control);
       }
       return slidersValuesCache.get(label); // this is the only place where the value of a slider becomes available to the MathJS code
-    },
-    setPointsCount: function(numPoints) {
-      const stepsInput = document.getElementById('steps');
-      stepsInput.value = numPoints;
-      stepsInput.dispatchEvent(new Event('input', { bubbles: true }));
-      return numPoints;
-    },
-    getPointsCount: function() {
-      return parseInt(document.getElementById('steps').value);
-    },
-    setOpacity: function(alphaValue) {
-      const alphaInput = document.getElementById('alpha');
-      alphaInput.value = alphaValue;
-      alphaInput.dispatchEvent(new Event('input', { bubbles: true }));
-      return alphaValue;
-    },
-    getOpacity: function() {
-      return parseFloat(document.getElementById('alpha').value);
     }
   };
 
-  scope['setTargetsCount'] = function(numVertices) {
-      const verticesInput = document.getElementById('vertices');
-      verticesInput.value = numVertices;
-      // Trigger input event to update UI
-      verticesInput.dispatchEvent(new Event('input', { bubbles: true }));
-      return numVertices;
-  }
-  scope['getTargetsCount'] = function() {
-      return parseInt(document.getElementById('vertices').value, 10);
-  }
   scope['getEquidistantPointsOnSphere'] = function(count, dimensions) {
     const points = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
     const regularArrays = points.map(point => Array.from(point));
     return math.matrix(regularArrays);
   }
-
-  // Update scope with current target points before initialization MathJS executes
-  initializeTargets()
-  const regularArrays = targets.map(target => Array.from(target));
-  scope['targetPoints'] = math.matrix(regularArrays);
-  scope['targetPointsLength'] = targets.length;
 
   let showStuff = null;
   let firstTime = true;
@@ -428,8 +396,15 @@ function generatePoints(debugMode, consumePoints) {
     }
   }
 
-  const steps = parseInt(document.getElementById('steps').value);
-  const alphaValue = parseFloat(document.getElementById('alpha').value);
+  // Update scope with current target points after initialization MathJS executes
+  initializeTargets(scope.targetsCount);
+  const regularArrays = targets.map(target => Array.from(target));
+  scope['targetPoints'] = math.matrix(regularArrays);
+  scope['targetPointsLength'] = targets.length;
+
+
+  const steps = scope.pointsCount;
+  const alphaValue = scope.opacity;
 
   return new Promise((resolve, reject) => {
     function generateChunk() {
@@ -537,7 +512,7 @@ function generatePoints(debugMode, consumePoints) {
       }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, points);
+      consumePoints(currentStep / steps, points, alphaValue);
       points = [];
 
       if (currentStep < steps) {
@@ -640,9 +615,6 @@ function toggleProgressIndicator(show) {
 
 async function generateAndDraw(clearPoints = true) {
   const generationId = currentGenerationId + 1;
-  const vertices = parseInt(document.getElementById('vertices').value);
-  const steps = parseInt(document.getElementById('steps').value);
-  const alphaValue = parseFloat(document.getElementById('alpha').value);
   const debugMode = document.getElementById('debugMode').checked;
 
   // Clear the write() log
@@ -681,7 +653,7 @@ async function generateAndDraw(clearPoints = true) {
 
     try {
       // TODO: consider putting the progress indicator thing in drawPoints3D() to simplify this call to generatePoints()
-      await generatePoints(debugMode, (progress, points) => {
+      await generatePoints(debugMode, (progress, points, alphaValue) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
         drawPoints3D(points, alphaValue);
@@ -715,9 +687,6 @@ function generateShareableLink() {
   const shareData = {
     initCode: initCode,
     mainCode: mainCode,
-    targets: document.getElementById('vertices').value,
-    steps: document.getElementById('steps').value,
-    alpha: document.getElementById('alpha').value,
     sliders: Object.fromEntries(slidersValuesCache),
     camera: {
       position: {
@@ -778,18 +747,6 @@ function loadSharedCode() {
 
       if (shareData.mainCode !== undefined) {
         document.getElementById('nextVertexAndPointMathJSCode').value = shareData.mainCode;
-      }
-
-      if (shareData.targets !== undefined) {
-        document.getElementById('vertices').value = shareData.targets;
-      }
-
-      if (shareData.steps !== undefined) {
-        document.getElementById('steps').value = shareData.steps;
-      }
-
-      if (shareData.alpha !== undefined) {
-        document.getElementById('alpha').value = shareData.alpha;
       }
 
       if (shareData.sliders) {

@@ -8,17 +8,8 @@
   <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
 </head>
 <body>
-<h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a> in 3D!</h1>
-<div id="controls">
-  <label for="vertices">Targets:</label>
-  <input type="number" id="vertices" value="4" min="1" aria-label="Number of target vertices" title="Number of target vertices"/>
-
-  <label for="steps">Points:</label>
-  <input type="number" id="steps" value="100000" step="50000" aria-label="Number of points to generate" title="Number of points to generate"/>
-
-  <label for="alpha">Opacity (0.0 - 1.0):</label>
-  <input type="number" id="alpha" value="1" step="0.1" min="0" max="1" aria-label="Point opacity from 0 to 1" title="Point opacity from 0 to 1"/>
-
+<div class="header-container">
+  <h1>Play around with the <a href="https://www.youtube.com/watch?v=kbKtFN71Lfs">Chaos</a> <a href="https://en.wikipedia.org/wiki/Chaos_game">game</a> in 3D!</h1>
   <div class="button-grid">
     <button id="generateBtn" aria-label="Generate new point cloud" title="Generate new point cloud">New point cloud</button>
     <button id="generateAddBtn" aria-label="Add more points to existing cloud" title="Add more points to existing cloud">Add points</button>
@@ -29,6 +20,23 @@
     <button id="resetSlidersBtn" style="display: none;" aria-label="Reset sliders to default values" title="Reset sliders to default values">Reset sliders ⟲</button>
   </span>
 </div>
+
+<div id="sliders"></div>
+<div id="controls"></div>
+<div id="progress-indicator"></div>
+
+  <div id="threejs-container">
+    <button id="resetCameraBtn" aria-label="Reset camera view" title="Reset camera view">⟲</button>
+    <div id="controls3d">
+      <strong>3D Controls:</strong><br>
+      <input type="checkbox" id="scaffolding-toggle" checked>
+      <label for="scaffolding-toggle">Show scaffolding</label><br>
+      • Orbit: Left click + drag<br>
+      • Zoom: Mouse wheel<br>
+      • Pan: Right click + drag
+    </div>
+  </div>
+
 <details id="customizeMathJSCode">
   <summary>Customize the "next point" code</summary>
 
@@ -74,7 +82,7 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
       <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target" in the advanced examples, below.
     </li>
   </ul>
-The following functions are usually used in the optional initialization code:
+The following functions are usually used in the initialization code:
 
   <ul>
     <li>
@@ -92,7 +100,7 @@ The following functions are usually used in the optional initialization code:
   <div class="codeBlock">
     Advanced example - Avoid previous target:
     <pre class="codeExample">
-# IMPORTANT! Put these two lines in the "Optional initialization code" pane.
+# IMPORTANT! Put these two lines in the "Initialization code" pane.
 previous_target = -1  # start with a non-existing target
 slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
 
@@ -117,9 +125,9 @@ setPointsCount(300000)
 setOpacity(0.5)
 
 # Create user controls for the parameters
-phase_offset = createSlider("Phase offset", 0, 2*math.pi, 5/2)
-amplitude = createSlider("Amplitude", -3/2, 4, 1/2)
-bias = createSlider("Bias", -1, 7/4, 1/2)
+phase_offset = createSlider("Phase offset", 0, 2*math.pi, 5/2, {display: "inline"})
+amplitude = createSlider("Amplitude", -3/2, 4, 1/2, {display: "inline"})
+bias = createSlider("Bias", -1, 7/4, 1/2, {display: "inline"})
 
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 nextTarget = targetPoints[nextTargetIndex, :]
@@ -140,12 +148,14 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
 </div>
 </details>
 <br/>
-<label for="initializationMathJSCode">Optional initialization code (runs once before first iteration):</label>
+<label for="initializationMathJSCode">Initialization code (runs once before first iteration):</label>
 <textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
-# Create a slider to let the user control how far to go toward the target
-slider = createSlider("how far to go toward the target", 0, 1.4, 0.5)
+currentPoint = [100, 100, 100]  # arbitary starting point
 
-currentPoint = [[100, 100, 100]]  # arbitrary starting point
+targetsCount = createSlider("Targets", 1, 16, 4, {step: 1, display: "inline"})
+pointsCount = createSlider("Points", 0, 300000, 100000, {step: 1, display: "inline"})
+opacity = createSlider("Opacity (0.0 - 1.0)", .01, 1, 1, {step: 0.01, display: "inline"})
+howFar = createSlider("How far to go toward the target", 0, 1.4, 0.5)  # a slider to let the user control how far to go toward the target
 </textarea>
 <label for="nextVertexAndPointMathJSCode">Code to calculate the next point (runs each iteration):</label>
 <textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
@@ -159,7 +169,7 @@ nextTarget = targetPoints[nextTargetIndex, :]
 delta = nextTarget - currentPoint
 
 # scale that vector
-scaledDelta = delta * slider
+scaledDelta = delta * howFar
 
 # next point is scaledDelta away from currentPoint
 nextPoint = currentPoint + scaledDelta
@@ -172,20 +182,7 @@ nextPoint = currentPoint + scaledDelta
 <div id="errorMessage">
 </div>
 
-<div id="sliders"></div>
-<div id="progress-indicator"></div>
-
-  <div id="threejs-container">
-    <button id="resetCameraBtn" aria-label="Reset camera view" title="Reset camera view">⟲</button>
-    <div id="controls3d">
-      <strong>3D Controls:</strong><br>
-      <input type="checkbox" id="scaffolding-toggle" checked>
-      <label for="scaffolding-toggle">Show scaffolding</label><br>
-      • Orbit: Left click + drag<br>
-      • Zoom: Mouse wheel<br>
-      • Pan: Right click + drag
-    </div>
-  </div><script type="module" src="static/chaos-game-3d.js?v=a82c764f0033"></script>
+<script type="module" src="static/chaos-game-3d.js?v=a82c764f0033"></script>
 <div><small><a href="https://github.com/herdrick/chaos-game/">source</a>&nbsp;&nbsp;&nbsp;<a href="chaos-game.html">2D version</a></small></div>
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "9ded2ae934bc48fcb280531fe7b8e22f"}'></script>
 </body>

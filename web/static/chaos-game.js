@@ -32,6 +32,9 @@ document.getElementById('customizeView').addEventListener('change', function(e) 
 function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged = true, options = {}) {
     const container = document.createElement('div');
     container.className = 'slider';
+    if (options.display === 'inline') {
+        container.classList.add('slider-inline');
+    }
 
     const labelContainer = document.createElement('div');
     labelContainer.className = 'label-container';
@@ -50,12 +53,14 @@ function createUserControl(label, min, max, defaultValue, clearPointsWhenChanged
 
     sliderDefaults.set(label, defaultValue);
 
+    const { display, ...sliderOptions } = options;
+
     noUiSlider.create(slider, {
         start: defaultValue,
         connect: true,
         range: {'min': min, 'max': max},
         step: 0.01,  // i wanted to try 0.1 but anything less granular than the value which was used when a Share link is created can cause a hard to fix problem: the value can be out of phase with multiples of the new step. We have legacy links out there that were created with step 0.01.
-        ...options
+        ...sliderOptions
     });
 
     const sliderDisplayPrecision = slider.noUiSlider.options.step ? Math.max(0, Math.ceil(-Math.log10(Math.abs(slider.noUiSlider.options.step)))) : 2;
@@ -285,13 +290,10 @@ function generatePoints(debugMode, consumePoints) {
               ? options.clearPointsWhenChanged
               : true;
 
-          // Extract clearPointsWhenChanged from options for noUISlider
-          const {clearPointsWhenChanged: _, ...sliderOptions} = options;
-
           const sliders = document.getElementById('sliders');
           if (!slidersValuesCache.has(label)) {
               VERBOSE && console.log(`This control does not exist yet, creating it now: "${label}" (${min} to ${max}, default: ${defaultValue})`);
-              const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, sliderOptions);
+              const control = createUserControl(label, min, max, defaultValue, clearPointsWhenChanged, options);
               sliders.appendChild(control);
           }
           return slidersValuesCache.get(label); // this is the only place where the value of a slider becomes available to the MathJS code
