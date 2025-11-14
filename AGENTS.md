@@ -23,3 +23,6 @@
 - The best outcome for executing a bit of code is success.
 - The second best outcome is throwing an error. It's a bad thing to silently fall back on some reasonable value. Fallbacks are bad.
 - Never silently catch or suppress errors
+
+## git
+- If I ask you to commit, then include your name in the commit msg
