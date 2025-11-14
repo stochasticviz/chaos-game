@@ -1,7 +1,7 @@
 import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
 import * as THREE from '../lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
-import * as PointsOnNSphere from './points-on-n-sphere.js?v=7299d83';
+import * as PointsOnNSphere from './points-on-n-sphere.js?v=d6db03bb';
 // we can't import noUiSlider in this way. ChatGPT: "noUiSlider’s distribution has been stuck in UMD-only for years — it never added a proper ESM export"
 
 const math = create(all);
