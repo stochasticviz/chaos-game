@@ -140,6 +140,7 @@ function getEquidistantPointsOnUnitNSphereApproximation(dimensions, nPoints, opt
 // const pts = getEquidistantPointsOnUnitNSphereApproximation(4, 8, { seed: 42 });
 // console.log(pts.map(v => Array.from(v)));
 
+// TODO: consider changing name of this to getPolytopeOrBestPackedVertices()
 export function getEquidistantPointsOnNSphere(dimensions, verticesCount) {
     let vertices = polytopes.regularPolytopeVertices(dimensions, verticesCount);
     if (! vertices)  {
