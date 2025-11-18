@@ -7,7 +7,7 @@
 
 ## Puppeteer
 - Use the Puppeteer MCP server to try out your code
-- To start a web server for the app, run the following command in the root directory of the project: `npx http-server -c=-1 -p 8090`. The server will be available at `http://127.0.0.1:8090`.
+- To start a web server for the app, run the following command in the root directory of the project: 'npx http-server -c=-1 -p 8090'. The server will be available at 'http://127.0.0.1:8090'.
 
 ## git
 - If I ask you to commit, then include your name in the commit msg.
