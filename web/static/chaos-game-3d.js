@@ -551,18 +551,11 @@ function drawPoints3D(pointsData, defaultAlpha) {
     const raw = pointsData[i].color.toArray();
 
     let r, g, b, a;
-    if (Array.isArray(raw[0])) {
-      const row = raw[0];
-      r = clamp255i(row[0]);
-      g = clamp255i(row[1]);
-      b = clamp255i(row[2]);
-      a = row[3];
-    } else {
-      r = clamp255i(raw[0]);
-      g = clamp255i(raw[1]);
-      b = clamp255i(raw[2]);
-      a = raw[3];
-    }
+    r = clamp255i(raw[0]);
+    g = clamp255i(raw[1]);
+    b = clamp255i(raw[2]);
+    a = raw[3];
+
     const alpha = (a === undefined ? defaultAlpha : a);
     const aByte = (alpha <= 0 ? 0 : (alpha >= 1 ? 255 : (alpha * 255 + 0.5) | 0));
 
