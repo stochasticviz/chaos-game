@@ -150,7 +150,7 @@ export function getEquidistantPointsOnNSphere(dimensions, verticesCount) {
 
     return vertices.map(vertex => {
           const norm = Math.hypot(...vertex) || 1;
-          return Array.from(vertex).map(coord => coord / norm);
+          return Array.from(vertex).map(coord => coord / norm);  // MathJS.matrix() constructor doesn't like Float64Array, so convert to JS array
       });
 
 
