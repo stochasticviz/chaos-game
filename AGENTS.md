@@ -1,9 +1,13 @@
 # AGENTS.md
 
 ## relevant files
-- Only web/chaos-game.html and web/chaos-game-3d.html and files imported/required by these HTML files already present in the repository are to be looked at or touched.
-- Do not add any untracked files unless you created them.
-
+- Only these files in the repo are relevant to your tasks:
+  - web/chaos-game-3d.html
+  - web/static/chaos-game-3d.js
+  - web/static/points-on-n-sphere.js
+  - web/static/polytopes.js
+  - web/static/chaos-game.css
+- Ignore the 2D stuff
 
 ## Puppeteer
 - Use the Puppeteer MCP server to try out your code
