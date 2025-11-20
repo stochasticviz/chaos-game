@@ -386,7 +386,7 @@ function generatePoints(debugMode, consumePoints) {
   }
 
   // Update scope with current target points after initialization MathJS executes
-  if (scope['targetPoints'] == undefined) {
+  if (scope['targetPoints'] === undefined) {
     // default targets: spread (approximately, typically) evenly the desired number of targets around on the 3D unit sphere (genus 0), then scale
     scope['targetPoints'] = math.multiply(math.matrix(PointsOnNSphere.getEquidistantPointsOnNSphere(3, scope.targetsCount)), SPHERE_RADIUS);
   }
