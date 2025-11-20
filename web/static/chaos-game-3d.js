@@ -351,8 +351,8 @@ function generatePoints(debugMode, consumePoints) {
   };
 
   scope['getEquidistantPointsOnSphere'] = function(count, dimensions) {
-    const points = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
-    return math.matrix(points);
+    const equidistantPoints = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
+    return math.matrix(equidistantPoints);
   }
 
   let showStuff = null;
