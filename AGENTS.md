@@ -1,16 +1,19 @@
 # AGENTS.md
 
 ## relevant files
-- Only web/chaos-game.html and web/chaos-game-3d.html and files imported/required by these HTML files already present in the repository are to be looked at or touched.
-- Do not add any untracked files unless you created them.
-
+- Only these files in the repo are relevant to your tasks:
+  - web/chaos-game-3d.html
+  - web/static/chaos-game-3d.js
+  - web/static/points-on-n-sphere.js
+  - web/static/polytopes.js
+  - web/static/chaos-game.css
+- Ignore the 2D stuff
 
 ## Puppeteer
 - Use the Puppeteer MCP server to try out your code
 - To start a web server for the app, run the following command in the root directory of the project: 'npx http-server -c=-1 -p 8090'. The server will be available at 'http://127.0.0.1:8090'.
 
 ## git
-- If I ask you to commit, then include your name in the commit msg.
 - Do not 'git push'.
 
 ## The human operator is fairly often wrong

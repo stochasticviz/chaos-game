@@ -253,17 +253,6 @@ function writeToDOM(...args) {
   return "write: " + text
 }
 
-function resetTargetsLocations(verticesCount) {
-  //console.log('    unitSphereTargets:', unitSphereTargets, '  typeof unitSphereTargets:', typeof unitSphereTargets);
-  targets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount);
-  targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
-}
-
-function initializeTargets(verticesCount) {
-  resetTargetsLocations(verticesCount);
-  createTargetMeshes();
-}
-
 function createTargetMeshes() {
   // Remove old vertex spheres
   targetMeshes.forEach(vertex => {
@@ -271,15 +260,15 @@ function createTargetMeshes() {
   });
   targetMeshes = [];
   const showScaffolding = document.getElementById('scaffolding-toggle').checked;
-  targets.forEach(target => {
+  for (let i = 0; i < targets.size()[0]; i++) {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
-    vertexMesh.position.set(target[0], target[1], target[2]);
+    vertexMesh.position.set(targets.get([i, 0]), targets.get([i, 1]), targets.get([i, 2]));
     vertexMesh.visible = showScaffolding;
     scene.add(vertexMesh);
     targetMeshes.push(vertexMesh);
-  });
+  };
 
   // Add lighting for the spheres
   if (!scene.getObjectByName('ambient-light')) {
@@ -397,11 +386,13 @@ function generatePoints(debugMode, consumePoints) {
   }
 
   // Update scope with current target points after initialization MathJS executes
-  initializeTargets(scope.targetsCount);
-  const regularArrays = targets.map(target => Array.from(target));
-  scope['targetPoints'] = math.matrix(regularArrays);
-  scope['targetPointsLength'] = targets.length;
-
+  if (scope['targetPoints'] === undefined) {
+    // default targets: spread (approximately, typically) evenly the desired number of targets around on the 3D unit sphere (genus 0), then scale
+    scope['targetPoints'] = math.multiply(math.matrix(PointsOnNSphere.getEquidistantPointsOnNSphere(3, scope.targetsCount)), SPHERE_RADIUS);
+  }
+  targets = scope['targetPoints'];
+  createTargetMeshes();
+  scope['targetPointsLength'] = targets.size()[0];
 
   const steps = scope.pointsCount;
   const alphaValue = scope.opacity;
@@ -472,6 +463,11 @@ function generatePoints(debugMode, consumePoints) {
           scope.nextPoint = undefined;
         }
 
+        // MathJS users can change scope.targetPoints. If so we need to update scope.targetPointsLength. Note that this is the only good reason to have a global 'targets' variable.
+        if (scope.targetPoints !== targets) {
+             targets = scope.targetPoints;
+             scope.targetPointsLength = targets.size()[0]
+        }
         if (scope.nextPointColor !== undefined) {
           scope.currentPointColor = scope.nextPointColor;
           scope.nextPointColor = undefined;
