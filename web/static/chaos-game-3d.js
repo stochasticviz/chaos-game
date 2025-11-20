@@ -253,12 +253,6 @@ function writeToDOM(...args) {
   return "write: " + text
 }
 
-function resetTargetsLocations(verticesCount) {
-  //console.log('    unitSphereTargets:', unitSphereTargets, '  typeof unitSphereTargets:', typeof unitSphereTargets);
-  targets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, verticesCount);
-  targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
-}
-
 function createTargetMeshes() {
   // Remove old vertex spheres
   targetMeshes.forEach(vertex => {
@@ -406,7 +400,8 @@ function generatePoints(debugMode, consumePoints) {
       scope['targetPoints'] = math.matrix(userTargets);
     }
   } else {
-    resetTargetsLocations(scope.targetsCount);
+    targets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, scope.targetsCount);
+    targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
     createTargetMeshes();
     const regularArrays = targets.map(target => Array.from(target));
     scope['targetPoints'] = math.matrix(regularArrays);
