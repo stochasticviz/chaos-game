@@ -260,7 +260,8 @@ function createTargetMeshes() {
   });
   targetMeshes = [];
   const showScaffolding = document.getElementById('scaffolding-toggle').checked;
-  targets.forEach(target => {
+  const targetsArray = (targets && typeof targets.toArray === 'function') ? targets.toArray() : targets;
+  targetsArray.forEach(target => {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
@@ -386,29 +387,13 @@ function generatePoints(debugMode, consumePoints) {
   }
 
   // Update scope with current target points after initialization MathJS executes
-  if (scope['targetPoints'] !== undefined) {
-    let userTargets = scope['targetPoints'];
-    // If it's a MathJS matrix, convert to Array for internal usage in 'targets'
-    if (typeof userTargets.toArray === 'function') {
-      userTargets = userTargets.toArray();
-    }
-    targets = userTargets;
-    createTargetMeshes();
-
-    // Ensure the scope variable is a Matrix, for consistency with default behavior (and so that syntax like [i, :] works)
-    if (!math.isMatrix(scope['targetPoints'])) {
-      scope['targetPoints'] = math.matrix(userTargets);
-    }
-  } else {
-    // default targets: spread (approximately, typically) evenly the desired number of targets around on the unit sphere, then scale
-    targets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, scope.targetsCount);
-    targets = targets.map(function(target) {return target.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
-    createTargetMeshes();
-    const regularArrays = targets.map(target => Array.from(target));
-    scope['targetPoints'] = math.matrix(regularArrays);
+  if (scope['targetPoints'] == undefined) {
+    // default targets: spread (approximately, typically) evenly the desired number of targets around on the 3D unit sphere (genus 0), then scale
+    scope['targetPoints'] = math.multiply(math.matrix(PointsOnNSphere.getEquidistantPointsOnNSphere(3, scope.targetsCount)), SPHERE_RADIUS);
   }
-  scope['targetPointsLength'] = targets.length;
-
+  targets = scope['targetPoints'];
+  createTargetMeshes();
+  scope['targetPointsLength'] = targets.size()[0];
 
   const steps = scope.pointsCount;
   const alphaValue = scope.opacity;
