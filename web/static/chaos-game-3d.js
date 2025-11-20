@@ -463,6 +463,11 @@ function generatePoints(debugMode, consumePoints) {
           scope.nextPoint = undefined;
         }
 
+        // MathJS users can change scope.targetPoints. If so we need to update scope.targetPointsLength. Note that this is the only good reason to have a global 'targets' variable.
+        if (scope.targetPoints !== targets) {
+             targets = scope.targetPoints;
+             scope.targetPointsLength = targets.size()[0]
+        }
         if (scope.nextPointColor !== undefined) {
           scope.currentPointColor = scope.nextPointColor;
           scope.nextPointColor = undefined;
