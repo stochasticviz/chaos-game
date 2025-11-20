@@ -259,11 +259,6 @@ function resetTargetsLocations(verticesCount) {
   targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
 }
 
-function initializeTargets(verticesCount) {
-  resetTargetsLocations(verticesCount);
-  createTargetMeshes();
-}
-
 function createTargetMeshes() {
   // Remove old vertex spheres
   targetMeshes.forEach(vertex => {
@@ -397,9 +392,25 @@ function generatePoints(debugMode, consumePoints) {
   }
 
   // Update scope with current target points after initialization MathJS executes
-  initializeTargets(scope.targetsCount);
-  const regularArrays = targets.map(target => Array.from(target));
-  scope['targetPoints'] = math.matrix(regularArrays);
+  if (scope['targetPoints'] !== undefined) {
+    let userTargets = scope['targetPoints'];
+    // If it's a MathJS matrix, convert to Array for internal usage in 'targets'
+    if (typeof userTargets.toArray === 'function') {
+      userTargets = userTargets.toArray();
+    }
+    targets = userTargets;
+    createTargetMeshes();
+
+    // Ensure the scope variable is a Matrix, for consistency with default behavior (and so that syntax like [i, :] works)
+    if (!math.isMatrix(scope['targetPoints'])) {
+      scope['targetPoints'] = math.matrix(userTargets);
+    }
+  } else {
+    resetTargetsLocations(scope.targetsCount);
+    createTargetMeshes();
+    const regularArrays = targets.map(target => Array.from(target));
+    scope['targetPoints'] = math.matrix(regularArrays);
+  }
   scope['targetPointsLength'] = targets.length;
 
 
