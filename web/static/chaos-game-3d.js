@@ -260,8 +260,7 @@ function createTargetMeshes() {
   });
   targetMeshes = [];
   const showScaffolding = document.getElementById('scaffolding-toggle').checked;
-  const targetsArray = (targets && typeof targets.toArray === 'function') ? targets.toArray() : targets;
-  targetsArray.forEach(target => {
+  targets.forEach(function (target) {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
