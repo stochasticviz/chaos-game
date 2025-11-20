@@ -400,8 +400,9 @@ function generatePoints(debugMode, consumePoints) {
       scope['targetPoints'] = math.matrix(userTargets);
     }
   } else {
+    // default targets: spread (approximately, typically) evenly the desired number of targets around on the unit sphere, then scale
     targets = PointsOnNSphere.getEquidistantPointsOnNSphere(3, scope.targetsCount);
-    targets = targets.map(function(inner_array) {return inner_array.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
+    targets = targets.map(function(target) {return target.map(function (scalar) {return scalar * SPHERE_RADIUS;}) } );
     createTargetMeshes();
     const regularArrays = targets.map(target => Array.from(target));
     scope['targetPoints'] = math.matrix(regularArrays);
