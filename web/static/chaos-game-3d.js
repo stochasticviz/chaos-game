@@ -260,15 +260,15 @@ function createTargetMeshes() {
   });
   targetMeshes = [];
   const showScaffolding = document.getElementById('scaffolding-toggle').checked;
-  targets.forEach(function (target) {
+  for (let i = 0; i < targets.size()[0]; i++) {
     const geometry = new THREE.SphereGeometry(4);
     const material = new THREE.MeshPhongMaterial({ color: 0x4285F4 });
     const vertexMesh = new THREE.Mesh(geometry, material);
-    vertexMesh.position.set(target[0], target[1], target[2]);
+    vertexMesh.position.set(targets.get([i, 0]), targets.get([i, 1]), targets.get([i, 2]));
     vertexMesh.visible = showScaffolding;
     scene.add(vertexMesh);
     targetMeshes.push(vertexMesh);
-  });
+  };
 
   // Add lighting for the spheres
   if (!scene.getObjectByName('ambient-light')) {
