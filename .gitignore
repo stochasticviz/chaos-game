@@ -17,7 +17,7 @@ Icon?
 # undo-tree per-file backup patterns (e.g., .file.~undo-tree~)
 *.#*~undo-tree~
 *.~undo-tree~
-# undo-tree directory for project-wide persistence
+# undo-tree directory
 .undo-tree/
 
 # flycheck/flymake files
