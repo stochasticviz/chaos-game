@@ -393,8 +393,9 @@ function generatePoints(debugMode, consumePoints) {
   createTargetMeshes();
   scope['targetPointsLength'] = targets.size()[0];
 
+  // TODO: if these aren't set, perhaps go with default and issue a warning into the errorMessage div.
   const steps = scope.pointsCount;
-  const alphaValue = scope.opacity;
+  const defaultAlphaValue = scope.opacity;
 
   return new Promise((resolve, reject) => {
     function generateChunk() {
@@ -506,7 +507,7 @@ function generatePoints(debugMode, consumePoints) {
       }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, pointsPositions, pointsRawColors, alphaValue);
+      consumePoints(currentStep / steps, pointsPositions, pointsRawColors, defaultAlphaValue);
 
       if (currentStep < steps) {
         setTimeout(generateChunk, 0);
@@ -643,10 +644,10 @@ async function generateAndDraw(clearPoints = true) {
 
     try {
       // TODO: consider putting the progress indicator thing in drawPoints3D() to simplify this call to generatePoints()
-      await generatePoints(debugMode, (progress, pointsPositions, pointsRawColors, alphaValue) => {
+      await generatePoints(debugMode, (progress, pointsPositions, pointsRawColors, defaultAlphaValue) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
-        drawPoints3D(pointsPositions, pointsRawColors, alphaValue);
+        drawPoints3D(pointsPositions, pointsRawColors, defaultAlphaValue);
       });
 
       if (document.getElementById('progress-indicator').textContent.includes('100%')) {
