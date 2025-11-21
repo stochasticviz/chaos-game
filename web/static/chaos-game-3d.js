@@ -425,10 +425,7 @@ function generatePoints(debugMode, consumePoints) {
             if (currentPointArray.length != 3) console.log("(currentPointArray.length != 3)  currentPointArray:", currentPointArray);
         }
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
-        points.push({
-            position: currentPointArray,
-            color: rawColor
-        });
+        points.push([currentPointArray, rawColor]);
 
 
         let resultSet = null;
@@ -543,7 +540,7 @@ function drawPoints3D(pointsData, defaultAlpha) {
   const groups = new Map();
 
   for (let i = 0; i < pointsData.length; i++) {
-    const raw = pointsData[i].color.toArray();
+    const raw = pointsData[i][1].toArray();
 
     let r, g, b, a;
     r = clamp255i(raw[0]);
@@ -572,7 +569,7 @@ function drawPoints3D(pointsData, defaultAlpha) {
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
     for (let i = 0; i < group.length; i++) {
-      const p = group[i].position;
+      const p = group[i][0];
       const idx = i * 3;
       positions[idx]     = p[0] ?? 0; // if this is a 0D point, then x=0  :)
       positions[idx + 1] = p[1] ?? 0; // if this is a 1D point, then y=0
