@@ -541,7 +541,11 @@ function drawPoints3D(pointsPositions, pointsColors, defaultAlpha) {
   const groups = new Map();
 
   for (let i = 0; i < pointsPositions.length; i++) {
-    const raw = pointsColors[i].toArray();
+    let raw = pointsColors[i].toArray();
+    // If the color is a nested array (e.g., from math.matrix([[R,G,B]])), un-nest it.
+    if (raw.length === 1 && Array.isArray(raw[0])) {
+      raw = raw[0];
+    }
 
     let r, g, b, a;
     r = clamp255i(raw[0]);
