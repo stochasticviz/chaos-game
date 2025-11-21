@@ -402,8 +402,8 @@ function generatePoints(debugMode, consumePoints) {
         reject(new Error('Generation cancelled'));
         return;
       }
-      const pointPositions = [];
-      const rawColors = [];
+      const pointsPositions = [];
+      const pointsRawColors = [];
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         let currentPointArray = null;
@@ -426,8 +426,8 @@ function generatePoints(debugMode, consumePoints) {
             if (currentPointArray.length != 3) console.log("(currentPointArray.length != 3)  currentPointArray:", currentPointArray);
         }
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
-        pointPositions.push(currentPointArray);
-        rawColors.push(rawColor);
+        pointsPositions.push(currentPointArray);
+        pointsRawColors.push(rawColor);
 
 
         let resultSet = null;
@@ -506,7 +506,7 @@ function generatePoints(debugMode, consumePoints) {
       }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, pointPositions, rawColors, alphaValue);
+      consumePoints(currentStep / steps, pointsPositions, pointsRawColors, alphaValue);
 
       if (currentStep < steps) {
         setTimeout(generateChunk, 0);
@@ -643,10 +643,10 @@ async function generateAndDraw(clearPoints = true) {
 
     try {
       // TODO: consider putting the progress indicator thing in drawPoints3D() to simplify this call to generatePoints()
-      await generatePoints(debugMode, (progress, pointPositions, rawColors, alphaValue) => {
+      await generatePoints(debugMode, (progress, pointsPositions, pointsRawColors, alphaValue) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
-        drawPoints3D(pointPositions, rawColors, alphaValue);
+        drawPoints3D(pointsPositions, pointsRawColors, alphaValue);
       });
 
       if (document.getElementById('progress-indicator').textContent.includes('100%')) {
