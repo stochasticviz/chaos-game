@@ -351,9 +351,8 @@ function generatePoints(debugMode, consumePoints) {
   };
 
   scope['getEquidistantPointsOnSphere'] = function(count, dimensions) {
-    const points = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
-    const regularArrays = points.map(point => Array.from(point));
-    return math.matrix(regularArrays);
+    const equidistantPoints = PointsOnNSphere.getEquidistantPointsOnNSphere(dimensions, count);
+    return math.matrix(equidistantPoints);
   }
 
   let showStuff = null;
@@ -403,7 +402,8 @@ function generatePoints(debugMode, consumePoints) {
         reject(new Error('Generation cancelled'));
         return;
       }
-      let points = [];
+      const pointsPositions = [];
+      const pointsRawColors = [];
       const endStep = Math.min(currentStep + CHUNK_SIZE, steps);
       for (let i = currentStep; i < endStep; i++) {
         let currentPointArray = null;
@@ -426,10 +426,8 @@ function generatePoints(debugMode, consumePoints) {
             if (currentPointArray.length != 3) console.log("(currentPointArray.length != 3)  currentPointArray:", currentPointArray);
         }
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
-        points.push({
-            position: currentPointArray,
-            color: rawColor
-        });
+        pointsPositions.push(currentPointArray);
+        pointsRawColors.push(rawColor);
 
 
         let resultSet = null;
@@ -508,13 +506,12 @@ function generatePoints(debugMode, consumePoints) {
       }
 
       currentStep = endStep;
-      consumePoints(currentStep / steps, points, alphaValue);
-      points = [];
+      consumePoints(currentStep / steps, pointsPositions, pointsRawColors, alphaValue);
 
       if (currentStep < steps) {
         setTimeout(generateChunk, 0);
       } else {
-        resolve(points);
+        resolve();
       }
     }
 
@@ -540,11 +537,15 @@ const unpackRGBA = k => ({
 });
 
 /* This function gained, in commit ffc3d34, a important opt for the end user -- clamped colors to 0 thru 255, ints only. This greatly reduced mesh count for some MathJS code. But also ChatGPT did a lot of general opt which appears to have done nothing in the usual case, see "... No noticeable speedup in this https://tinyurl.com/43b4wn2j" in that commit's msg. So be aware that simplifying this function should always be on the table. Details: https://github.com/herdrick/chaos-game/issues/83 */
-function drawPoints3D(pointsData, defaultAlpha) {
+function drawPoints3D(pointsPositions, pointsColors, defaultAlpha) {
   const groups = new Map();
 
-  for (let i = 0; i < pointsData.length; i++) {
-    const raw = pointsData[i].color.toArray();
+  for (let i = 0; i < pointsPositions.length; i++) {
+    let raw = pointsColors[i].toArray();
+    // If the color is a nested array (e.g., from math.matrix([[R,G,B]])), un-nest it.
+    if (raw.length === 1 && Array.isArray(raw[0])) {
+      raw = raw[0];
+    }
 
     let r, g, b, a;
     r = clamp255i(raw[0]);
@@ -561,7 +562,7 @@ function drawPoints3D(pointsData, defaultAlpha) {
       bucket = [];
       groups.set(key, bucket);
     }
-    bucket.push(pointsData[i]);
+    bucket.push(pointsPositions[i]);
   }
 
   // Build one mesh per group key
@@ -573,7 +574,7 @@ function drawPoints3D(pointsData, defaultAlpha) {
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(group.length * 3);
     for (let i = 0; i < group.length; i++) {
-      const p = group[i].position;
+      const p = group[i];
       const idx = i * 3;
       positions[idx]     = p[0] ?? 0; // if this is a 0D point, then x=0  :)
       positions[idx + 1] = p[1] ?? 0; // if this is a 1D point, then y=0
@@ -642,10 +643,10 @@ async function generateAndDraw(clearPoints = true) {
 
     try {
       // TODO: consider putting the progress indicator thing in drawPoints3D() to simplify this call to generatePoints()
-      await generatePoints(debugMode, (progress, points, alphaValue) => {
+      await generatePoints(debugMode, (progress, pointsPositions, pointsRawColors, alphaValue) => {
         document.getElementById('progress-indicator').textContent =
           `Generating points... ${Math.round(progress * 100)}%`;
-        drawPoints3D(points, alphaValue);
+        drawPoints3D(pointsPositions, pointsRawColors, alphaValue);
       });
 
       if (document.getElementById('progress-indicator').textContent.includes('100%')) {
