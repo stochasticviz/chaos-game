@@ -7,6 +7,8 @@ Hosted, live: [chaos-game-3d.html](https://herdrick.github.io/chaos-game/chaos-g
 
 [Source](web/chaos-game-3d.html)
 
+⚠️ Alpha Status: This is in active development. Expect changes to the the MathJS execution sandbox and available bindings before 1.0. 
+
 ## 2D
 Hosted, live: [chaos-game.html](https://herdrick.github.io/chaos-game/chaos-game.html)
 
@@ -28,3 +30,4 @@ python3 -m http.server 8080
 This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 You are free to use, modify, and distribute this project under the terms of the Apache 2.0 License.
+
