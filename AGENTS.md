@@ -1,6 +1,6 @@
 # AGENTS.md
 
-## relevant files
+## Relevant files
 - Only these files in the repo are relevant to your tasks:
   - web/chaos-game-3d.html
   - web/static/chaos-game-3d.js
@@ -33,7 +33,7 @@
   - correct the premise with a fact (e.g., "THREE.js is fully capable of 2D rendering."),
   - and ideally propose the simpler, more consistent alternative (e.g., "A simpler path would be to keep using THREE.js and use an OrthographicCamera. Shall I investigate that instead?").
 
-## an uncaught error bubbling up to the human operator is the 2nd best outcome
+## An uncaught error bubbling up to the human operator is the 2nd best outcome
 - The best outcome for executing a bit of code is success.
 - The second best outcome is throwing an error. It's a bad thing to silently fall back on some reasonable value. Fallbacks are bad.
 - Never silently catch or suppress errors
