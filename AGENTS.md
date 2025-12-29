@@ -11,8 +11,7 @@
 
 ## Playwright
 - Use the Playwright MCP server to try out your code
-- The URL for the app will be http://127.0.0.1:8090/web/chaos-game-3d.html
-  - If that web server is not running, start it like this in the root directory of the project: 'npx http-server -c=-1 -p 8090'.
+- Start the web app like this in the root directory of the project: 'python3 -m http.server <port number>' ... you may need an unusual port number to not collide with some other server
 
 ## git
 - If I ask you to commit, then include your name at the bottom of the commit msg.
