@@ -1,4 +1,5 @@
-import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
+import { create, all } from 'https://cdn.jsdelivr.net/npm/mathjs@15/+esm';
+
 import * as THREE from '../lib/three/0.172.0/three.module.js';
 import { OrbitControls } from '../lib/three/0.172.0/examples/jsm/controls/OrbitControls.js';
 import * as PointsOnNSphere from './points-on-n-sphere.js?v=d6db03bb';
