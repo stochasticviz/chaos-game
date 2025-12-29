@@ -1,4 +1,4 @@
-import { create, all } from '../lib/mathjs/14.2.0/math.mjs';
+import { create, all } from 'https://cdn.jsdelivr.net/npm/mathjs@15/+esm';
 const math = create(all);
 
 // params
