@@ -416,10 +416,6 @@ function generatePoints(debugMode, consumePoints) {
           console.log("currentPoint:", scope.currentPoint);
         }
         currentPointArray = scope.currentPoint.toArray();
-        if (showStuff) {
-            //console.log("pushing currentPointArray:", currentPointArray);
-            if (currentPointArray.length != 3) console.log("(currentPointArray.length != 3)  currentPointArray:", currentPointArray);
-        }
         const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor; // point color remains set across iterations by default
         pointsPositions.push(currentPointArray);
         pointsRawColors.push(rawColor);
@@ -536,17 +532,11 @@ function drawPoints3D(pointsPositions, pointsColors, defaultAlpha) {
   const groups = new Map();
 
   for (let i = 0; i < pointsPositions.length; i++) {
-    let raw = pointsColors[i].toArray();
-    // If the color is a nested array (e.g., from math.matrix([[R,G,B]])), un-nest it.
-    if (raw.length === 1 && Array.isArray(raw[0])) {
-      raw = raw[0];
-    }
-
-    let r, g, b, a;
-    r = clamp255i(raw[0]);
-    g = clamp255i(raw[1]);
-    b = clamp255i(raw[2]);
-    a = raw[3];
+    const raw = pointsColors[i].toArray();
+    const r = clamp255i(raw[0]);
+    const g = clamp255i(raw[1]);
+    const b = clamp255i(raw[2]);
+    const a = raw[3];
 
     const alpha = (a === undefined ? defaultAlpha : a);
     const aByte = (alpha <= 0 ? 0 : (alpha >= 1 ? 255 : (alpha * 255 + 0.5) | 0));
