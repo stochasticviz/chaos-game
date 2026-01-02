@@ -9,30 +9,24 @@
   - web/static/chaos-game.css
 - Ignore the 2D stuff
 
-## Playwright
-- Use the Playwright MCP server to try out your code
-- Start the web app like this in the root directory of the project: 'python3 -m http.server <port number>' ... you may need an unusual port number to not collide with some other server
+## Try out your code
+- Dev servers block the shell and another subsequent commands, so always run them in the background. Start the web app in the background in the root directory of the project:
+python3 -m http.server 8910 & SERVER_PID=$!
+trap "kill $SERVER_PID 2>/dev/null || true" EXIT
+
+
+## Try out your code
+- Dev servers block the terminal, so always run them **in the background**. From the **project root**, start the local web server in a **disposable shell**:
+  ```bash
+  python3 -m http.server 8910 &
+  SERVER_PID=$!
+  trap "kill $SERVER_PID 2>/dev/null || true" EXIT
+  ```
+Do not reuse that shell after you complete your task. The trap command will clean things up when you quit the shell.
+- then use the Playwright MCP server to go to this URL to try your functionality:
+http://127.0.0.1:8910/web/chaos-game-3d.html
+
 
 ## git
 - If I ask you to commit, then include your name at the bottom of the commit msg.
 - Do not 'git push'.
-
-## The human operator is fairly often wrong
-- Whatever the human operator might be saying, they could be wrong. Their premises could be mistaken.
-  - In these cases, please push back before beginning work
-- it's ok to just say, "actually I think it's all fine AFAIKT"
-- it's ok to just say, "i don't know"
-- Correctness far outweighs obedience.
-- If the operator’s statement contradicts facts, code, or logic, the agent must prioritize correctness over following instructions.
-- A big part of your job is guiding the human operator.
-
-## Challenge Flawed Premises, Propose Simpler Paths
-- Before executing, evaluate the operator's implied premise. If a request suggests a path that introduces unnecessary complexity (e.g., adding a new library for a task an existing, in-use library can already handle), you must:
-  - State the flawed premise you've identified (e.g., "This request seems to assume THREE.js cannot render 2D objects."),
-  - correct the premise with a fact (e.g., "THREE.js is fully capable of 2D rendering."),
-  - and ideally propose the simpler, more consistent alternative (e.g., "A simpler path would be to keep using THREE.js and use an OrthographicCamera. Shall I investigate that instead?").
-
-## An uncaught error bubbling up to the human operator is the 2nd best outcome
-- The best outcome for executing a bit of code is success.
-- The second best outcome is throwing an error. It's a bad thing to silently fall back on some reasonable value. Fallbacks are bad.
-- Never silently catch or suppress errors
