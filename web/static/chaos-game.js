@@ -395,7 +395,6 @@ function generatePoints(debugMode, consumePoints) {
 
   let points = [];
   let pointsInViewCount = 0;
-  let currentPointsArray = null;
   let showStuff = null;
   let firstTime = true;
   let resultSet = null;
@@ -472,22 +471,14 @@ function generatePoints(debugMode, consumePoints) {
             console.log("i:", i)
             console.log("currentPoint:", scope.currentPoint);
         }
-        currentPointsArray = scope.currentPoint.toArray();
-        if (typeof currentPointsArray[0] === 'number') {
-            // single point [x, y] - wrap for iteration
-            currentPointsArray = [currentPointsArray];
+        const currentPointArray = scope.currentPoint.toArray();
+        const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;  // Determine the color to use: nextPointColor if set, otherwise currentPointColor
+        const pointColor = convertToColorString(rawColor);
+        points.push({ x: currentPointArray[0], y: currentPointArray[1], color: pointColor });
+        if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
+          currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
+          pointsInViewCount++;
         }
-        // save points to be plotted
-        currentPointsArray.forEach(function (currentPointArray) {
-            // Determine the color to use: nextPointColor if set, otherwise currentPointColor
-            const rawColor = scope.nextPointColor !== undefined ? scope.nextPointColor : scope.currentPointColor;
-            const pointColor = convertToColorString(rawColor);
-            points.push({ x: currentPointArray[0], y: currentPointArray[1], color: pointColor });
-            if (currentPointArray[0] >= viewLeft && currentPointArray[0] <= viewLeft + viewWidth &&
-              currentPointArray[1] >= viewTop && currentPointArray[1] <= viewTop + viewHeight) {
-              pointsInViewCount++;
-            }
-        });
 
         if (! debugMode) {
             try {
