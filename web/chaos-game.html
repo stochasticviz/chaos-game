@@ -102,27 +102,24 @@ nextPoint = randomInt() ? point1 : point2</pre>
   <div class="codeBlock">
     Advanced example - Avoid previous target:
     <pre class="codeExample">
-# IMPORTANT! Put these two lines in the "Optional initialization code" pane.
+# Put this chunk in the initialization code pane
 previous_target = -1  # start with a non-existing target
 slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
 
-# The rest of this code goes in the main pane
-
+# Put the rest of the code in the main pane
 # Get all possible indices except the target we used in the last iteration
 possibleTargetIndices = math.range(1, targetPointsLength+1)
 possibleTargetIndices = possibleTargetIndices[possibleTargetIndices != previous_target]
-
 nextTargetIndex = math.pickRandom(possibleTargetIndices)
 nextTarget = targetPoints[nextTargetIndex, :]
 nextPoint = currentPoint + (nextTarget - currentPoint) * slider
-
 # Store current target for next iteration
 previous_target = nextTargetIndex</pre>
   </div>
     Advanced example - The Corcoran Attractor:
     <div class="codeBlock">
       <pre class="codeExample">
-# put this chunk in the initialization code pane
+# Put this chunk in the initialization code pane
 setTargetsCount(12)
 setPointsCount(3000000)
 setOpacity(0.5)
@@ -130,12 +127,10 @@ phase_offset = createSlider("Phase offset", 0, 2*math.pi, math.pi*29/25)
 amplitude = createSlider("Amplitude", -3/2, 4, 1/3)
 bias = createSlider("Bias", -1, 7/4, 1/2)
 
-# put this chunk in the main code pane
+# Put the rest of the code in the main pane
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 nextTarget = targetPoints[nextTargetIndex, :]
-
 displacement_factors = math.matrix([math.sin(nextTarget[2] + phase_offset) * amplitude + bias, math.sin(nextTarget[1] + phase_offset) * amplitude + bias])
-
 # Apply the factors to the displacement
 displacement_to_target = nextTarget - currentPoint
 nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement_factors)
