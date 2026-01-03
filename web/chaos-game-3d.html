@@ -104,7 +104,7 @@ The following functions are usually used in the initialization code:
 previous_target = -1  # start with a non-existing target
 slider = createSlider("how far to go toward the target", -2, 1.4, 0.5)
 
-# The rest of this code goes in the main pane
+# The rest of the code goes in the main pane
 
 # Get all possible indices except the target we used in the last iteration
 possibleTargetIndices = math.range(1, targetPointsLength+1)
@@ -120,23 +120,20 @@ previous_target = nextTargetIndex</pre>
   <div class="codeBlock">
     Advanced example - The Corcoran Attractor:
     <pre class="codeExample">
-setTargetsCount(6)
-setPointsCount(300000)
-setOpacity(0.5)
-
-# Create user controls for the parameters
-phase_offset = createSlider("Phase offset", 0, 2*math.pi, 5/2, {display: "inline"})
+# Put this chunk in the "Initialization code" pane.
+currentPoint = [100, 100, 100]  # arbitrary starting point
+targetsCount = createSlider("Targets", 1, 16, 6, {step: 1, display: "inline"})
+pointsCount = createSlider("Points", 0, 300000, 100000, {step: 1, display: "inline"})
+opacity = createSlider("Opacity (0.0 - 1.0)", .01, 1, 1, {step: 0.01, display: "inline"})
+phase_offset = createSlider("Phase offset", 0, 2*math.pi, 5/2)
 amplitude = createSlider("Amplitude", -3/2, 4, 1/2, {display: "inline"})
 bias = createSlider("Bias", -1, 7/4, 1/2, {display: "inline"})
 
+# The rest of the code goes in the main pane
 nextTargetIndex = math.randomInt(1, targetPointsLength+1)
 nextTarget = targetPoints[nextTargetIndex, :]
 
-displacement_factors = math.matrix([
-  [math.sin(nextTarget[1,2] + phase_offset) * amplitude + bias,
-   math.sin(nextTarget[1,1] + phase_offset) * amplitude + bias,
-   math.sin(nextTarget[1,3] + phase_offset) * amplitude + bias]
-])
+displacement_factors = math.matrix([math.sin(nextTarget[2] + phase_offset) * amplitude + bias,   math.sin(nextTarget[1] + phase_offset) * amplitude + bias, math.sin(nextTarget[3] + phase_offset) * amplitude + bias])
 
 # Apply the factors to the displacement
 displacement_to_target = nextTarget - currentPoint
@@ -157,6 +154,8 @@ pointsCount = createSlider("Points", 0, 300000, 100000, {step: 1, display: "inli
 opacity = createSlider("Opacity (0.0 - 1.0)", .01, 1, 1, {step: 0.01, display: "inline"})
 howFar = createSlider("How far to go toward the target", 0, 1.4, 0.5)  # a slider to let the user control how far to go toward the target
 </textarea>
+<br/>
+<br/>
 <label for="nextVertexAndPointMathJSCode">Code to calculate the next point (runs each iteration):</label>
 <textarea class="mathJSCode" id="nextVertexAndPointMathJSCode" rows="10">
 # pick a random target vertex

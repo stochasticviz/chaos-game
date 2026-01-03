@@ -403,7 +403,7 @@ function generatePoints(debugMode, consumePoints) {
   function getRandomVisiblePoint() {
     const x = viewLeft + Math.random() * viewWidth;
     const y = viewTop + Math.random() * viewHeight;
-    return math.divide(math.matrix([[x, y]]), 2);
+    return math.divide(math.matrix([x, y]), 2);
   }
 
   // Helper function to convert complex number to [x, y] array
