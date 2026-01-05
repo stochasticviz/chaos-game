@@ -22,7 +22,7 @@ trap "kill $SERVER_PID 2>/dev/null || true" EXIT
   SERVER_PID=$!
   trap "kill $SERVER_PID 2>/dev/null || true" EXIT
   ```
-Do not reuse that shell after you complete your task. The trap command will clean things up when you quit the shell.
+It will be immediately available. Do not reuse that shell after you complete your task. The trap command will clean things up when you quit the shell.
 - then use the Playwright MCP server to go to this URL to try your functionality:
 http://127.0.0.1:8910/web/chaos-game-3d.html
 

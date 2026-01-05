@@ -385,6 +385,24 @@ function generatePoints(debugMode, consumePoints) {
     }
   }
 
+  // Fallback defaults for user-settable values
+  const DEFAULT_TARGETS_COUNT = 4;
+  const DEFAULT_POINTS_COUNT = 100000;
+  const DEFAULT_OPACITY = 1;
+
+  if (scope.targetsCount === undefined) {
+    console.info('targetsCount not set by user code, using default:', DEFAULT_TARGETS_COUNT);
+    scope.targetsCount = DEFAULT_TARGETS_COUNT;
+  }
+  if (scope.pointsCount === undefined) {
+    console.info('pointsCount not set by user code, using default:', DEFAULT_POINTS_COUNT);
+    scope.pointsCount = DEFAULT_POINTS_COUNT;
+  }
+  if (scope.opacity === undefined) {
+    console.info('opacity not set by user code, using default:', DEFAULT_OPACITY);
+    scope.opacity = DEFAULT_OPACITY;
+  }
+
   // Update scope with current target points after initialization MathJS executes
   if (scope['targetPoints'] === undefined) {
     // default targets: spread (approximately, typically) evenly the desired number of targets around on the 3D unit sphere (genus 0), then scale
@@ -394,7 +412,6 @@ function generatePoints(debugMode, consumePoints) {
   createTargetMeshes();
   scope['targetPointsLength'] = targets.size()[0];
 
-  // TODO: if these aren't set, perhaps go with default and issue a warning into the errorMessage div.
   const steps = scope.pointsCount;
   const defaultAlphaValue = scope.opacity;
 
