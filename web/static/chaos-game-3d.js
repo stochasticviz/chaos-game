@@ -31,7 +31,7 @@ function getRandomVisiblePoint() {
     const x = (Math.random() - 0.5) * SPHERE_RADIUS;
     const y = (Math.random() - 0.5) * SPHERE_RADIUS;
     const z = (Math.random() - 0.5) * SPHERE_RADIUS;
-    return math.matrix([[x, y, z]]);
+    return math.matrix([x, y, z]);
 }
 
 // Initialize Three.js scene
