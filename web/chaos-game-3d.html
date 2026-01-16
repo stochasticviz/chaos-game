@@ -41,7 +41,8 @@
   <summary>Customize the "next point" code</summary>
 
 <div id="codeExplanation">
-Write your own code to calculate where the next point should be, by setting the <code>nextPoint</code> variable. <code>nextPoint</code> must be an array of three numbers <code>[100, 200, 300]</code> or a matrix <code>[[100, 200, 300]]</code>. The default code simply picks one of the targets at random and moves the current point halfway there, but you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target, <code>targetPoints</code>. Both are matrices.<br/>
+Write your own code to calculate where the next point should be, by setting the <code>nextPoint</code> variable to vector, ex. <code>nextPoint = [100, 200, 300]</code>. The default code simply picks one of the targets at random and moves the current point halfway there, but you can change that using <a href="https://mathjs.org/docs/reference/functions.html#arithmetic-functions">functions</a>, <a href="https://mathjs.org/docs/expressions/syntax.html#operators">operators</a>, and whatever else you can find in <a href="https://mathjs.org/docs/">MathJS</a>. You can use the coordinates of the current point, <code>currentPoint</code>, and the coordinates of each target, <code>targetPoints</code>. Both are matrices.<br/><br/>
+In the default initialization code you will see uses of the <code>createSlider()</code> function. This creates a slider that controls a number. This function should usually be used in the initialization code. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then ex. <code>nextPoint = currentPoint + t</code> in your code gives your end user 'live' control over the scalar value, <code>t</code>.<br/><br/>
 <details class="examples-docs">
 <summary>Show examples</summary>
 <div>
@@ -73,32 +74,27 @@ nextPoint = math.multiply(midpoint, rotation)</pre>
 <div>
   <ul>
     <li>
-      <strong>write() function</strong> Write text to the page. Example: <code>write("currentPoint:", currentPoint)</code>
+      <strong>write()</strong>&nbsp;&nbsp;&nbsp;Write text to the page. Example: <code>write("currentPoint:", currentPoint)</code>
     </li>
     <li>
-      <strong>nextPointColor</strong> If you set the variable <code>nextPointColor</code> to <a href="https://en.wikipedia.org/wiki/RGB_color_model">[255, 0, 0]</a> the next point will be plotted in red. Example: <code>nextPointColor = [111, 200, 15]</code>.  You can optionally add a fourth element, the opacity (aka alpha), a number between 0 and 1. Example: <code>nextPointColor = [111, 200, 15, 0.3]</code>. The default opacity is 1.0.
+      <strong>Advanced use of <code>createSlider()</code></strong>&nbsp;&nbsp;&nbsp;Optionally you can specifiy a 5th parameter which, when <code>false</code>, prevents the existing points from being cleared when the user slides the slider. Example: <code>slider = createSlider("rotation", 0, pi*2, 0, false)</code>. You can also pass arbitrary arguments to <a href="https://refreshless.com/nouislider/">noUiSlider.create()</a> by using a Javascript object as the 5th parameter, like <code>{step: 0.01}</code> to set a custom step increment.
     </li>
     <li>
-      <strong>Technique: saving data for the next iteration</strong> Variables set in one iteration are available in subsequent iterations. See "Avoid previous target" in the advanced examples, below.
+      <strong>Saving data for the next iteration</strong>&nbsp;&nbsp;&nbsp;Variables set in one iteration are available in subsequent iterations. See "Avoid previous target" in the advanced examples, below.
+    </li>
+    <li>
+      <strong>opacity</strong>&nbsp;&nbsp;&nbsp;Setting this variable controls point transparency. Range: 0.0 (fully transparent) to 1.0 (fully opaque). Lower values help visualize point density. Example: <code>opacity = 0.3</code>.
+    </li>
+    <li>
+      <strong>pointsCount</strong>&nbsp;&nbsp;&nbsp;Setting this variable in the initialization code controls the total number of points to generate. Higher values produce more detailed fractals. Example: <code>pointsCount = 2000000</code>.
+    </li>
+    <li>
+      <strong>targetsCount</strong>&nbsp;&nbsp;&nbsp;Setting this variable in the initialization code controls the number of target vertices in <code>targetPoints</code>. Default targets are distributed evenly on the unit sphere. Example: <code>targetsCount = 6</code>.
+    </li>
+    <li>
+      <strong>nextPointColor</strong>&nbsp;&nbsp;&nbsp;If you set this variable to, ex. <a href="https://en.wikipedia.org/wiki/RGB_color_model">[255, 0, 0]</a>, the next point will be plotted in red. Example: <code>nextPointColor = [111, 200, 15]</code>. You can optionally add a fourth element, the opacity (aka alpha), a number between 0 and 1. Example: <code>nextPointColor = [111, 200, 15, 0.3]</code>. The default opacity is 1.0.
     </li>
   </ul>
-The following functions are usually used in the initialization code:
-
-  <ul>
-    <li>
-      <strong>createSlider() function</strong> Create a slider that controls a number. Example: <code>t = createSlider("some number", -1, 4, 2)</code> will create a slider ranging over -1 to 4 and starting at 2. Then ex. <code>nextPoint = currentPoint + t</code> in your code gives your end user 'live' control over the scalar value, <code>t</code>. Optionally you can specifiy a 5th parameter which, when <code>false</code>, prevents the existing points from being cleared when the user slides the slider. Example: <code>slider = createSlider("rotation", 0, 6.28, 0, false)</code>. You can also pass arguments to <a href="https://refreshless.com/nouislider/">noUiSlider.create()</a> by using a Javascript object as the 5th parameter, like <code>{step: 0.01}</code> to set a custom step increment.
-    </li>
-    <li>
-      <strong>opacity</strong> Controls point transparency. Range: 0.0 (fully transparent) to 1.0 (fully opaque). Lower values help visualize point density. Example: <code>opacity = 0.3</code>.
-    </li>
-    <li>
-      <strong>pointsCount</strong> The total number of points to generate. Higher values produce more detailed fractals. Example: <code>pointsCount = 2000000</code>.
-    </li>
-    <li>
-      <strong>targetsCount</strong> The number of target vertices for the chaos game. Default targets are distributed evenly on the unit sphere. Example: <code>targetsCount = 6</code>.
-    </li>
-  </ul>
-
   <div class="advanced-examples">
   <div class="codeBlock">
     Advanced example - Avoid previous target:
@@ -149,7 +145,6 @@ nextPoint = currentPoint + math.dotMultiply(displacement_to_target, displacement
 <label for="initializationMathJSCode">Initialization code (runs once before first iteration):</label>
 <textarea class="mathJSCode" id="initializationMathJSCode" rows="4">
 currentPoint = [100, 100, 100]  # arbitrary starting point
-
 targetsCount = createSlider("Targets", 1, 16, 4, {step: 1, display: "inline"})
 pointsCount = createSlider("Points", 0, 300000, 100000, {step: 1, display: "inline"})
 opacity = createSlider("Opacity (0.0 - 1.0)", .01, 1, 1, {step: 0.01, display: "inline"})
@@ -171,7 +166,7 @@ delta = nextTarget - currentPoint
 # scale that vector
 scaledDelta = delta * howFar
 
-# next point is scaledDelta away from currentPoint
+# set next point to be scaledDelta away from currentPoint
 nextPoint = currentPoint + scaledDelta
 </textarea>
 <div id="debugModeDiv">
